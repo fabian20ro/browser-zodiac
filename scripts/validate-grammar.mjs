@@ -98,11 +98,14 @@ function extractRefs(entry) {
   }
   return refs;
 }
-
 function validateLocale(locale) {
   const grammar = loadLocaleGrammar(locale);
+  let totalEntries = 0;
+  let symbolCount = 0;
 
   for (const [symbol, entries] of grammar.entries()) {
+    symbolCount++;
+    totalEntries += entries.length;
     if (entries.length < minEntriesPerSymbol) {
       throw new Error(
         `Locale ${locale}: symbol "${symbol}" has ${entries.length} entries (min ${minEntriesPerSymbol})`,
@@ -111,6 +114,7 @@ function validateLocale(locale) {
   }
 
   const roots = ['origin', 'warning', 'luckyColor', 'compatibility'];
+
   const seen = new Set();
   const queue = [...roots];
 
@@ -139,6 +143,7 @@ function validateLocale(locale) {
       }
     }
   }
+  console.log(`Grammar validation passed for ${locale}: checked ${symbolCount} symbols and ${totalEntries} entries.`);
 }
 
 for (const locale of locales) {
