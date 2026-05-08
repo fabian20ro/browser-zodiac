@@ -18,6 +18,16 @@
 
 ---
 
+### [2026-05-08] Guard action-button clicks against rejection
+
+**Context:** A small UI hardening pass on `src/ui/actions.ts`.
+**What happened:** Wrapped `createActionButton()` click handlers in `try/catch` so a rejected async action no longer leaves an unhandled promise rejection or accidentally shows success feedback. Added a regression test covering the rejected-action path.
+**Outcome:** Success — behavior is now stable when an action fails.
+**Insight:** UI helper buttons should treat rejected async callbacks as a failure path, not as a success with missing feedback.
+**Promoted to Lessons Learned:** Yes
+
+---
+
 ### [2026-03-04] Externalize grammar data to text files
 
 **Context:** Grammar data (~37-42 symbols per locale) was hardcoded in TypeScript locale files. Goal: move to external text files for easier editing, extensibility, and future CDN delivery.

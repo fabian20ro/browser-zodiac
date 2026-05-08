@@ -143,4 +143,19 @@ describe('createActionButton', () => {
     expect(btn.textContent).toBe('⧉');
     expect(btn.classList.contains('action-btn--feedback')).toBe(false);
   });
+
+  it('does not show success feedback when the click action rejects', async () => {
+    const btn = createActionButton({
+      icon: '⧉',
+      feedbackIcon: '✓',
+      ariaLabel: 'Copy',
+      onClick: () => Promise.reject(new Error('boom')),
+    });
+
+    btn.click();
+    await Promise.resolve();
+
+    expect(btn.textContent).toBe('⧉');
+    expect(btn.classList.contains('action-btn--feedback')).toBe(false);
+  });
 });

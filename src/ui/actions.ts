@@ -12,14 +12,18 @@ export function createActionButton(options: ActionButtonOptions): HTMLButtonElem
   btn.setAttribute('aria-label', options.ariaLabel);
   btn.setAttribute('title', options.ariaLabel);
   btn.addEventListener('click', async () => {
-    const result = await options.onClick();
-    if (options.feedbackIcon && result !== false) {
-      btn.textContent = options.feedbackIcon;
-      btn.classList.add('action-btn--feedback');
-      setTimeout(() => {
-        btn.textContent = options.icon;
-        btn.classList.remove('action-btn--feedback');
-      }, 1500);
+    try {
+      const result = await options.onClick();
+      if (options.feedbackIcon && result !== false) {
+        btn.textContent = options.feedbackIcon;
+        btn.classList.add('action-btn--feedback');
+        setTimeout(() => {
+          btn.textContent = options.icon;
+          btn.classList.remove('action-btn--feedback');
+        }, 1500);
+      }
+    } catch {
+      // Keep the control stable if the action fails.
     }
   });
   return btn;
