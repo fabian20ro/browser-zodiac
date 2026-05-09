@@ -1,6 +1,7 @@
 export interface ActionButtonOptions {
   icon: string;
   feedbackIcon?: string;
+  errorIcon?: string;
   ariaLabel: string;
   onClick: () => void | Promise<boolean>;
 }
@@ -23,7 +24,9 @@ export function createActionButton(options: ActionButtonOptions): HTMLButtonElem
         }, 1500);
       }
     } catch {
-      // Keep the control stable if the action fails.
+      if (options.errorIcon) {
+        btn.textContent = options.errorIcon;
+      }
     }
   });
   return btn;

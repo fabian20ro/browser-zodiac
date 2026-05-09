@@ -158,4 +158,18 @@ describe('createActionButton', () => {
     expect(btn.textContent).toBe('⧉');
     expect(btn.classList.contains('action-btn--feedback')).toBe(false);
   });
+
+  it('shows error icon when click action rejects', async () => {
+    const btn = createActionButton({
+      icon: '⧉',
+      errorIcon: '✕',
+      ariaLabel: 'Copy',
+      onClick: () => Promise.reject(new Error('boom')),
+    });
+
+    btn.click();
+    await Promise.resolve();
+
+    expect(btn.textContent).toBe('✕');
+  });
 });
