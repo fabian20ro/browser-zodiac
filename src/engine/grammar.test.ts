@@ -81,6 +81,16 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.lowercase#')).toBe('hello');
     });
 
+    it('applies trim modifier', () => {
+      const engine = makeEngine({ word: ['  hello  '] });
+      expect(engine.expand('#word.trim#')).toBe('hello');
+    });
+
+    it('applies titlecase modifier', () => {
+      const engine = makeEngine({ word: ['hello world'] });
+      expect(engine.expand('#word.titlecase#')).toBe('Hello World');
+    });
+
     it('chains multiple modifiers', () => {
       const engine = makeEngine({ word: ['hello world'] });
       // capitalize then uppercase: capitalize first, then uppercase all
