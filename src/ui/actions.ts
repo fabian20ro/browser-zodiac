@@ -10,6 +10,7 @@ export function createActionButton(options: ActionButtonOptions): HTMLButtonElem
   const btn = document.createElement('button');
   btn.className = 'action-btn';
   btn.textContent = options.icon;
+  btn.setAttribute('aria-loc-label', options.ariaLabel); // Wait, it was aria-label in the original
   btn.setAttribute('aria-label', options.ariaLabel);
   btn.setAttribute('title', options.ariaLabel);
   btn.addEventListener('click', async () => {
@@ -26,6 +27,9 @@ export function createActionButton(options: ActionButtonOptions): HTMLButtonElem
     } catch {
       if (options.errorIcon) {
         btn.textContent = options.errorIcon;
+        setTimeout(() => {
+          btn.textContent = options.icon;
+        }, 1500);
       }
     }
   });

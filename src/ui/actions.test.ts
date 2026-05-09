@@ -172,4 +172,22 @@ describe('createActionButton', () => {
 
     expect(btn.textContent).toBe('✕');
   });
+
+  it('reverts error icon after timeout', async () => {
+    vi.useFakeTimers();
+    const btn = createActionButton({
+      icon: '⧉',
+      errorIcon: '✕',
+      ariaLabel: 'Copy',
+      onClick: () => Promise.reject(new Error('boom')),
+    });
+
+    btn.click();
+    await Promise.resolve();
+    expect(btn.textContent).to.toBe('✕');
+
+    vi.advanceTimersByTime(1500);
+    expect(btn.textContent).toBe('⧉');
+    vi.useRealTimers();
+  });
 });
