@@ -67,6 +67,7 @@ export function createGrammarEngine(grammar: Grammar, rng: SeededRandom) {
   addModifier('uppercase', (s) => s.toUpperCase());
   addModifier('lowercase', (s) => s.toLowerCase());
   addModifier('trim', (s) => s.trim());
+  addModifier('collapse-spaces', (s) => s.replace(/\s+/g, ' ').trim());
   addModifier('titlecase', (s) => s.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '));
 
   return { expand, addModifier };
