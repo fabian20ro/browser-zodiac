@@ -145,3 +145,11 @@
 **Outcome:** Success — transient feedback now behaves predictably across rapid repeated clicks.
 **Insight:** Temporary button feedback needs two safeguards: cancel the old timer and reset the control to its base state before running the next action.
 **Promoted to Lessons Learned:** Yes
+
+### [2026-05-11] Default reusable action buttons to type=button
+
+**Context:** Small UI hardening pass on `src/ui/actions.ts`.
+**What happened:** Set `createActionButton()` to `type="button"` so the reusable helper can't accidentally submit a surrounding form, and added a regression test covering the default button type.
+**Outcome:** Success — action buttons are now safer as generic reusable controls.
+**Insight:** Reusable buttons should opt out of implicit form-submit behavior unless they are intentionally form submits.
+**Promoted to Lessons Learned:** Yes

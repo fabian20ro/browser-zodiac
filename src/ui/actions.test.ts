@@ -74,6 +74,15 @@ describe('createActionButton', () => {
     expect(btn.className).toBe('action-btn');
   });
 
+  it('defaults to type button', () => {
+    const btn = createActionButton({
+      icon: '⧉',
+      ariaLabel: 'Copy',
+      onClick: () => {},
+    });
+    expect(btn.type).toBe('button');
+  });
+
   it('displays the icon', () => {
     const btn = createActionButton({
       icon: '→',

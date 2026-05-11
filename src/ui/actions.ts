@@ -9,6 +9,7 @@ export interface ActionButtonOptions {
 export function createActionButton(options: ActionButtonOptions): HTMLButtonElement {
   const btn = document.createElement('button');
   btn.className = 'action-btn';
+  btn.type = 'button';
   btn.textContent = options.icon;
   btn.setAttribute('aria-label', options.ariaLabel);
   btn.setAttribute('title', options.ariaLabel);

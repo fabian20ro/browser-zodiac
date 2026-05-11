@@ -36,6 +36,7 @@ Obsolete lessons → Archive section at bottom (with date and reason). Never del
 **[2026-05-11]** Transient feedback buttons need timer cancellation on reactivation — If a control shows temporary success/error feedback after async completion, clear any pending revert timer and reset to the base icon/class at the start of a new click. Otherwise an older timeout can restore the stale state too early or leave the previous feedback visible after a new failed/no-op action.
 
 **[2026-05-11]** Clipboard helpers should return `false` when the Clipboard API is unavailable — `navigator.clipboard` may be missing in older browsers or restricted contexts. Wrap the write in `try/catch` (or preflight the API) so UI actions can treat missing clipboard support as a recoverable outcome instead of a hard throw.
+**[2026-05-11]** Generic helper buttons should set `type="button"` — `document.createElement('button')` defaults to submit behavior inside forms, which can create accidental page submits when reusable action buttons get embedded elsewhere.
 
 ## Testing & Quality
 
