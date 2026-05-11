@@ -136,6 +136,33 @@ describe('createActionButton', () => {
     vi.useRealTimers();
   });
 
+  it('resets the revert timer when clicked again before timeout', async () => {
+    vi.useFakeTimers();
+    const btn = createActionButton({
+      icon: '⧉',
+      feedbackIcon: '✓',
+      ariaLabel: 'Copy',
+      onClick: () => {},
+    });
+
+    btn.click();
+    await Promise.resolve();
+    expect(btn.textContent).toBe('✓');
+
+    vi.advanceTimersByTime(1000);
+    btn.click();
+    await Promise.resolve();
+    expect(btn.textContent).toBe('✓');
+
+    vi.advanceTimersByTime(1499);
+    expect(btn.textContent).toBe('✓');
+
+    vi.advanceTimersByTime(1);
+    expect(btn.textContent).toBe('⧉');
+    expect(btn.classList.contains('action-btn--feedback')).toBe(false);
+    vi.useRealTimers();
+  });
+
   it('does not show feedback when feedbackIcon is not set', () => {
     const btn = createActionButton({
       icon: '→',

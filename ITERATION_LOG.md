@@ -135,3 +135,13 @@
 - 2026-05-05: Audit RO acord/articol. Fix: eliminat construcții "a lui #planeta#"; rescris formă cu slash de gen ("preaprobat/ă") în formulare neutră.
 
 - 2026-05-05: Follow-up audit. Observat regresie: eliminarea lui "lui" a păstrat totuși construcții imposibile cu intrări articulate (#planeta#) în genitiv. Fix: eliminat complet dependența de #planeta# în cele 2 template-uri.
+
+---
+
+### [2026-05-11] Reset transient feedback timers on repeat clicks
+
+**Context:** A small UI hardening pass on `src/ui/actions.ts`.
+**What happened:** Added timeout cancellation and base-state reset at the start of each `createActionButton()` click so stale success/error feedback cannot linger or revert too early when a button is clicked again before its prior timeout expires. Added a regression test covering the repeat-click timing case.
+**Outcome:** Success — transient feedback now behaves predictably across rapid repeated clicks.
+**Insight:** Temporary button feedback needs two safeguards: cancel the old timer and reset the control to its base state before running the next action.
+**Promoted to Lessons Learned:** Yes
