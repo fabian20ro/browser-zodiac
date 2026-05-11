@@ -33,6 +33,8 @@ Obsolete lessons → Archive section at bottom (with date and reason). Never del
 
 **[2026-05-08]** Catch rejected async UI actions in helpers — `createActionButton`-style wrappers should handle callback rejections deliberately so a failed `Promise` does not become an unhandled rejection or a false success state. Keep the control visually stable on failure and cover the rejection path in tests.
 
+**[2026-05-11]** Clipboard helpers should return `false` when the Clipboard API is unavailable — `navigator.clipboard` may be missing in older browsers or restricted contexts. Wrap the write in `try/catch` (or preflight the API) so UI actions can treat missing clipboard support as a recoverable outcome instead of a hard throw.
+
 ## Testing & Quality
 
 <!-- Format: **[YYYY-MM-DD]** Brief title — Explanation -->

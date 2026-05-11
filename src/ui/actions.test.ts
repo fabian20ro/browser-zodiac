@@ -29,6 +29,23 @@ describe('copyToClipboard', () => {
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith('test');
   });
 
+  it('returns false when the clipboard API is unavailable', async () => {
+    const original = Object.getOwnPropertyDescriptor(navigator, 'clipboard');
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: undefined,
+    });
+
+    try {
+      const result = await copyToClipboard('test');
+      expect(result).toBe(false);
+    } finally {
+      if (original) {
+        Object.defineProperty(navigator, 'clipboard', original);
+      }
+    }
+  });
+
   it('returns false on failure', async () => {
     Object.assign(navigator, {
       clipboard: { writeText: vi.fn().mockRejectedValue(new Error('denied')) },

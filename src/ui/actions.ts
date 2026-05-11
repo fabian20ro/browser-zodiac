@@ -35,11 +35,13 @@ export function createActionButton(options: ActionButtonOptions): HTMLButtonElem
   return btn;
 }
 
-export function copyToClipboard(text: string): Promise<boolean> {
-  return navigator.clipboard.writeText(text).then(
-    () => true,
-    () => false,
-  );
+export async function copyToClipboard(text: string): Promise<boolean> {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export function buildGoogleAIUrl(query: string): string {
