@@ -56,6 +56,8 @@ Obsolete lessons → Archive section at bottom (with date and reason). Never del
 
 <!-- Format: **[YYYY-MM-DD]** Brief title — Explanation -->
 
+**[2026-05-12]** Recursive timer cancellation needs a guard flag — If a scheduler re-arms itself from inside its callback, clearing the current timeout handle is not enough. Set a cancelled flag and check it before scheduling the next timeout so cancelation works even when invoked from the callback path.
+
 ---
 
 ## Archive

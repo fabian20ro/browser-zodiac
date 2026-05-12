@@ -18,6 +18,16 @@
 
 ---
 
+### [2026-05-12] Make midnight scheduler cancelation authoritative
+
+**Context:** A small reliability pass on `src/engine/scheduler.ts`.
+**What happened:** Fixed `scheduleMidnightGmt()` so cancelation still stops future midnight reschedules even when `cancel()` is called from inside the callback itself. Added a regression test that advances fake timers across midnight and confirms no second callback fires after cancelation.
+**Outcome:** Success — the midnight scheduler now respects cancelation on the callback path.
+**Insight:** Recursive timeout schedulers need an explicit cancelled flag; clearing the current handle alone does not prevent the callback from re-arming the next timeout.
+**Promoted to Lessons Learned:** Yes
+
+---
+
 ### [2026-05-08] Guard action-button clicks against rejection
 
 **Context:** A small UI hardening pass on `src/ui/actions.ts`.
