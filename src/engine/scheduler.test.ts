@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { msUntilNextMidnightGmt, toGmtDateString } from './scheduler.ts';
+import { describe, it, expect, vi } from 'vitest';
+import { msUntilNextMidnightGmt, toGmtDateString, scheduleMidnightGmt } from './scheduler.ts';
 
 describe('msUntilNextMidnightGmt', () => {
   it('returns 24 hours when called at exactly midnight UTC', () => {
@@ -50,5 +50,28 @@ describe('toGmtDateString', () => {
 
   it('handles year boundary', () => {
     expect(toGmtDateString(new Date('2027-01-01T00:00:00.000Z'))).toBe('2027-01-01');
+  });
+});
+
+describe('scheduleMidnightGmt', () => {
+  it('stops rescheduling after cancel is called from the callback', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-03-03T23:59:59.999Z'));
+
+    let calls = 0;
+    let cancel = () => {};
+
+    cancel = scheduleMidnightGmt(() => {
+      calls += 1;
+      cancel();
+    });
+
+    vi.advanceTimersByTime(1);
+    expect(calls).toBe(1);
+
+    vi.advanceTimersByTime(24 * 60 * 60 * 1000);
+    expect(calls).toBe(1);
+
+    vi.useRealTimers();
   });
 });
