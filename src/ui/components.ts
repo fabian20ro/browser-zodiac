@@ -33,6 +33,7 @@ export function createTopBar(
   // Language toggle button (shows flag of OTHER language to switch to)
   const otherLocale = locales.find((l) => l.id !== currentLangId) ?? locales[0];
   const langBtn = el('button', 'top-bar__btn', LANG_FLAGS[otherLocale.id] ?? otherLocale.name);
+  langBtn.type = 'button';
   langBtn.setAttribute(
     'aria-label',
     ui.switchToLanguageLabel.replace('{language}', otherLocale.name),
@@ -41,6 +42,7 @@ export function createTopBar(
 
   // Theme toggle button
   const themeBtn = el('button', 'top-bar__btn', isDark ? '\u2600\uFE0F' : '\u{1F319}');
+  themeBtn.type = 'button';
   themeBtn.setAttribute('aria-label', isDark ? ui.switchToLightTheme : ui.switchToDarkTheme);
   themeBtn.addEventListener('click', onThemeToggle);
 
@@ -69,6 +71,7 @@ export function createSignCard(
   const symbol = el('span', 'sign-card__symbol', horoscope.signSymbol);
   const name = el('span', 'sign-card__name', ui.signNames[horoscope.sign]);
   const diceBtn = el('button', 'sign-card__randomize', '\u{1F3B2}');
+  diceBtn.type = 'button';
   diceBtn.setAttribute('aria-label', ui.randomizeSign);
   diceBtn.addEventListener('click', onRandomize);
   nameRow.append(symbol, name, diceBtn);
@@ -131,6 +134,7 @@ export function createRegenerateButton(
   onRegenerate: () => void,
 ): HTMLElement {
   const btn = el('button', 'regen-btn', ui.regenerate);
+  btn.type = 'button';
   btn.addEventListener('click', onRegenerate);
   return btn;
 }
@@ -143,6 +147,7 @@ export function createDivinationPanel(
   const heading = el('h3', 'divination-card__heading', ui.browserDivination);
 
   const toggle = el('button', 'divination-card__toggle', '\u25BC');
+  toggle.type = 'button';
   toggle.setAttribute('aria-expanded', 'false');
   toggle.setAttribute('aria-label', ui.toggleDivinationDetails);
   heading.appendChild(toggle);

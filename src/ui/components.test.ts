@@ -62,6 +62,11 @@ describe('createRegenerateButton', () => {
     expect(btn.tagName).toBe('BUTTON');
   });
 
+  it('defaults to type button', () => {
+    const btn = createRegenerateButton(minimalUi, () => {}) as HTMLButtonElement;
+    expect(btn.type).toBe('button');
+  });
+
   it('has the regen-btn CSS class', () => {
     const btn = createRegenerateButton(minimalUi, () => {});
     expect(btn.className).toBe('regen-btn');
@@ -93,6 +98,7 @@ describe('createSignCard', () => {
     expect(btn).not.toBeNull();
     expect(btn!.textContent).toBe('\u{1F3B2}');
     expect(btn!.getAttribute('aria-label')).toBe('Randomize');
+    expect((btn as HTMLButtonElement).type).toBe('button');
   });
 
   it('calls onRandomize when dice button is clicked', () => {
@@ -150,9 +156,13 @@ describe('createTopBar', () => {
   it('uses localized aria labels for language and theme toggles', () => {
     const bar = createTopBar(locales, 'en', minimalUi, () => {}, true, () => {});
     const buttons = bar.querySelectorAll('button');
+    const languageButton = buttons[0] as HTMLButtonElement;
+    const themeButton = buttons[1] as HTMLButtonElement;
 
-    expect(buttons[0].getAttribute('aria-label')).toBe('Switch to Română');
-    expect(buttons[1].getAttribute('aria-label')).toBe('Switch to light theme');
+    expect(languageButton.getAttribute('aria-label')).toBe('Switch to Română');
+    expect(themeButton.getAttribute('aria-label')).toBe('Switch to light theme');
+    expect(languageButton.type).toBe('button');
+    expect(themeButton.type).toBe('button');
   });
 });
 
@@ -161,5 +171,6 @@ describe('createDivinationPanel', () => {
     const panel = createDivinationPanel({ readings: [], fingerprint: 'f' }, minimalUi);
     const toggle = panel.querySelector('.divination-card__toggle');
     expect(toggle?.getAttribute('aria-label')).toBe('Toggle divination details');
+    expect((toggle as HTMLButtonElement).type).toBe('button');
   });
 });
