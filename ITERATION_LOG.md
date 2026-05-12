@@ -126,6 +126,16 @@
 **Insight:** When users compare hero position against fixed top controls, a subtle negative margin on the hero container can solve perceived alignment faster than only shrinking global wrapper padding.
 **Promoted to Lessons Learned:** No
 
+### [2026-05-12] Clarify UTC-day wording in README
+
+**Context:** A small docs pass on `README.md`.
+**What happened:** Updated the feature description for daily horoscopes to say the same sign gets the same horoscope for the same UTC day, matching the ISO-date seeding and GMT/UTC midnight scheduling in the runtime.
+**Outcome:** Success — the README now states the time boundary explicitly.
+**Insight:** Time-based user-facing docs should name the actual day boundary used by the code, especially when the app keys behavior off UTC rather than local time.
+**Promoted to Lessons Learned:** Yes
+
+---
+
 ### [2026-03-10] Service worker cache TTL with stale refresh
 
 **Context:** User requested time-based expiration for `public/sw.js` cached responses (3-minute TTL), keeping non-GET/cross-origin bypass behavior unchanged, and bumping cache version.

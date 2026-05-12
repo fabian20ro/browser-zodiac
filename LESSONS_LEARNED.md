@@ -58,6 +58,8 @@ Obsolete lessons → Archive section at bottom (with date and reason). Never del
 
 **[2026-05-12]** Recursive timer cancellation needs a guard flag — If a scheduler re-arms itself from inside its callback, clearing the current timeout handle is not enough. Set a cancelled flag and check it before scheduling the next timeout so cancelation works even when invoked from the callback path.
 
+**[2026-05-12]** Time-based docs should name the UTC day when the code seeds from ISO dates — If the runtime uses `toISOString().slice(0, 10)` and GMT/UTC midnight scheduling, user-facing docs should say UTC day or GMT day explicitly instead of a vague "each day".
+
 ---
 
 ## Archive
