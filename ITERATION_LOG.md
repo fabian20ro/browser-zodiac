@@ -116,6 +116,16 @@
 
 ---
 
+### [2026-05-13] Fix Android UA precedence in browser oracle
+
+**Context:** Small reliability pass on `src/divination/browser-oracle.ts`.
+**What happened:** Moved the Android branch ahead of the generic Linux check in `detectOS()` so Android browsers are recognized correctly even though their user agents often contain `Linux`. Added focused jsdom coverage for Android and desktop Linux user agents alongside the existing iOS/macOS cases.
+**Outcome:** Success — browser OS detection now respects both Apple and Android UA precedence.
+**Insight:** UA substring checks need the platform-specific mobile identifiers before generic desktop substrings for both Apple and Android families.
+**Promoted to Lessons Learned:** Yes
+
+---
+
 <!-- New entries above this line, most recent first -->
 
 ### [2026-03-09] Fix Romanian agreement/uppercase issues + light theme contrast/header spacing

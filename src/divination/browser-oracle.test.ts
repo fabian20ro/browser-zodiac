@@ -81,4 +81,30 @@ describe('readBrowserOracle', () => {
 
     expect(osReading?.raw).toBe('macOS');
   });
+
+  it('classifies Android user agents as Android even though they often contain Linux', () => {
+    Object.defineProperty(navigator, 'userAgent', {
+      configurable: true,
+      value:
+        'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36',
+    });
+
+    const profile = readBrowserOracle();
+    const osReading = profile.readings.find((reading) => reading.key === 'elemental_os');
+
+    expect(osReading?.raw).toBe('Android');
+  });
+
+  it('still classifies desktop Linux user agents as Linux', () => {
+    Object.defineProperty(navigator, 'userAgent', {
+      configurable: true,
+      value:
+        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    });
+
+    const profile = readBrowserOracle();
+    const osReading = profile.readings.find((reading) => reading.key === 'elemental_os');
+
+    expect(osReading?.raw).toBe('Linux');
+  });
 });
