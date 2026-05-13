@@ -37,6 +37,7 @@ Obsolete lessons → Archive section at bottom (with date and reason). Never del
 
 **[2026-05-11]** Clipboard helpers should return `false` when the Clipboard API is unavailable — `navigator.clipboard` may be missing in older browsers or restricted contexts. Wrap the write in `try/catch` (or preflight the API) so UI actions can treat missing clipboard support as a recoverable outcome instead of a hard throw.
 **[2026-05-11]** Generic helper buttons should set `type="button"` — `document.createElement('button')` defaults to submit behavior inside forms, which can create accidental page submits when reusable action buttons get embedded elsewhere.
+**[2026-05-13]** iPhone/iPad user agents can still contain `Mac OS X` — when classifying OS from UA strings, check iPhone/iPad before the macOS substring or iOS devices will be misidentified as macOS.
 
 ## Testing & Quality
 

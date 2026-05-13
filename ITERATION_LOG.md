@@ -106,6 +106,16 @@
 
 ---
 
+### [2026-05-13] Fix iOS UA detection precedence
+
+**Context:** Small reliability pass on `src/divination/browser-oracle.ts`.
+**What happened:** Moved the iPhone/iPad branch ahead of the `Mac OS` check in `detectOS()` so iPhones and iPads are classified as iOS even though their user agents include `Mac OS X`. Added a focused jsdom test covering both iOS and desktop macOS user agents.
+**Outcome:** Success — browser OS detection now respects mobile UA precedence.
+**Insight:** UA substring checks need the most specific mobile identifiers before generic desktop substrings, especially for Apple devices.
+**Promoted to Lessons Learned:** Yes
+
+---
+
 <!-- New entries above this line, most recent first -->
 
 ### [2026-03-09] Fix Romanian agreement/uppercase issues + light theme contrast/header spacing

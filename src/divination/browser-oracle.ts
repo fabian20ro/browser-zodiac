@@ -19,11 +19,11 @@ function detectBrowser(ua: string): string {
 }
 
 function detectOS(ua: string): string {
+  if (ua.includes('iPhone') || ua.includes('iPad')) return 'iOS';
   if (ua.includes('Windows')) return 'Windows';
   if (ua.includes('Mac OS')) return 'macOS';
   if (ua.includes('Linux')) return 'Linux';
   if (ua.includes('Android')) return 'Android';
-  if (ua.includes('iPhone') || ua.includes('iPad')) return 'iOS';
   return 'Unknown';
 }
 
