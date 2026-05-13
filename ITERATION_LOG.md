@@ -96,6 +96,16 @@
 **Insight:** Separating structural text generation templates from raw vocabulary lists makes the data much more maintainable. The top-level import model is both simpler to parse and faster to load than the older per-section nested include model.
 **Promoted to Lessons Learned:** No
 
+### [2026-05-13] Clarify regenerate behavior in README
+
+**Context:** Small docs-only maintenance for the horoscope app.
+**What happened:** Updated the README feature copy so the daily horoscope description matches runtime behavior more closely: the baseline reading is stable per sign/day, while the Regenerate button re-rolls it via the consultation counter.
+**Outcome:** Success — docs now describe the initial deterministic daily reading and the explicit reroll path.
+**Insight:** When the app has a stable daily baseline plus an intentional reroll control, the README should name both so readers do not assume regeneration is identical to the first draw.
+**Promoted to Lessons Learned:** No
+
+---
+
 <!-- New entries above this line, most recent first -->
 
 ### [2026-03-09] Fix Romanian agreement/uppercase issues + light theme contrast/header spacing

@@ -11,7 +11,7 @@ A funny and absurd horoscope generator that reads your browser like a crystal ba
 ## Features
 
 - **Browser divination** — your zodiac sign is determined by your browser fingerprint (UA, language, screen, platform, timezone). Same browser, same destiny
-- **Daily absurd horoscopes** — generated through a context-free grammar engine with hundreds of mystical/ridiculous sentence fragments. Same sign gets the same horoscope for the same UTC day
+- **Daily absurd horoscopes** — generated through a context-free grammar engine with hundreds of mystical/ridiculous sentence fragments. Same sign gets the same baseline horoscope for the same UTC day; the Regenerate button re-rolls it with a consultation counter
 - **Bilingual** — Romanian (auto-detected from browser language) and English, with a flag toggle to switch
 - **Light + dark theme** — because the stars shine differently depending on your mood
 - **Mobile-first** — responsive design that looks good on any screen
