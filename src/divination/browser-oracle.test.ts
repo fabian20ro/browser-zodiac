@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { readBrowserOracle } from './browser-oracle.ts';
 
 const originalUserAgent = navigator.userAgent;
@@ -9,6 +9,9 @@ const originalHardwareConcurrency = navigator.hardwareConcurrency;
 const originalOnLine = navigator.onLine;
 const originalInnerWidth = window.innerWidth;
 const originalInnerHeight = window.innerHeight;
+const originalScreenWidth = screen.width;
+const originalScreenHeight = screen.height;
+const originalDateTimeFormat = Intl.DateTimeFormat;
 
 function setNavigatorProperty<K extends keyof Navigator>(key: K, value: Navigator[K]) {
   Object.defineProperty(navigator, key, {
@@ -22,6 +25,22 @@ beforeEach(() => {
   setNavigatorProperty('platform', 'MacIntel');
   setNavigatorProperty('hardwareConcurrency', 8);
   setNavigatorProperty('onLine', true);
+  Object.defineProperty(screen, 'width', {
+    configurable: true,
+    value: 1920,
+  });
+  Object.defineProperty(screen, 'height', {
+    configurable: true,
+    value: 1080,
+  });
+  Object.defineProperty(Intl, 'DateTimeFormat', {
+    configurable: true,
+    value: function DateTimeFormat() {
+      return {
+        resolvedOptions: () => ({ timeZone: 'Europe/Bucharest' }),
+      };
+    },
+  });
   Object.defineProperty(navigator, 'userAgent', {
     configurable: true,
     value: originalUserAgent,
@@ -52,6 +71,18 @@ afterEach(() => {
   Object.defineProperty(window, 'innerHeight', {
     configurable: true,
     value: originalInnerHeight,
+  });
+  Object.defineProperty(screen, 'width', {
+    configurable: true,
+    value: originalScreenWidth,
+  });
+  Object.defineProperty(screen, 'height', {
+    configurable: true,
+    value: originalScreenHeight,
+  });
+  Object.defineProperty(Intl, 'DateTimeFormat', {
+    configurable: true,
+    value: originalDateTimeFormat,
   });
 });
 
@@ -106,5 +137,29 @@ describe('readBrowserOracle', () => {
     const osReading = profile.readings.find((reading) => reading.key === 'elemental_os');
 
     expect(osReading?.raw).toBe('Linux');
+  });
+
+  it('includes stable browser properties in the fingerprint used for sign assignment', () => {
+    Object.defineProperty(navigator, 'userAgent', {
+      configurable: true,
+      value:
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    });
+    setNavigatorProperty('language', 'en-GB');
+    setNavigatorProperty('platform', 'Win32');
+    Object.defineProperty(screen, 'width', {
+      configurable: true,
+      value: 1440,
+    });
+    Object.defineProperty(screen, 'height', {
+      configurable: true,
+      value: 900,
+    });
+
+    const profile = readBrowserOracle();
+
+    expect(profile.fingerprint).toBe(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36|en-GB|1440x900|Win32|Europe/Bucharest',
+    );
   });
 });
