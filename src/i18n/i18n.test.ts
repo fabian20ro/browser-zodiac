@@ -57,6 +57,12 @@ describe('detectLanguage', () => {
     expect(detectLanguage()).toBe('ro');
   });
 
+  it('trims browser language ids before matching them', () => {
+    setNavigatorProperty('language', '  RO-RO  ');
+
+    expect(detectLanguage()).toBe('ro');
+  });
+
   it('falls back to English for unknown browser language', () => {
     setNavigatorProperty('language', 'de-DE');
 

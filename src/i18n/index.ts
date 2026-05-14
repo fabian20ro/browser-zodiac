@@ -46,7 +46,7 @@ export function detectLanguage(): string {
   } catch {
     // localStorage unavailable
   }
-  const browserLang = normalizeLocaleId(navigator.language?.slice(0, 2) ?? '');
+  const browserLang = normalizeLocaleId(navigator.language ?? '').slice(0, 2);
   if (registry.has(browserLang)) return browserLang;
   return 'en';
 }

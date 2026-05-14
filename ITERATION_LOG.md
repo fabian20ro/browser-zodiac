@@ -136,6 +136,14 @@
 
 ---
 
+### [2026-05-14] Trim browser language before locale prefix
+
+**Context:** Small i18n boundary hardening in `src/i18n/index.ts`.
+**What happened:** Updated `detectLanguage()` to normalize the full `navigator.language` value before taking the two-letter prefix, then added a regression test for whitespace-padded browser language ids.
+**Outcome:** Success — browser-language detection now tolerates leading/trailing whitespace as well as mixed case.
+**Insight:** When extracting a locale prefix from browser input, trim first and then slice; slicing raw input can hide whitespace normalization bugs.
+**Promoted to Lessons Learned:** Yes
+
 <!-- New entries above this line, most recent first -->
 
 ### [2026-03-09] Fix Romanian agreement/uppercase issues + light theme contrast/header spacing

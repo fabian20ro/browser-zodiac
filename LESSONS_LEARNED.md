@@ -39,7 +39,7 @@ Obsolete lessons → Archive section at bottom (with date and reason). Never del
 **[2026-05-11]** Generic helper buttons should set `type="button"` — `document.createElement('button')` defaults to submit behavior inside forms, which can create accidental page submits when reusable action buttons get embedded elsewhere.
 **[2026-05-13]** iPhone/iPad user agents can still contain `Mac OS X` — when classifying OS from UA strings, check iPhone/iPad before the macOS substring or iOS devices will be misidentified as macOS.
 **[2026-05-13]** Android user agents can still contain `Linux` — when classifying OS from UA strings, check Android before the generic Linux substring or mobile Android devices will be misidentified as desktop Linux.
-**[2026-05-14]** Normalize locale ids at the i18n boundary — Browser and storage language values can arrive mixed-case or with whitespace. Normalize once on lookup/detect/persist so legacy values like `RO` still resolve to `ro`.
+**[2026-05-14]** Normalize locale ids at the i18n boundary — Browser and storage language values can arrive mixed-case or with whitespace. Normalize once on lookup/detect/persist, and trim browser language before taking its prefix so values like `  RO-RO  ` still resolve to `ro`.
 
 ## Testing & Quality
 
