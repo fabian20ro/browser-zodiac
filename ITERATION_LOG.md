@@ -144,6 +144,16 @@
 **Insight:** When extracting a locale prefix from browser input, trim first and then slice; slicing raw input can hide whitespace normalization bugs.
 **Promoted to Lessons Learned:** Yes
 
+### [2026-05-14] Catch unmatched grammar delimiters in validation
+
+**Context:** Small maintenance pass on the grammar validation script.
+**What happened:** Added a validation check in `scripts/validate-grammar.mjs` to reject entries with an unmatched `#` delimiter before they reach the runtime grammar engine. Confirmed the current EN/RO data still passes validation.
+**Outcome:** Success — malformed template delimiters will now fail fast during the grammar audit.
+**Insight:** Grammar content should be validated for delimiter balance as well as missing symbols; otherwise broken templates can slip through static reference checks.
+**Promoted to Lessons Learned:** Yes
+
+---
+
 <!-- New entries above this line, most recent first -->
 
 ### [2026-03-09] Fix Romanian agreement/uppercase issues + light theme contrast/header spacing

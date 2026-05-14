@@ -9,6 +9,7 @@ const minEntriesPerSymbol = 5;
 const sectionRe = /^===\s*(.+?)\s*===$/;
 const fromRe = /^@from\s+(\S+)\s+import\s+\*$/;
 const symbolRefRe = /#([^#.]+)(?:\.[^#]+)?#/g;
+const hashRe = /#/g;
 
 // Add schema validation for loaded grammars and create a CLI audit script for the data directory.
 const runtimeSymbols = new Set([
@@ -98,6 +99,16 @@ function extractRefs(entry) {
   }
   return refs;
 }
+
+function validateEntrySyntax(locale, symbol, entry, entryIndex) {
+  const hashCount = (entry.match(hashRe) ?? []).length;
+  if (hashCount % 2 !== 0) {
+    throw new Error(
+      `Locale ${locale}: symbol "${symbol}" entry ${entryIndex + 1} has an unmatched "#" delimiter: ${entry}`,
+    );
+  }
+}
+
 function validateLocale(locale) {
   const grammar = loadLocaleGrammar(locale);
   let totalEntries = 0;
@@ -137,12 +148,14 @@ function validateLocale(locale) {
       );
     }
 
-    for (const entry of entries) {
+    for (const [entryIndex, entry] of entries.entries()) {
+      validateEntrySyntax(locale, symbol, entry, entryIndex);
       for (const ref of extractRefs(entry)) {
         queue.push(ref);
       }
     }
   }
+
   console.log(`Grammar validation passed for ${locale}: checked ${symbolCount} symbols and ${totalEntries} entries.`);
 }
 

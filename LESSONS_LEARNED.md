@@ -47,6 +47,8 @@ Obsolete lessons → Archive section at bottom (with date and reason). Never del
 
 **[2026-03-04]** Exclude test files from tsconfig build — When test files use Node-only modules (`node:fs`, `node:path`) in a browser-targeted project, add `"exclude": ["src/**/*.test.ts"]` to `tsconfig.json`. Vitest type-checks tests separately; `tsc` in the build script doesn't need to.
 
+**[2026-05-14]** Validate grammar delimiters before runtime — The grammar engine treats `#` as a structural delimiter, so grammar validation should reject entries with unmatched hashes instead of letting broken templates reach the UI.
+
 ## Performance & Infrastructure
 
 <!-- Format: **[YYYY-MM-DD]** Brief title — Explanation -->
