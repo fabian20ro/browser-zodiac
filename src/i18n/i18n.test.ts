@@ -1,5 +1,24 @@
-import { describe, it, expect } from 'vitest';
-import { getLocale, getAvailableLocales } from './index.ts';
+// @vitest-environment jsdom
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { getLocale, getAvailableLocales, detectLanguage } from './index.ts';
+
+const originalLanguage = navigator.language;
+
+function setNavigatorProperty<K extends keyof Navigator>(key: K, value: Navigator[K]) {
+  Object.defineProperty(navigator, key, {
+    configurable: true,
+    value,
+  });
+}
+
+beforeEach(() => {
+  localStorage.removeItem('horror-scope-lang');
+});
+
+afterEach(() => {
+  localStorage.removeItem('horror-scope-lang');
+  setNavigatorProperty('language', originalLanguage);
+});
 
 describe('getLocale', () => {
   it('returns English locale for "en"', () => {
@@ -14,9 +33,34 @@ describe('getLocale', () => {
     expect(locale.name).toBe('Română');
   });
 
+  it('normalizes locale ids before lookup', () => {
+    const locale = getLocale('RO');
+    expect(locale.id).toBe('ro');
+  });
+
   it('falls back to English for unknown locale', () => {
     const locale = getLocale('xx');
     expect(locale.id).toBe('en');
+  });
+});
+
+describe('detectLanguage', () => {
+  it('normalizes stored language ids before returning them', () => {
+    localStorage.setItem('horror-scope-lang', 'RO');
+
+    expect(detectLanguage()).toBe('ro');
+  });
+
+  it('normalizes browser language ids before matching them', () => {
+    setNavigatorProperty('language', 'RO-RO');
+
+    expect(detectLanguage()).toBe('ro');
+  });
+
+  it('falls back to English for unknown browser language', () => {
+    setNavigatorProperty('language', 'de-DE');
+
+    expect(detectLanguage()).toBe('en');
   });
 });
 

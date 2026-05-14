@@ -126,6 +126,16 @@
 
 ---
 
+### [2026-05-14] Normalize locale ids across i18n lookup and storage
+
+**Context:** Small reliability pass on `src/i18n/index.ts` and its tests.
+**What happened:** Added locale-id normalization for `getLocale()`, `detectLanguage()`, and `persistLanguage()` so mixed-case or padded ids still resolve correctly. Added jsdom tests covering stored-language normalization, browser-language normalization, and the uppercase `getLocale('RO')` lookup path.
+**Outcome:** Success — locale resolution is now tolerant of legacy casing and storage drift.
+**Insight:** Locale ids behave like user input at the boundary; normalize them once at lookup and persistence points instead of relying on callers to be perfectly clean.
+**Promoted to Lessons Learned:** Yes
+
+---
+
 <!-- New entries above this line, most recent first -->
 
 ### [2026-03-09] Fix Romanian agreement/uppercase issues + light theme contrast/header spacing
