@@ -156,6 +156,14 @@
 
 <!-- New entries above this line, most recent first -->
 
+### [2026-05-15] Harden titlecase whitespace handling
+
+**Context:** Small grammar-engine hardening pass on `src/engine/grammar.ts`.
+**What happened:** Updated the built-in `titlecase` modifier to trim and split on whitespace runs before capitalizing words, so padded input no longer leaks stray spaces into the result. Added a regression test covering padded input.
+**Outcome:** Success — the modifier now titlecases cleanly for whitespace-padded phrases.
+**Insight:** Text-formatting modifiers should normalize padding before capitalizing; otherwise the modifier can preserve leading/trailing spaces from upstream grammar entries.
+**Promoted to Lessons Learned:** Yes
+
 ### [2026-03-09] Fix Romanian agreement/uppercase issues + light theme contrast/header spacing
 
 **Context:** User reported Romanian grammar agreement mistakes and stray uppercase mid-sentence in generated horoscope text, plus low contrast gold-on-light theme and title block positioned too low.

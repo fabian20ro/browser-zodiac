@@ -96,6 +96,11 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.titlecase#')).toBe('Hello World');
     });
 
+    it('titlecases padded whitespace cleanly', () => {
+      const engine = makeEngine({ word: ['  hello   world  '] });
+      expect(engine.expand('#word.titlecase#')).toBe('Hello World');
+    });
+
     it('chains multiple modifiers', () => {
       const engine = makeEngine({ word: ['hello world'] });
       // capitalize then uppercase: capitalize first, then uppercase all
