@@ -45,7 +45,7 @@ export function readBrowserOracle(): DivinationProfile {
   const browser = detectBrowser(ua);
   const os = detectOS(ua);
   const screenRes = `${screen.width}x${screen.height}`;
-  const lang = navigator.language;
+  const lang = navigator.language.trim();
   const colorScheme = getColorScheme();
   const hour = new Date().getHours();
   const timeOfDay = getTimeOfDay(hour);

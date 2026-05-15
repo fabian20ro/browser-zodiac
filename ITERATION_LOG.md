@@ -164,6 +164,16 @@
 
 ---
 
+### [2026-05-15] Trim browser language before fingerprinting
+
+**Context:** Small divination hardening pass on `src/divination/browser-oracle.ts`.
+**What happened:** Trimmed `navigator.language` before building the fingerprint so incidental whitespace does not change sign assignment. Added a regression test that covers padded browser language input and confirms the reading is normalized.
+**Outcome:** Success — browser fingerprinting is now tolerant of whitespace-padded language ids.
+**Insight:** Fingerprint inputs should normalize incidental whitespace before hashing; otherwise the same browser can produce different destiny keys for cosmetic input drift.
+**Promoted to Lessons Learned:** Yes
+
+---
+
 <!-- New entries above this line, most recent first -->
 
 ### [2026-05-15] Harden titlecase whitespace handling

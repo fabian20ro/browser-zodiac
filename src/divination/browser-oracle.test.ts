@@ -188,4 +188,19 @@ describe('readBrowserOracle', () => {
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36|en-GB|1440x900|Win32|Europe/Bucharest',
     );
   });
+
+  it('trims browser language before using it in the fingerprint', () => {
+    Object.defineProperty(navigator, 'userAgent', {
+      configurable: true,
+      value:
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    });
+    setNavigatorProperty('language', '  en-US  ');
+
+    const profile = readBrowserOracle();
+    const languageReading = profile.readings.find((reading) => reading.key === 'cultural_destiny');
+
+    expect(profile.fingerprint).toContain('|en-US|');
+    expect(languageReading?.raw).toBe('en-US');
+  });
 });
