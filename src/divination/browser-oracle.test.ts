@@ -203,4 +203,19 @@ describe('readBrowserOracle', () => {
     expect(profile.fingerprint).toContain('|en-US|');
     expect(languageReading?.raw).toBe('en-US');
   });
+
+  it('trims browser platform before using it in the fingerprint', () => {
+    Object.defineProperty(navigator, 'userAgent', {
+      configurable: true,
+      value:
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    });
+    setNavigatorProperty('platform', '  Win32  ');
+
+    const profile = readBrowserOracle();
+    const platformReading = profile.readings.find((reading) => reading.key === 'cosmic_platform');
+
+    expect(profile.fingerprint).toContain('|Win32|');
+    expect(platformReading?.raw).toBe('Win32');
+  });
 });

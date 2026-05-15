@@ -50,7 +50,7 @@ export function readBrowserOracle(): DivinationProfile {
   const hour = new Date().getHours();
   const timeOfDay = getTimeOfDay(hour);
   const cores = navigator.hardwareConcurrency || 0;
-  const platform = navigator.platform || 'unknown';
+  const platform = (navigator.platform || 'unknown').trim() || 'unknown';
   const online = navigator.onLine;
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Void';
   const windowSize = `${window.innerWidth}x${window.innerHeight}`;
