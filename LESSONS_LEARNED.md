@@ -41,6 +41,7 @@ Obsolete lessons → Archive section at bottom (with date and reason). Never del
 **[2026-05-13]** Android user agents can still contain `Linux` — when classifying OS from UA strings, check Android before the generic Linux substring or mobile Android devices will be misidentified as desktop Linux.
 **[2026-05-14]** Normalize locale ids across i18n lookup and storage — Browser and storage language values can arrive mixed-case or with whitespace. Normalize once on lookup/detect/persist, and trim browser language before taking its prefix so values like `  RO-RO  ` still resolve to `ro`.
 **[2026-05-15]** Titlecase should normalize whitespace before capitalizing — Split on `\s+` after trimming so padding does not leak into rendered titles.
+**[2026-05-15]** iOS browser UAs need vendor-specific tokens in browser detection — Mobile iOS browsers often identify as `CriOS`, `FxiOS`, `EdgiOS`, or `OPiOS`; treat those tokens as Chrome, Firefox, Edge, or Opera respectively instead of falling back to Safari.
 
 ## Testing & Quality
 

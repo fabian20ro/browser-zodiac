@@ -126,6 +126,32 @@ describe('readBrowserOracle', () => {
     expect(osReading?.raw).toBe('Android');
   });
 
+  it('classifies iPhone Chrome as Chrome instead of Safari', () => {
+    Object.defineProperty(navigator, 'userAgent', {
+      configurable: true,
+      value:
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/124.0.0.0 Mobile/15E148 Safari/604.1',
+    });
+
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find((reading) => reading.key === 'spirit_browser');
+
+    expect(browserReading?.raw).toBe('Chrome');
+  });
+
+  it('classifies iPhone Firefox as Firefox instead of Safari', () => {
+    Object.defineProperty(navigator, 'userAgent', {
+      configurable: true,
+      value:
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/124.0 Mobile/15E148 Safari/605.1.15',
+    });
+
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find((reading) => reading.key === 'spirit_browser');
+
+    expect(browserReading?.raw).toBe('Firefox');
+  });
+
   it('still classifies desktop Linux user agents as Linux', () => {
     Object.defineProperty(navigator, 'userAgent', {
       configurable: true,

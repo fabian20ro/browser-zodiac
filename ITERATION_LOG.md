@@ -154,6 +154,16 @@
 
 ---
 
+### [2026-05-15] Recognize iOS browser vendor tokens in browser oracle
+
+**Context:** Small reliability pass on `src/divination/browser-oracle.ts`.
+**What happened:** Expanded browser detection so iOS-specific UA tokens (`CriOS`, `FxiOS`, `EdgiOS`, `OPiOS`) map to Chrome, Firefox, Edge, and Opera instead of falling through to Safari. Added regression tests for iPhone Chrome and iPhone Firefox UAs.
+**Outcome:** Success — browser classification now handles common iOS browser variants without changing the fingerprint shape.
+**Insight:** Mobile browser UAs often carry vendor-specific tokens instead of the desktop browser name, so detection needs explicit iOS variants before the Safari fallback.
+**Promoted to Lessons Learned:** Yes
+
+---
+
 <!-- New entries above this line, most recent first -->
 
 ### [2026-05-15] Harden titlecase whitespace handling

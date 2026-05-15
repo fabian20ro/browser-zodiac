@@ -10,10 +10,10 @@ export interface DivinationProfile {
 }
 
 function detectBrowser(ua: string): string {
-  if (ua.includes('Firefox')) return 'Firefox';
-  if (ua.includes('Edg')) return 'Edge';
-  if (ua.includes('OPR') || ua.includes('Opera')) return 'Opera';
-  if (ua.includes('Chrome')) return 'Chrome';
+  if (ua.includes('Firefox') || ua.includes('FxiOS')) return 'Firefox';
+  if (ua.includes('Edg') || ua.includes('EdgiOS')) return 'Edge';
+  if (ua.includes('OPR') || ua.includes('Opera') || ua.includes('OPiOS')) return 'Opera';
+  if (ua.includes('Chrome') || ua.includes('CriOS')) return 'Chrome';
   if (ua.includes('Safari')) return 'Safari';
   return 'Unknown';
 }
