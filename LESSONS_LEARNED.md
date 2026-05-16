@@ -31,11 +31,27 @@ Obsolete lessons → Archive section at bottom (with date and reason). Never del
 
 **[2026-03-04]** Romanian gender: use variant symbols, not template-level pronouns — When a template needs a gendered possessive (ta/tău/tale) or object clitic (-l/-o) next to a mixed-gender symbol, create a variant symbol with the gendered element embedded in each entry (e.g., `parteCorpTa` alongside bare `parteCorp`). Pattern: `#symbolTa#` replaces `#symbol# ta`. Keep bare and variant symbols in sync. For object clitics, prefer restructuring the template to avoid them entirely (e.g., "aruncă o privire" instead of "verifică-l").
 
+**[2026-05-08]** Catch rejected async UI actions in helpers — `createActionButton`-style wrappers should handle callback rejections deliberately so a failed `Promise` does not become an unhandled rejection or a false success state. Keep the control visually stable on failure and cover the rejection path in tests.
+
+**[2026-05-11]** Transient feedback buttons need timer cancellation on reactivation — If a control shows temporary success/error feedback after async completion, clear any pending revert timer and reset to the base icon/class at the start of a new click. Otherwise an older timeout can restore the stale state too early or leave the previous feedback visible after a new failed/no-op action.
+
+**[2026-05-11]** Clipboard helpers should return `false` when the Clipboard API is unavailable — `navigator.clipboard` may be missing in older browsers or restricted contexts. Wrap the write in `try/catch` (or preflight the API) so UI actions can treat missing clipboard support as a recoverable outcome instead of a hard throw.
+**[2026-05-11]** Generic helper buttons should set `type="button"` — `document.createElement('button')` defaults to submit behavior inside forms, which can create accidental page submits when reusable action buttons get embedded elsewhere.
+**[2026-05-13]** iPhone/iPad user agents can still contain `Mac OS X` — when classifying OS from UA strings, check iPhone/iPad before the macOS substring or iOS devices will be misidentified as macOS.
+**[2026-05-13]** Android user agents can still contain `Linux` — when classifying OS from UA strings, check Android before the generic Linux substring or mobile Android devices will be misidentified as desktop Linux.
+**[2026-05-14]** Normalize locale ids across i18n lookup and storage — Browser and storage language values can arrive mixed-case or with whitespace. Normalize once on lookup/detect/persist, and trim browser language before taking its prefix so values like `  RO-RO  ` still resolve to `ro`.
+**[2026-05-15]** Titlecase should normalize whitespace before capitalizing — Split on `\s+` after trimming so padding does not leak into rendered titles.
+**[2026-05-15]** iOS browser UAs need vendor-specific tokens in browser detection — Mobile iOS browsers often identify as `CriOS`, `FxiOS`, `EdgiOS`, or `OPiOS`; treat those tokens as Chrome, Firefox, Edge, or Opera respectively instead of falling back to Safari.
+**[2026-05-15]** Trim browser language before fingerprinting — `navigator.language` can carry incidental whitespace; trim it before using it in a fingerprint so the same browser does not hash differently because of padding.
+**[2026-05-15]** Trim browser platform before fingerprinting — `navigator.platform` can carry incidental whitespace just like `navigator.language`; trim it before using it in the divination fingerprint so padded values do not split destiny keys.
+
 ## Testing & Quality
 
 <!-- Format: **[YYYY-MM-DD]** Brief title — Explanation -->
 
 **[2026-03-04]** Exclude test files from tsconfig build — When test files use Node-only modules (`node:fs`, `node:path`) in a browser-targeted project, add `"exclude": ["src/**/*.test.ts"]` to `tsconfig.json`. Vitest type-checks tests separately; `tsc` in the build script doesn't need to.
+
+**[2026-05-14]** Validate grammar delimiters before runtime — The grammar engine treats `#` as a structural delimiter, so grammar validation should reject entries with unmatched hashes instead of letting broken templates reach the UI.
 
 ## Performance & Infrastructure
 
@@ -48,6 +64,10 @@ Obsolete lessons → Archive section at bottom (with date and reason). Never del
 ## Process & Workflow
 
 <!-- Format: **[YYYY-MM-DD]** Brief title — Explanation -->
+
+**[2026-05-12]** Recursive timer cancellation needs a guard flag — If a scheduler re-arms itself from inside its callback, clearing the current timeout handle is not enough. Set a cancelled flag and check it before scheduling the next timeout so cancelation works even when invoked from the callback path.
+
+**[2026-05-12]** Time-based docs should name the UTC day when the code seeds from ISO dates — If the runtime uses `toISOString().slice(0, 10)` and GMT/UTC midnight scheduling, user-facing docs should say UTC day or GMT day explicitly instead of a vague "each day".
 
 ---
 

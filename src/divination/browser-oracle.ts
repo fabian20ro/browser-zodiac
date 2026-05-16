@@ -10,20 +10,20 @@ export interface DivinationProfile {
 }
 
 function detectBrowser(ua: string): string {
-  if (ua.includes('Firefox')) return 'Firefox';
-  if (ua.includes('Edg')) return 'Edge';
-  if (ua.includes('OPR') || ua.includes('Opera')) return 'Opera';
-  if (ua.includes('Chrome')) return 'Chrome';
+  if (ua.includes('Firefox') || ua.includes('FxiOS')) return 'Firefox';
+  if (ua.includes('Edg') || ua.includes('EdgiOS')) return 'Edge';
+  if (ua.includes('OPR') || ua.includes('Opera') || ua.includes('OPiOS')) return 'Opera';
+  if (ua.includes('Chrome') || ua.includes('CriOS')) return 'Chrome';
   if (ua.includes('Safari')) return 'Safari';
   return 'Unknown';
 }
 
 function detectOS(ua: string): string {
+  if (ua.includes('iPhone') || ua.includes('iPad')) return 'iOS';
   if (ua.includes('Windows')) return 'Windows';
   if (ua.includes('Mac OS')) return 'macOS';
-  if (ua.includes('Linux')) return 'Linux';
   if (ua.includes('Android')) return 'Android';
-  if (ua.includes('iPhone') || ua.includes('iPad')) return 'iOS';
+  if (ua.includes('Linux')) return 'Linux';
   return 'Unknown';
 }
 
@@ -45,12 +45,12 @@ export function readBrowserOracle(): DivinationProfile {
   const browser = detectBrowser(ua);
   const os = detectOS(ua);
   const screenRes = `${screen.width}x${screen.height}`;
-  const lang = navigator.language;
+  const lang = navigator.language.trim();
   const colorScheme = getColorScheme();
   const hour = new Date().getHours();
   const timeOfDay = getTimeOfDay(hour);
   const cores = navigator.hardwareConcurrency || 0;
-  const platform = navigator.platform || 'unknown';
+  const platform = (navigator.platform || 'unknown').trim() || 'unknown';
   const online = navigator.onLine;
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Void';
   const windowSize = `${window.innerWidth}x${window.innerHeight}`;

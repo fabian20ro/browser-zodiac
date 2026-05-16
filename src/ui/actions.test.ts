@@ -29,6 +29,23 @@ describe('copyToClipboard', () => {
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith('test');
   });
 
+  it('returns false when the clipboard API is unavailable', async () => {
+    const original = Object.getOwnPropertyDescriptor(navigator, 'clipboard');
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: undefined,
+    });
+
+    try {
+      const result = await copyToClipboard('test');
+      expect(result).toBe(false);
+    } finally {
+      if (original) {
+        Object.defineProperty(navigator, 'clipboard', original);
+      }
+    }
+  });
+
   it('returns false on failure', async () => {
     Object.assign(navigator, {
       clipboard: { writeText: vi.fn().mockRejectedValue(new Error('denied')) },
@@ -55,6 +72,15 @@ describe('createActionButton', () => {
       onClick: () => {},
     });
     expect(btn.className).toBe('action-btn');
+  });
+
+  it('defaults to type button', () => {
+    const btn = createActionButton({
+      icon: '⧉',
+      ariaLabel: 'Copy',
+      onClick: () => {},
+    });
+    expect(btn.type).toBe('button');
   });
 
   it('displays the icon', () => {
@@ -119,6 +145,33 @@ describe('createActionButton', () => {
     vi.useRealTimers();
   });
 
+  it('resets the revert timer when clicked again before timeout', async () => {
+    vi.useFakeTimers();
+    const btn = createActionButton({
+      icon: '⧉',
+      feedbackIcon: '✓',
+      ariaLabel: 'Copy',
+      onClick: () => {},
+    });
+
+    btn.click();
+    await Promise.resolve();
+    expect(btn.textContent).toBe('✓');
+
+    vi.advanceTimersByTime(1000);
+    btn.click();
+    await Promise.resolve();
+    expect(btn.textContent).toBe('✓');
+
+    vi.advanceTimersByTime(1499);
+    expect(btn.textContent).toBe('✓');
+
+    vi.advanceTimersByTime(1);
+    expect(btn.textContent).toBe('⧉');
+    expect(btn.classList.contains('action-btn--feedback')).toBe(false);
+    vi.useRealTimers();
+  });
+
   it('does not show feedback when feedbackIcon is not set', () => {
     const btn = createActionButton({
       icon: '→',
@@ -142,5 +195,52 @@ describe('createActionButton', () => {
 
     expect(btn.textContent).toBe('⧉');
     expect(btn.classList.contains('action-btn--feedback')).toBe(false);
+  });
+
+  it('does not show success feedback when the click action rejects', async () => {
+    const btn = createActionButton({
+      icon: '⧉',
+      feedbackIcon: '✓',
+      ariaLabel: 'Copy',
+      onClick: () => Promise.reject(new Error('boom')),
+    });
+
+    btn.click();
+    await Promise.resolve();
+
+    expect(btn.textContent).toBe('⧉');
+    expect(btn.classList.contains('action-btn--feedback')).toBe(false);
+  });
+
+  it('shows error icon when click action rejects', async () => {
+    const btn = createActionButton({
+      icon: '⧉',
+      errorIcon: '✕',
+      ariaLabel: 'Copy',
+      onClick: () => Promise.reject(new Error('boom')),
+    });
+
+    btn.click();
+    await Promise.resolve();
+
+    expect(btn.textContent).toBe('✕');
+  });
+
+  it('reverts error icon after timeout', async () => {
+    vi.useFakeTimers();
+    const btn = createActionButton({
+      icon: '⧉',
+      errorIcon: '✕',
+      ariaLabel: 'Copy',
+      onClick: () => Promise.reject(new Error('boom')),
+    });
+
+    btn.click();
+    await Promise.resolve();
+    expect(btn.textContent).to.toBe('✕');
+
+    vi.advanceTimersByTime(1500);
+    expect(btn.textContent).toBe('⧉');
+    vi.useRealTimers();
   });
 });

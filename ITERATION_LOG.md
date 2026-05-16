@@ -18,6 +18,26 @@
 
 ---
 
+### [2026-05-12] Make midnight scheduler cancelation authoritative
+
+**Context:** A small reliability pass on `src/engine/scheduler.ts`.
+**What happened:** Fixed `scheduleMidnightGmt()` so cancelation still stops future midnight reschedules even when `cancel()` is called from inside the callback itself. Added a regression test that advances fake timers across midnight and confirms no second callback fires after cancelation.
+**Outcome:** Success — the midnight scheduler now respects cancelation on the callback path.
+**Insight:** Recursive timeout schedulers need an explicit cancelled flag; clearing the current handle alone does not prevent the callback from re-arming the next timeout.
+**Promoted to Lessons Learned:** Yes
+
+---
+
+### [2026-05-08] Guard action-button clicks against rejection
+
+**Context:** A small UI hardening pass on `src/ui/actions.ts`.
+**What happened:** Wrapped `createActionButton()` click handlers in `try/catch` so a rejected async action no longer leaves an unhandled promise rejection or accidentally shows success feedback. Added a regression test covering the rejected-action path.
+**Outcome:** Success — behavior is now stable when an action fails.
+**Insight:** UI helper buttons should treat rejected async callbacks as a failure path, not as a success with missing feedback.
+**Promoted to Lessons Learned:** Yes
+
+---
+
 ### [2026-03-04] Externalize grammar data to text files
 
 **Context:** Grammar data (~37-42 symbols per locale) was hardcoded in TypeScript locale files. Goal: move to external text files for easier editing, extensibility, and future CDN delivery.
@@ -76,7 +96,103 @@
 **Insight:** Separating structural text generation templates from raw vocabulary lists makes the data much more maintainable. The top-level import model is both simpler to parse and faster to load than the older per-section nested include model.
 **Promoted to Lessons Learned:** No
 
+### [2026-05-13] Clarify regenerate behavior in README
+
+**Context:** Small docs-only maintenance for the horoscope app.
+**What happened:** Updated the README feature copy so the daily horoscope description matches runtime behavior more closely: the baseline reading is stable per sign/day, while the Regenerate button re-rolls it via the consultation counter.
+**Outcome:** Success — docs now describe the initial deterministic daily reading and the explicit reroll path.
+**Insight:** When the app has a stable daily baseline plus an intentional reroll control, the README should name both so readers do not assume regeneration is identical to the first draw.
+**Promoted to Lessons Learned:** No
+
+---
+
+### [2026-05-13] Fix iOS UA detection precedence
+
+**Context:** Small reliability pass on `src/divination/browser-oracle.ts`.
+**What happened:** Moved the iPhone/iPad branch ahead of the `Mac OS` check in `detectOS()` so iPhones and iPads are classified as iOS even though their user agents include `Mac OS X`. Added a focused jsdom test covering both iOS and desktop macOS user agents.
+**Outcome:** Success — browser OS detection now respects mobile UA precedence.
+**Insight:** UA substring checks need the most specific mobile identifiers before generic desktop substrings, especially for Apple devices.
+**Promoted to Lessons Learned:** Yes
+
+---
+
+### [2026-05-13] Fix Android UA precedence in browser oracle
+
+**Context:** Small reliability pass on `src/divination/browser-oracle.ts`.
+**What happened:** Moved the Android branch ahead of the generic Linux check in `detectOS()` so Android browsers are recognized correctly even though their user agents often contain `Linux`. Added focused jsdom coverage for Android and desktop Linux user agents alongside the existing iOS/macOS cases.
+**Outcome:** Success — browser OS detection now respects both Apple and Android UA precedence.
+**Insight:** UA substring checks need the platform-specific mobile identifiers before generic desktop substrings for both Apple and Android families.
+**Promoted to Lessons Learned:** Yes
+
+---
+
+### [2026-05-14] Normalize locale ids across i18n lookup and storage
+
+**Context:** Small reliability pass on `src/i18n/index.ts` and its tests.
+**What happened:** Added locale-id normalization for `getLocale()`, `detectLanguage()`, and `persistLanguage()` so mixed-case or padded ids still resolve correctly. Added jsdom tests covering stored-language normalization, browser-language normalization, and the uppercase `getLocale('RO')` lookup path.
+**Outcome:** Success — locale resolution is now tolerant of legacy casing and storage drift.
+**Insight:** Locale ids behave like user input at the boundary; normalize them once at lookup and persistence points instead of relying on callers to be perfectly clean.
+**Promoted to Lessons Learned:** Yes
+
+---
+
+### [2026-05-14] Trim browser language before locale prefix
+
+**Context:** Small i18n boundary hardening in `src/i18n/index.ts`.
+**What happened:** Updated `detectLanguage()` to normalize the full `navigator.language` value before taking the two-letter prefix, then added a regression test for whitespace-padded browser language ids.
+**Outcome:** Success — browser-language detection now tolerates leading/trailing whitespace as well as mixed case.
+**Insight:** When extracting a locale prefix from browser input, trim first and then slice; slicing raw input can hide whitespace normalization bugs.
+**Promoted to Lessons Learned:** Yes
+
+### [2026-05-14] Catch unmatched grammar delimiters in validation
+
+**Context:** Small maintenance pass on the grammar validation script.
+**What happened:** Added a validation check in `scripts/validate-grammar.mjs` to reject entries with an unmatched `#` delimiter before they reach the runtime grammar engine. Confirmed the current EN/RO data still passes validation.
+**Outcome:** Success — malformed template delimiters will now fail fast during the grammar audit.
+**Insight:** Grammar content should be validated for delimiter balance as well as missing symbols; otherwise broken templates can slip through static reference checks.
+**Promoted to Lessons Learned:** Yes
+
+---
+
+### [2026-05-15] Recognize iOS browser vendor tokens in browser oracle
+
+**Context:** Small reliability pass on `src/divination/browser-oracle.ts`.
+**What happened:** Expanded browser detection so iOS-specific UA tokens (`CriOS`, `FxiOS`, `EdgiOS`, `OPiOS`) map to Chrome, Firefox, Edge, and Opera instead of falling through to Safari. Added regression tests for iPhone Chrome and iPhone Firefox UAs.
+**Outcome:** Success — browser classification now handles common iOS browser variants without changing the fingerprint shape.
+**Insight:** Mobile browser UAs often carry vendor-specific tokens instead of the desktop browser name, so detection needs explicit iOS variants before the Safari fallback.
+**Promoted to Lessons Learned:** Yes
+
+---
+
+### [2026-05-15] Trim browser language before fingerprinting
+
+**Context:** Small divination hardening pass on `src/divination/browser-oracle.ts`.
+**What happened:** Trimmed `navigator.language` before building the fingerprint so incidental whitespace does not change sign assignment. Added a regression test that covers padded browser language input and confirms the reading is normalized.
+**Outcome:** Success — browser fingerprinting is now tolerant of whitespace-padded language ids.
+**Insight:** Fingerprint inputs should normalize incidental whitespace before hashing; otherwise the same browser can produce different destiny keys for cosmetic input drift.
+**Promoted to Lessons Learned:** Yes
+
+---
+
+### [2026-05-16] Link divination toggle to its detail list
+
+**Context:** Small accessibility pass on `src/ui/components.ts`.
+**What happened:** Added `aria-controls` and a stable id to the browser-divination details list so the toggle button explicitly references the content it expands/collapses. Extended the component test to assert the id/controls relationship.
+**Outcome:** Success — the divination toggle now exposes a clearer accessibility contract without changing visible behavior.
+**Insight:** Collapsed/expanded controls are easier to understand when the button and controlled region are explicitly linked, not just state-tagged.
+**Promoted to Lessons Learned:** No
+
+---
+
 <!-- New entries above this line, most recent first -->
+
+### [2026-05-15] Harden titlecase whitespace handling
+
+**Context:** Small grammar-engine hardening pass on `src/engine/grammar.ts`.
+**What happened:** Updated the built-in `titlecase` modifier to trim and split on whitespace runs before capitalizing words, so padded input no longer leaks stray spaces into the result. Added a regression test covering padded input.
+**Outcome:** Success — the modifier now titlecases cleanly for whitespace-padded phrases.
+**Insight:** Text-formatting modifiers should normalize padding before capitalizing; otherwise the modifier can preserve leading/trailing spaces from upstream grammar entries.
+**Promoted to Lessons Learned:** Yes
 
 ### [2026-03-09] Fix Romanian agreement/uppercase issues + light theme contrast/header spacing
 
@@ -106,6 +222,16 @@
 **Insight:** When users compare hero position against fixed top controls, a subtle negative margin on the hero container can solve perceived alignment faster than only shrinking global wrapper padding.
 **Promoted to Lessons Learned:** No
 
+### [2026-05-12] Clarify UTC-day wording in README
+
+**Context:** A small docs pass on `README.md`.
+**What happened:** Updated the feature description for daily horoscopes to say the same sign gets the same horoscope for the same UTC day, matching the ISO-date seeding and GMT/UTC midnight scheduling in the runtime.
+**Outcome:** Success — the README now states the time boundary explicitly.
+**Insight:** Time-based user-facing docs should name the actual day boundary used by the code, especially when the app keys behavior off UTC rather than local time.
+**Promoted to Lessons Learned:** Yes
+
+---
+
 ### [2026-03-10] Service worker cache TTL with stale refresh
 
 **Context:** User requested time-based expiration for `public/sw.js` cached responses (3-minute TTL), keeping non-GET/cross-origin bypass behavior unchanged, and bumping cache version.
@@ -125,3 +251,29 @@
 - 2026-05-05: Audit RO acord/articol. Fix: eliminat construcții "a lui #planeta#"; rescris formă cu slash de gen ("preaprobat/ă") în formulare neutră.
 
 - 2026-05-05: Follow-up audit. Observat regresie: eliminarea lui "lui" a păstrat totuși construcții imposibile cu intrări articulate (#planeta#) în genitiv. Fix: eliminat complet dependența de #planeta# în cele 2 template-uri.
+
+---
+
+### [2026-05-11] Reset transient feedback timers on repeat clicks
+
+**Context:** A small UI hardening pass on `src/ui/actions.ts`.
+**What happened:** Added timeout cancellation and base-state reset at the start of each `createActionButton()` click so stale success/error feedback cannot linger or revert too early when a button is clicked again before its prior timeout expires. Added a regression test covering the repeat-click timing case.
+**Outcome:** Success — transient feedback now behaves predictably across rapid repeated clicks.
+**Insight:** Temporary button feedback needs two safeguards: cancel the old timer and reset the control to its base state before running the next action.
+**Promoted to Lessons Learned:** Yes
+
+### [2026-05-11] Default reusable action buttons to type=button
+
+**Context:** Small UI hardening pass on `src/ui/actions.ts`.
+**What happened:** Set `createActionButton()` to `type="button"` so the reusable helper can't accidentally submit a surrounding form, and added a regression test covering the default button type.
+**Outcome:** Success — action buttons are now safer as generic reusable controls.
+**Insight:** Reusable buttons should opt out of implicit form-submit behavior unless they are intentionally form submits.
+**Promoted to Lessons Learned:** Yes
+
+### [2026-05-16] Sync README with shipped quick actions
+
+**Context:** Small docs-only maintenance for the horoscope app.
+**What happened:** Updated the README feature list to mention the shipped horoscope-card actions (`Copy horoscope text`, `Interpret with AI`, and `Randomize Sign`) alongside the already-documented browser-divination panel.
+**Outcome:** Success — the top-level docs now reflect the visible quick-action controls users can actually click.
+**Insight:** When a UI ships multiple affordances on one card, the README should call out the whole action set so the top-level feature list matches the page surface.
+**Promoted to Lessons Learned:** No

@@ -10,6 +10,10 @@ const registry = new Map<string, LocalePack>();
 registry.set('en', en);
 registry.set('ro', ro);
 
+function normalizeLocaleId(id: string): string {
+  return id.trim().toLowerCase();
+}
+
 const grammars = new Map<string, Grammar>();
 
 /** Preload grammar data for all registered locales in parallel. */
@@ -22,8 +26,9 @@ export async function loadAllGrammars(): Promise<void> {
 }
 
 export function getLocale(id: string): LocalePack {
-  const base = registry.get(id) ?? en;
-  const grammar = grammars.get(id) ?? base.grammar;
+  const normalizedId = normalizeLocaleId(id);
+  const base = registry.get(normalizedId) ?? en;
+  const grammar = grammars.get(normalizedId) ?? base.grammar;
   return { ...base, grammar };
 }
 
@@ -34,18 +39,21 @@ export function getAvailableLocales(): LocalePack[] {
 export function detectLanguage(): string {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved && registry.has(saved)) return saved;
+    if (saved) {
+      const normalizedSaved = normalizeLocaleId(saved);
+      if (registry.has(normalizedSaved)) return normalizedSaved;
+    }
   } catch {
     // localStorage unavailable
   }
-  const browserLang = navigator.language?.slice(0, 2);
+  const browserLang = normalizeLocaleId(navigator.language ?? '').slice(0, 2);
   if (registry.has(browserLang)) return browserLang;
   return 'en';
 }
 
 export function persistLanguage(id: string): void {
   try {
-    localStorage.setItem(STORAGE_KEY, id);
+    localStorage.setItem(STORAGE_KEY, normalizeLocaleId(id));
   } catch {
     // localStorage unavailable
   }

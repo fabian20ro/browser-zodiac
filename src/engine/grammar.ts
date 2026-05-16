@@ -66,6 +66,12 @@ export function createGrammarEngine(grammar: Grammar, rng: SeededRandom) {
   addModifier('capitalize', (s) => s.charAt(0).toUpperCase() + s.slice(1));
   addModifier('uppercase', (s) => s.toUpperCase());
   addModifier('lowercase', (s) => s.toLowerCase());
+  addModifier('trim', (s) => s.trim());
+  addModifier('collapse-spaces', (s) => s.replace(/\s+/g, ' ').trim());
+  addModifier('titlecase', (s) => {
+    const words = s.trim().split(/\s+/).filter(Boolean);
+    return words.map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  });
 
   return { expand, addModifier };
 }

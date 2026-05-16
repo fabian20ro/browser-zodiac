@@ -16,8 +16,10 @@ export function toGmtDateString(date: Date): string {
  */
 export function scheduleMidnightGmt(callback: () => void): () => void {
   let handle: ReturnType<typeof setTimeout>;
+  let cancelled = false;
 
   function scheduleNext(): void {
+    if (cancelled) return;
     const delay = msUntilNextMidnightGmt(new Date());
     handle = setTimeout(() => {
       callback();
@@ -26,5 +28,8 @@ export function scheduleMidnightGmt(callback: () => void): () => void {
   }
 
   scheduleNext();
-  return () => clearTimeout(handle);
+  return () => {
+    cancelled = true;
+    clearTimeout(handle);
+  };
 }
