@@ -170,7 +170,10 @@ describe('createDivinationPanel', () => {
   it('uses localized aria label for details toggle', () => {
     const panel = createDivinationPanel({ readings: [], fingerprint: 'f' }, minimalUi);
     const toggle = panel.querySelector('.divination-card__toggle');
+    const list = panel.querySelector('.divination-card__list');
     expect(toggle?.getAttribute('aria-label')).toBe('Toggle divination details');
+    expect(toggle?.getAttribute('aria-controls')).toBe('divination-card__list');
+    expect(list?.id).toBe('divination-card__list');
     expect((toggle as HTMLButtonElement).type).toBe('button');
   });
 });

@@ -174,6 +174,16 @@
 
 ---
 
+### [2026-05-16] Link divination toggle to its detail list
+
+**Context:** Small accessibility pass on `src/ui/components.ts`.
+**What happened:** Added `aria-controls` and a stable id to the browser-divination details list so the toggle button explicitly references the content it expands/collapses. Extended the component test to assert the id/controls relationship.
+**Outcome:** Success — the divination toggle now exposes a clearer accessibility contract without changing visible behavior.
+**Insight:** Collapsed/expanded controls are easier to understand when the button and controlled region are explicitly linked, not just state-tagged.
+**Promoted to Lessons Learned:** No
+
+---
+
 <!-- New entries above this line, most recent first -->
 
 ### [2026-05-15] Harden titlecase whitespace handling

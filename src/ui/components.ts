@@ -153,7 +153,9 @@ export function createDivinationPanel(
   heading.appendChild(toggle);
 
   const list = el('div', 'divination-card__list');
+  list.id = 'divination-card__list';
   list.classList.add('divination-card__list--collapsed');
+  toggle.setAttribute('aria-controls', list.id);
 
   for (const reading of divination.readings) {
     const label = ui.divinationLabels[reading.key] ?? reading.key;
