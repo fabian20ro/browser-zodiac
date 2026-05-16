@@ -17,6 +17,7 @@ A funny and absurd horoscope generator that reads your browser like a crystal ba
 - **Mobile-first** — responsive design that looks good on any screen
 - **Installable as a PWA** — add it to your home screen for daily cosmic guidance
 - **"We know everything about you"** — an expandable panel that reveals all the browser properties used for your divination
+- **Quick actions** — the horoscope card lets you `Copy horoscope text`, `Interpret with AI`, and `Randomize Sign` without leaving the page
 
 ## Tech
 

@@ -259,3 +259,11 @@
 **Outcome:** Success — action buttons are now safer as generic reusable controls.
 **Insight:** Reusable buttons should opt out of implicit form-submit behavior unless they are intentionally form submits.
 **Promoted to Lessons Learned:** Yes
+
+### [2026-05-16] Sync README with shipped quick actions
+
+**Context:** Small docs-only maintenance for the horoscope app.
+**What happened:** Updated the README feature list to mention the shipped horoscope-card actions (`Copy horoscope text`, `Interpret with AI`, and `Randomize Sign`) alongside the already-documented browser-divination panel.
+**Outcome:** Success — the top-level docs now reflect the visible quick-action controls users can actually click.
+**Insight:** When a UI ships multiple affordances on one card, the README should call out the whole action set so the top-level feature list matches the page surface.
+**Promoted to Lessons Learned:** No
