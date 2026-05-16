@@ -218,4 +218,26 @@ describe('readBrowserOracle', () => {
     expect(profile.fingerprint).toContain('|Win32|');
     expect(platformReading?.raw).toBe('Win32');
   });
+
+  it('classifies touch devices as sensitive and non-touch as numb', () => {
+    // Test sensitive (touch enabled)
+    Object.defineProperty(navigator, 'maxTouchPoints', {
+      configurable: true,
+      value: 5,
+    });
+
+    let profile = readBrowserOracle();
+    let tactileReading = profile.readings.find((reading) => reading.key === 'tactile_sensibility');
+    expect(tactileReading?.raw).toBe('sensitive');
+
+    // Test numb (touch disabled/zero)
+    Object.defineProperty(navigator, 'maxTouchPoints', {
+      configurable: true,
+      value: 0,
+    });
+
+    profile = readBrowserOracle();
+    tactileReading = profile.readings.find((reading) => reading.key === 'tactile_sensibility');
+    expect(tactileReading?.raw).toBe('numb');
+  });
 });
