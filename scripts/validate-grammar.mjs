@@ -148,8 +148,13 @@ function validateLocale(locale) {
       );
     }
 
+    const seenEntriesInSymbol = new Set();
     for (const [entryIndex, entry] of entries.entries()) {
       validateEntrySyntax(locale, symbol, entry, entryIndex);
+      if (seenEntriesInSymbol.has(entry)) {
+        throw new Error(`Locale ${locale}: duplicate entry in symbol "${symbol}": ${entry}`);
+      }
+      seenEntriesInSymbol.add(entry);
       for (const ref of extractRefs(entry)) {
         queue.push(ref);
       }
