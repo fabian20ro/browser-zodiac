@@ -38,7 +38,7 @@ export function getAvailableLocales(): LocalePack[] {
 
 export function detectLanguage(): string {
   try {
-    const saved = localStorage.getItem(STORAGE_KEY);
+    const saved = window.localStorage.getItem(STORAGE_KEY);
     if (saved) {
       const normalizedSaved = normalizeLocaleId(saved);
       if (registry.has(normalizedSaved)) return normalizedSaved;
@@ -53,7 +53,7 @@ export function detectLanguage(): string {
 
 export function persistLanguage(id: string): void {
   try {
-    localStorage.setItem(STORAGE_KEY, normalizeLocaleId(id));
+    window.localStorage.setItem(STORAGE_KEY, normalizeLocaleId(id));
   } catch {
     // localStorage unavailable
   }

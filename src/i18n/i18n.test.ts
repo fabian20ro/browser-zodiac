@@ -4,6 +4,21 @@ import { getLocale, getAvailableLocales, detectLanguage } from './index.ts';
 
 const originalLanguage = navigator.language;
 
+const localStorageStub = (() => {
+  const items = new Map<string, string>();
+  return {
+    getItem: (key: string) => items.get(key) ?? null,
+    setItem: (key: string, value: string) => items.set(key, value),
+    removeItem: (key: string) => items.delete(key),
+    clear: () => items.clear(),
+  };
+})();
+
+Object.defineProperty(window, 'localStorage', {
+  configurable: true,
+  value: localStorageStub,
+});
+
 function setNavigatorProperty<K extends keyof Navigator>(key: K, value: Navigator[K]) {
   Object.defineProperty(navigator, key, {
     configurable: true,
@@ -12,11 +27,11 @@ function setNavigatorProperty<K extends keyof Navigator>(key: K, value: Navigato
 }
 
 beforeEach(() => {
-  localStorage.removeItem('horror-scope-lang');
+  window.localStorage.removeItem('horror-scope-lang');
 });
 
 afterEach(() => {
-  localStorage.removeItem('horror-scope-lang');
+  window.localStorage.removeItem('horror-scope-lang');
   setNavigatorProperty('language', originalLanguage);
 });
 
@@ -46,7 +61,7 @@ describe('getLocale', () => {
 
 describe('detectLanguage', () => {
   it('normalizes stored language ids before returning them', () => {
-    localStorage.setItem('horror-scope-lang', 'RO');
+    window.localStorage.setItem('horror-scope-lang', 'RO');
 
     expect(detectLanguage()).toBe('ro');
   });
