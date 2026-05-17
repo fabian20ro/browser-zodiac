@@ -11,10 +11,13 @@ export function createGrammarEngine(grammar: Grammar, rng: SeededRandom) {
     const entries: { text: string; weight: number }[] = options.map((opt) => {
       const sepIdx = opt.lastIndexOf(WEIGHT_SEPARATOR);
       if (sepIdx !== -1) {
-        const weight = parseInt(opt.slice(sepIdx + WEIGHT_SEPARATOR.length), 10);
+        const weightStr = opt.slice(sepIdx + WEIGHT_SEPARATOR.length);
+        const weight = parseInt(weightStr, 10);
         if (!isNaN(weight) && weight > 0) {
           return { text: opt.slice(0, sepIdx), weight };
         }
+        // If invalid weight, strip the separator and treat as weight 1
+        return { text: opt.slice(0, sepIdx), weight: 1 };
       }
       return { text: opt, weight: 1 };
     });
