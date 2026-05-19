@@ -277,3 +277,13 @@
 **Outcome:** Success — the top-level docs now reflect the visible quick-action controls users can actually click.
 **Insight:** When a UI ships multiple affordances on one card, the README should call out the whole action set so the top-level feature list matches the page surface.
 **Promoted to Lessons Learned:** No
+
+---
+
+### [2026-05-17] Stabilize i18n localStorage tests on Node 26
+
+**Context:** Compound Autopilot small reliability pass after baseline `npm test` failed in `src/i18n/i18n.test.ts` because unqualified `localStorage` was unavailable under Node 26.
+**What happened:** Changed i18n persistence reads/writes to use `window.localStorage` explicitly and added a small jsdom test stub for `window.localStorage` so locale tests do not depend on Node's experimental process-level localStorage flag.
+**Outcome:** Success — `npm test` passes and `npm run build` passes.
+**Insight:** In browser-targeted code tested under Node 26 + jsdom, avoid unqualified `localStorage`; use the window-scoped API and test it explicitly.
+**Promoted to Lessons Learned:** Yes

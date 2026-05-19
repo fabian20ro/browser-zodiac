@@ -57,11 +57,11 @@ describe('createGrammarEngine', () => {
       expect(commonCount).toBeGreaterThan(40);
     });
 
-    it('treats invalid weight as weight 1', () => {
+    it('treats invalid weight as weight 1 and strips separator', () => {
       const engine = makeEngine({ item: ['a~~invalid', 'b'] });
-      // Both should be selectable (weight 1 each, but '~~invalid' stays in text)
+      // Both should be selectable (weight 1 each), but we now strip the garbage.
       const result = engine.expand('#item#');
-      expect(['a~~invalid', 'b']).toContain(result);
+      expect(['a', 'b']).toContain(result);
     });
   });
 

@@ -54,6 +54,7 @@ export function readBrowserOracle(): DivinationProfile {
   const online = navigator.onLine;
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Void';
   const windowSize = `${window.innerWidth}x${window.innerHeight}`;
+  const touchPoints = navigator.maxTouchPoints || 0;
 
   const readings: DivinationReading[] = [
     {
@@ -109,6 +110,11 @@ export function readBrowserOracle(): DivinationProfile {
     {
       key: 'cosmic_timezone',
       raw: timezone,
+      interpretation: '',
+    },
+    {
+      key: 'tactile_sensibility',
+      raw: touchPoints > 0 ? 'sensitive' : 'numb',
       interpretation: '',
     },
   ];

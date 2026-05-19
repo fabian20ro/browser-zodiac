@@ -44,6 +44,7 @@ Obsolete lessons → Archive section at bottom (with date and reason). Never del
 **[2026-05-15]** iOS browser UAs need vendor-specific tokens in browser detection — Mobile iOS browsers often identify as `CriOS`, `FxiOS`, `EdgiOS`, or `OPiOS`; treat those tokens as Chrome, Firefox, Edge, or Opera respectively instead of falling back to Safari.
 **[2026-05-15]** Trim browser language before fingerprinting — `navigator.language` can carry incidental whitespace; trim it before using it in a fingerprint so the same browser does not hash differently because of padding.
 **[2026-05-15]** Trim browser platform before fingerprinting — `navigator.platform` can carry incidental whitespace just like `navigator.language`; trim it before using it in the divination fingerprint so padded values do not split destiny keys.
+**[2026-05-17]** Use `window.localStorage` explicitly in browser-facing i18n code — Node 26 exposes an experimental process-level `localStorage` surface that may be unavailable without `--localstorage-file`, while jsdom-backed tests can still provide `window.localStorage`. Referencing the window-scoped API keeps browser code and tests aligned.
 
 ## Testing & Quality
 

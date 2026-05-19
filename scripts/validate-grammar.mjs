@@ -12,6 +12,7 @@ const symbolRefRe = /#([^#.]+)(?:\.[^#]+)?#/g;
 const hashRe = /#/g;
 
 // Add schema validation for loaded grammars and create a CLI audit script for the data directory.
+let globalTotalEntries = 0;
 const runtimeSymbols = new Set([
   'signName',
   'spirit_browser',
@@ -148,8 +149,13 @@ function validateLocale(locale) {
       );
     }
 
+    const seenEntriesInSymbol = new Set();
     for (const [entryIndex, entry] of entries.entries()) {
       validateEntrySyntax(locale, symbol, entry, entryIndex);
+      if (seenEntriesInSymbol.has(entry)) {
+        throw new Error(`Locale ${locale}: duplicate entry in symbol "${symbol}": ${entry}`);
+      }
+      seenEntriesInSymbol.add(entry);
       for (const ref of extractRefs(entry)) {
         queue.push(ref);
       }
@@ -157,6 +163,7 @@ function validateLocale(locale) {
   }
 
   console.log(`Grammar validation passed for ${locale}: checked ${symbolCount} symbols and ${totalEntries} entries.`);
+  globalTotalEntries += totalEntries;
 }
 
 for (const locale of locales) {
@@ -164,3 +171,4 @@ for (const locale of locales) {
 }
 
 console.log(`Grammar validation passed for locales: ${locales.join(', ')}`);
+console.log(`Grand total entries checked across all locales: ${globalTotalEntries}`);

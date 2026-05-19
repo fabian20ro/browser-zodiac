@@ -197,6 +197,26 @@ describe('createActionButton', () => {
     expect(btn.classList.contains('action-btn--feedback')).toBe(false);
   });
 
+  it('prevents concurrent executions of onClick', async () => {
+    const onClick = vi.fn().mockImplementation(async () => {
+      await new Promise(resolve => setTimeout(resolve, 50));
+    });
+    const btn = createActionButton({
+      icon: '⧉',
+      ariaLabel: 'Copy',
+      onClick,
+    });
+
+    btn.click();
+    btn.click();
+    btn.click();
+
+    await Promise.resolve(); 
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
   it('does not show success feedback when the click action rejects', async () => {
     const btn = createActionButton({
       icon: '⧉',
@@ -237,7 +257,7 @@ describe('createActionButton', () => {
 
     btn.click();
     await Promise.resolve();
-    expect(btn.textContent).to.toBe('✕');
+    expect(btn.textContent).toBe('✕');
 
     vi.advanceTimersByTime(1500);
     expect(btn.textContent).toBe('⧉');

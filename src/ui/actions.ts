@@ -15,8 +15,12 @@ export function createActionButton(options: ActionButtonOptions): HTMLButtonElem
   btn.setAttribute('title', options.ariaLabel);
 
   let revertTimer: ReturnType<typeof setTimeout> | null = null;
+  let isRunning = false;
 
   btn.addEventListener('click', async () => {
+    if (isRunning) return;
+    isRunning = true;
+
     if (revertTimer !== null) {
       clearTimeout(revertTimer);
       revertTimer = null;
@@ -43,6 +47,8 @@ export function createActionButton(options: ActionButtonOptions): HTMLButtonElem
           revertTimer = null;
         }, 1500);
       }
+    } finally {
+      isRunning = false;
     }
   });
   return btn;
