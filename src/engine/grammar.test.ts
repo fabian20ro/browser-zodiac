@@ -91,6 +91,11 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.collapse-spaces#')).toBe('hello world');
     });
 
+    it('applies collapse-spaces to tabs and newlines', () => {
+      const engine = makeEngine({ word: ["\t  hello \n\n  world\t"] });
+      expect(engine.expand('#word.collapse-spaces#')).toBe('hello world');
+    });
+
     it('applies titlecase modifier', () => {
       const engine = makeEngine({ word: ['hello world'] });
       expect(engine.expand('#word.titlecase#')).toBe('Hello World');
