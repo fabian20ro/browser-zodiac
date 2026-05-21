@@ -75,6 +75,7 @@ export function createGrammarEngine(grammar: Grammar, rng: SeededRandom) {
     const words = s.trim().split(/\s+/).filter(Boolean);
     return words.map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
   });
+  addModifier('sentencecase', (s) => s.charAt(0).toUpperCase() + s.slice(1));
 
   return { expand, addModifier };
 }

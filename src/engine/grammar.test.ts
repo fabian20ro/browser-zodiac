@@ -101,6 +101,11 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.titlecase#')).toBe('Hello World');
     });
 
+    it('applies sentencecase modifier', () => {
+      const engine = makeEngine({ word: ['hello world'] });
+      expect(engine.expand('#word.sentencecase#')).toBe('Hello world');
+    });
+
     it('titlecases padded whitespace cleanly', () => {
       const engine = makeEngine({ word: ['  hello   world  '] });
       expect(engine.expand('#word.titlecase#')).toBe('Hello World');
