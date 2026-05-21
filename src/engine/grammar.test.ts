@@ -96,6 +96,11 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.collapse-spaces#')).toBe('hello world');
     });
 
+    it('applies strip-punctuation modifier', () => {
+      const engine = makeEngine({ word: ['hello, world!'] });
+      expect(engine.expand('#word.strip-punctuation#')).toBe('hello world');
+    });
+
     it('applies titlecase modifier', () => {
       const engine = makeEngine({ word: ['hello world'] });
       expect(engine.expand('#word.titlecase#')).toBe('Hello World');

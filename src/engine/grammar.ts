@@ -71,6 +71,7 @@ export function createGrammarEngine(grammar: Grammar, rng: SeededRandom) {
   addModifier('lowercase', (s) => s.toLowerCase());
   addModifier('trim', (s) => s.trim());
   addModifier('collapse-spaces', (s) => s.replace(/\s+/g, ' ').trim());
+  addModifier('strip-punctuation', (s) => s.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, ''));
   addModifier('titlecase', (s) => {
     const words = s.trim().split(/\s+/).filter(Boolean);
     return words.map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
@@ -78,4 +79,3 @@ export function createGrammarEngine(grammar: Grammar, rng: SeededRandom) {
 
   return { expand, addModifier };
 }
-// dummy
