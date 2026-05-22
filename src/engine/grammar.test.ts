@@ -112,6 +112,11 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.capitalize.uppercase#')).toBe('HELLO WORLD');
     });
 
+    it('applies exclaim modifier', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(engine.expand('#word.exclaim#')).toBe('hello!');
+    });
+   
     it('ignores unknown modifiers', () => {
       const engine = makeEngine({ word: ['hello'] });
       expect(engine.expand('#word.nonexistent#')).toBe('hello');
