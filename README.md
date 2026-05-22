@@ -30,3 +30,21 @@ npm install
 npm run dev      # local dev server
 npm run build    # production build
 ```
+
+## Grammar Syntax
+
+The horoscope text is generated from grammar files located in `public/data/`.
+
+### Entries and Weighting
+
+Entries can include weights using the `~~` separator. A higher weight means a higher probability of being selected.
+Example: `#signName#~~10 #prediction#~~5` (Sign name is twice as likely as prediction).
+
+### Modifiers
+
+Modifiers are applied to symbols using a dot notation within the `#symbol.modifier#` syntax. Supported modifiers include:
+- `capitalize`: Capitalizes the first letter.
+- `uppercase`: Converts text to uppercase.
+- `lowercase`: Converts text to lowercase.
+- `trim`: Removes surrounding whitespace.
+- `titlecase`: Capitalizes every word.
