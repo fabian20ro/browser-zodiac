@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "lint": "tsc --noEmit",
-    "validate:grammar": "node scripts/validate-grammar.mjs"
+    "validate:grammar": "node scripts/validate-grammar.mjs",
+    "test:grammar-en": "node scripts/validate-grammar.mjs en"
   },
   "devDependencies": {
     "jsdom": "^28.1.0",
