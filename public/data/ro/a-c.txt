@@ -410,7 +410,7 @@ Cel mai bun match: cineva al cărui #dispozitiv# face și el #actiuneCorp# în t
 Evită pe oricine al cărui #spiritAnimal# are un scor de credit mai bun decât al tău.
 Cel mai compatibil cu cineva care își tratează contul de economii ca pe un animal de suport emoțional.
 Limbajul tău de iubire e compatibil cu oricine a denumit un spreadsheet după un fost.
-Caută oameni a căror asigurare de sănătate acoperă întâlniri cu o #creatura#.
+Caută oameni a căror asigurare de sănătate acoperă întâlniri cu #creaturaCuArticol#.
 Cosmosul recomandă o investiție comună cu cineva al cărui #dispozitiv# e și el pe #actiuneCorp#.
 Evită încurcăturile financiare cu oricine poartă #culoare# — portofoliul lor e blestemat.
 Cel mai compatibil cu cineva care are și el o relație complicată cu scorul de credit.
@@ -418,15 +418,15 @@ Chakra inimii tale se aliniază cu oricine bugetează gustările ca și cheltuia
 Cel mai bun match romantic: cineva al cărui #dispozitiv# a fost și el refuzat la un restaurant.
 Evită sfaturi de wellness de la oricine al cărui spirit de #creatura# e la o detoxifiere.
 Stelele recomandă terapie de cuplu cu oricine împarte opinia ta despre #evitare#.
-Evită pe oricine și-a numit rețeaua WiFi după un #creatura#.
+Evită pe oricine și-a numit rețeaua WiFi după #creaturaCuArticol#.
 Aura ta se potrivește cu oamenii care și-au dat un nume încurajator la #parteCorp#.
 Compatibil cu oricine al cărui #dispozitiv# a început și el să se comporte ciudat.
-Caută oameni care poartă #obiect# fără să explice de ce.
+Caută oameni care poartă #obiectCuArticol# fără să explice de ce.
 Cel mai compatibil cu cineva care a fost avertizat despre #subiect# înainte.
 Evită pe oricine care face contact vizual cu #corpCosmic# — știu prea multe.
 Cosmosul recomandă să te împrietenești cu un #profesionist# pentru asigurare spirituală.
 Cel mai bun match: cineva al cărui animal spirit e și el confuz în legătură cu rolul său.
-Energia ta se aliniază cu oricine a pierdut un concurs de privit fix cu un #creatura#.
+Energia ta se aliniază cu oricine a pierdut un concurs de privit fix cu #creaturaCuArticol#.
 Compatibilitate maximă cu cineva al cărui cont bancar scoate și el sunete de #actiuneCorp#.
 
 
@@ -522,6 +522,57 @@ wendigo instructor de fitness
 basilisk conștient de buget
 poltergeist de aplicații de dating
 lich de planificare a pensiei
+
+
+=== creaturaCuArticol ===
+un unicorn
+un dragon
+un fenix
+un kraken
+un goblin
+un sfinx
+un yeti
+un mothman
+un chupacabra
+un drop bear
+un jackalope
+un ornitorinc vrăjitor
+un gremlin
+un basilisk
+o chimeră
+un minotaur
+o ceață conștientă
+o hidră birocratică
+un trol complex emoțional
+un grifon cu anxietate
+o pasăre-tunet domesticită
+un pegas scutit de taxe
+un vârcolac filozofic
+o banshee politicoasă
+un kraken manager de mijloc
+un centaur life coach
+un dragon cu ordin de restricție
+un colos miniaturizat
+un yeti invizibil (pretinde el)
+un basilisk hipoalergenic
+un sfinx pensionat
+un vampir vegan
+un fenix consultant financiar
+un kraken guru al iubirii
+un goblin influencer de wellness
+un minotaur de fond de hedging
+o chimeră terapeut de cuplu
+un gargoyle de asigurări de sănătate
+o zână a criptomonedelor
+un ciclop avocat de divorțuri
+un cerber de suport emoțional
+un centaur cardiolog (tratează doar inimi frânte)
+un dragon scutit de taxe
+o sirenă suflet pereche (rezultatele pot varia)
+un wendigo instructor de fitness
+un basilisk conștient de buget
+un poltergeist de aplicații de dating
+un lich de planificare a pensiei
 
 
 === culoare ===

@@ -31,6 +31,8 @@ Obsolete lessons → Archive section at bottom (with date and reason). Never del
 
 **[2026-03-04]** Romanian gender: use variant symbols, not template-level pronouns — When a template needs a gendered possessive (ta/tău/tale) or object clitic (-l/-o) next to a mixed-gender symbol, create a variant symbol with the gendered element embedded in each entry (e.g., `parteCorpTa` alongside bare `parteCorp`). Pattern: `#symbolTa#` replaces `#symbol# ta`. Keep bare and variant symbols in sync. For object clitics, prefer restructuring the template to avoid them entirely (e.g., "aruncă o privire" instead of "verifică-l").
 
+**[2026-06-03]** Romanian indefinite articles belong in mixed-gender variant symbols — For symbols with mixed grammatical gender, never hardcode `un/o/unui` in the parent template. Add an article-bearing variant such as `#creaturaCuArticol#` or reuse an existing one like `#obiectCuArticol#`; otherwise outputs like `un ceață` or `pe rățușcă` leak into generated text.
+
 **[2026-05-08]** Catch rejected async UI actions in helpers — `createActionButton`-style wrappers should handle callback rejections deliberately so a failed `Promise` does not become an unhandled rejection or a false success state. Keep the control visually stable on failure and cover the rejection path in tests.
 
 **[2026-05-11]** Transient feedback buttons need timer cancellation on reactivation — If a control shows temporary success/error feedback after async completion, clear any pending revert timer and reset to the base icon/class at the start of a new click. Otherwise an older timeout can restore the stale state too early or leave the previous feedback visible after a new failed/no-op action.

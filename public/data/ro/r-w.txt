@@ -213,7 +213,7 @@ subtextul romantic al mesajelor de eroare
 
 
 === warning ===
-Ferește-te de #creatura# care poartă #obiect#.
+Ferește-te de #creaturaCuArticol# care poartă #obiectCuArticol#.
 NU te încrede în nimeni îmbrăcat în #culoare# astăzi.
 Dacă #parteCorpTa# începe să #actiuneCorp#, consultă un #profesionist#.
 Universul îți judecă alegerea de browser. Alege cu înțelepciune.
@@ -221,38 +221,38 @@ Evită să apeși butoane etichetate „#mantra#".
 #dispozitivulTau.capitalize# pune ceva la cale. Fii vigilent.
 #planeta# te urmărește. Comportă-te normal.
 Nu deschide emailuri de la #corpCosmic# — e o capcană.
-Un #creatura# se preface că e #profesionist#. Nu te lăsa păcălit.
+#creaturaCuArticol.capitalize# se preface că e #profesionist#. Nu te lăsa păcălit.
 Dacă auzi #mancare# vorbind, ignoră — nu e momentul.
 #dispozitivulTau.capitalize# a șoptit altor #dispozitiv#-uri despre tine.
 NU accepta #cadou# de la nimeni îmbrăcat în #culoare#.
 Dacă #corpCosmic# face contact vizual, nu privești primul în altă parte.
 #parteCorpTa.capitalize# știe ceva ce tu nu știi. Ascultă.
-Acel #creatura# de la #locatie# nu e ce pare.
+#creaturaCuArticol.capitalize# de la #locatie# nu e ce pare.
 #planeta# ți-a trimis deja #numarMic# avertismente. Acesta e ultimul.
 Dacă #celebritate# te contactează, e deja prea târziu.
-Oricine întreabă despre #subiect# azi e un #creatura# deghizat.
+Oricine întreabă despre #subiect# azi pretinde în secret că este #creaturaCuArticol#.
 #dispozitivulTau.capitalize# va încerca să se actualizeze într-un moment crucial. Fii pregătit.
 NU căuta pe Google „#subiect#" — rezultatele te vor găsi pe tine.
 #dispozitivulTau.capitalize# investește energie emoțională în #subiect#. Randamentul nu e grozav.
 #planeta# ți-a revocat garanția la #aspectViataTa#. Ești acum neasigurat cosmic.
-Un #creatura# de la #locatie# vrea să discute #subiect# cu #parteCorpTa#. Pune limite.
+#creaturaCuArticol.capitalize# de la #locatie# vrea să discute #subiect# cu #parteCorpTa#. Pune limite.
 Dacă #obiectCuArticol# începe să strălucească lângă #mancare#, viața ta amoroasă se complică.
 NU lăsa un #profesionist# lângă #dispozitivulTau# azi — lucrează pentru #planeta#.
-#parteCorpTa.capitalize# a deschis un cont bancar comun cu un #creatura#. Îngheață-ți activele.
+#parteCorpTa.capitalize# a deschis un cont bancar comun cu #creaturaCuArticol#. Îngheață-ți activele.
 #corpCosmic# dă swipe right pe #aspectViataTa#. Nu e un compliment.
 Dacă găsești o chitanță pentru #cadou# la #locatie#, asigurarea ta de sănătate a fost compromisă.
-Un #creatura# deghizat în #profesionist# îți va oferi #mancare# — e un buyout cu efect de levier.
+#creaturaCuArticol.capitalize# sub acoperire ca #profesionist# îți va oferi #mancare# — e un buyout cu efect de levier.
 #dispozitivulTau.capitalize# de la #locatie# scrie poezie de dragoste despre #obiectCuArticol#. Nu încuraja.
 #parteCorpTa.capitalize# va primi o factură de la #planeta# pentru #numarMic# contravenții cosmice.
 NU discuta despre #subiect# lângă #dispozitivulTau# — raportează la #corpCosmic# de săptămâni.
 #aspectViataTa.capitalize# a primit preaprobare pentru un împrumut de la #planeta#. Rata dobânzii e sănătatea ta mintală.
-Un #obiect# al tău a început să evolueze de unul singur. Nu interveni.
+#obiectCuArticol.capitalize# dintre lucrurile tale a început să evolueze de unul singur. Nu interveni.
 Dacă #aspectViataTa# începe să se comporte ciudat, e tehnic normal săptămâna asta.
 Un #profesionist# va încerca să-ți vândă asigurare pentru #aspectViataTa#. Refuză politicos dar ferm.
 NU lăsa #dispozitivulTau# și #parteCorpTa# să comunice nesupravegheat.
-Dacă găsești #obiect# la #locatie#, lasă-l exact unde e.
+Dacă găsești #obiectCuArticol# la #locatie#, lasă-l exact unde e.
 #planeta# a deschis o investigație asupra obiceiurilor tale de navigare. Golește-ți cache-ul.
-Un #creatura# de lângă #locatie# a întrebat de tine pe nume.
+#creaturaCuArticol.capitalize# de lângă #locatie# a întrebat de tine pe nume.
 #parteCorpTa.capitalize# va încerca să #actiuneCorp# — nu o lăsa să termine.
 Automatul de la #locatie# îți știe PIN-ul. Evită-l.
 NU citi clauzele mici la nimic astăzi — ignoranța e armură.

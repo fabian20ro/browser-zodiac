@@ -10,6 +10,7 @@ const sectionRe = /^===\s*(.+?)\s*===$/;
 const fromRe = /^@from\s+(\S+)\s+import\s+\*$/;
 const symbolRefRe = /#([^#.]+)(?:\.[^#]+)?#/g;
 const hashRe = /#/g;
+const pastedLineNumberRe = /^\d+\|/;
 
 // Add schema validation for loaded grammars and create a CLI audit script for the data directory.
 let globalTotalEntries = 0;
@@ -102,6 +103,12 @@ function extractRefs(entry) {
 }
 
 function validateEntrySyntax(locale, symbol, entry, entryIndex) {
+  if (pastedLineNumberRe.test(entry)) {
+    throw new Error(
+      `Locale ${locale}: symbol "${symbol}" entry ${entryIndex + 1} looks like a pasted line-number artifact: ${entry}`,
+    );
+  }
+
   const hashCount = (entry.match(hashRe) ?? []).length;
   if (hashCount % 2 !== 0) {
     throw new Error(

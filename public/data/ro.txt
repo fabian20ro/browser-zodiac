@@ -17,7 +17,7 @@ Hai, #signName#! #corpCosmic# a decretat: #predictie# #consecinta# #sfat#
 #salutTimpuriu.capitalize#, #signName#! #predictie# Un semn #adjectiv#, dar #sfat#
 #deschidere.capitalize# #predictie# #planeta# a depus o plângere oficială. #consecinta# #sfat#
 Ascultă vidul, #signName#: #predictie# #consecinta# Mantra ta: „#mantra#."
-#deschidere.capitalize# Un #creatura# a prezis asta: #predictie# #sfat# #intelepciune.capitalize#.
+#deschidere.capitalize# #creaturaCuArticol.capitalize# a prezis asta: #predictie# #sfat# #intelepciune.capitalize#.
 #salutTimpuriu.capitalize#! #corpCosmic# a trimis un memo: #predictie# #consecinta# #sfat#
 #deschidere.capitalize# #predictie# Asta nu e nici exercițiu, nici vis. #consecinta# #sfat#
 #corpCosmic.capitalize# tușește nervos, #signName#. #predictie# #consecinta# #sfat#
@@ -144,7 +144,7 @@ Vei întâlni #intalnire# la #locatie#.
 #parteCorpTa.capitalize# va dezvolta o afinitate ciudată pentru #mancare#.
 Stelele sugerează să eviți #evitare# cu orice preț.
 Vei #accident# din greșeală.
-Un #adjectiv# #creatura# va apărea în #locatie# cu #cadou#.
+La #locatie# va apărea #creaturaCuArticol# cu aer #adjectiv# și cu #cadou#.
 Următorul update de la #dispozitiv# va dezvălui #secret#.
 Cineva te va confunda cu #celebritate# la #locatie#.
 #parteCorpTa.capitalize# va începe să #actiuneCorp# în cel mai nepotrivit moment.
@@ -157,41 +157,41 @@ O eroare cosmică va face ca #aspectViata# să funcționeze perfect pentru exact
 Vei descoperi un talent ascuns pentru #subiect# în timp ce eviți #evitare#.
 Umbra ta va fi scurt în dezacord cu direcția ta la #locatie#.
 O ceață #adjectiv# se va așeza peste #aspectViataTa# și va refuza să plece.
-Vei auzi #intalnire# explicând #subiect# unui #creatura#.
+Vei auzi #intalnire# explicând #subiect# pentru #creaturaCuArticol#.
 #dispozitivulTau.capitalize# îți va corecta automat numele în ceva profund profetic.
 O eroare de dosare în cosmos îți va atribui temporar #aspectViata# altcuiva.
 Conceptul de #evitare# va deveni conștient și te va căuta personal.
-Vei găsi #cadou# în interiorul unui #obiect# pe care îl ai de ani.
+Vei găsi #cadou# ascuns lângă #obiectCuArticol# pe care îl ai de ani.
 #celebritate.capitalize# îți va da like accidental la o poză din 2014.
 Reflexia ta va clipi cu o altă frecvență decât tine.
 Vei deschide o ușă și vei vedea scurt #locatie# înainte să se schimbe.
 Numărul #numarMic# te va urmări cu ostilitate crescândă.
-Un #creatura# îți va înmâna o chitanță pentru ceva ce n-ai cumpărat.
-   170|#intalnire.capitalize# îți va cere părerea despre #subiect# și chiar va asculta.
-   171|#parteCorpTa.capitalize# va primi o notificare.
-   172|Vei rezolva din greșeală #subiect# în timp ce-ți căutai cheile.
-   173|WiFi-ul la #locatie# va funcționa doar când nu-l folosești.
-   174|#dispozitivulTau.capitalize# va afișa scurt un mesaj de la #celebritate#.
+#creaturaCuArticol.capitalize# îți va înmâna o chitanță pentru ceva ce n-ai cumpărat.
+#intalnire.capitalize# îți va cere părerea despre #subiect# și chiar va asculta.
+#parteCorpTa.capitalize# va primi o notificare.
+Vei rezolva din greșeală #subiect# în timp ce-ți căutai cheile.
+WiFi-ul la #locatie# va funcționa doar când nu-l folosești.
+#dispozitivulTau.capitalize# va afișa scurt un mesaj de la #celebritate#.
 
 
 O factură #adjectiv# va sosi dintr-o dimensiune în care aparent ai o ipotecă.
 #celebritate.capitalize# îți va trimite o sumă care ridică mai multe întrebări decât răspunsuri.
 #parteCorpTa.capitalize# va detecta o schimbare bruscă în economia locală.
 Te vei îndrăgosti de spreadsheet-ul cuiva la #locatie#.
-Un #creatura# îți va oferi sfaturi nesolicitate de investiții care sunt deranjant de sensate.
+#creaturaCuArticol.capitalize# îți va oferi sfaturi nesolicitate de investiții care sunt deranjant de sensate.
 Asigurarea ta de sănătate va refuza retroactiv acoperirea unui vis pe care l-ai avut.
 Vei primi o cerere în căsătorie din partea propriului scor de credit.
 Un doctor #adjectiv# va apărea la #locatie# și te va diagnostica cu „vibrații excesive."
 #dispozitivulTau.capitalize# va plasa un ordin de cumpărare în numele tău pentru #numarMare# unități de stabilitate emoțională.
-Vei găsi o scrisoare de dragoste adresată contului tău bancar în interiorul unui #obiect#.
-Un #creatura# la #locatie# îți va înmâna o factură detaliată pentru ultimele #numarMic# decizii proaste.
+Vei găsi o scrisoare de dragoste adresată contului tău bancar ascunsă lângă #obiectCuArticol#.
+#creaturaCuArticol.capitalize# la #locatie# îți va înmâna o factură detaliată pentru ultimele #numarMic# decizii proaste.
 #parteCorpTa.capitalize# va începe să genereze venit pasiv fără să te anunțe.
 Un #profesionist# te va informa că viața ta amoroasă a fost achiziționată de un holding.
 Vei descoperi că #mancare# a fost singurul lucru care-ți ținea sistemul imunitar departe de faliment.
 Abonamentul tău la sală va deveni conștient și te va da în judecată la instanța de reclamații mici.
 #celebritate.capitalize# îți va oferi un împrumut cu dobândă legată de succesul tău romantic.
 Un plic #adjectiv# conținând averea ta netă dintr-o viață anterioară va apărea la #locatie#.
-#dispozitivulTau.capitalize# te va potrivi cu un #creatura# pe o aplicație de dating pe care n-ai instalat-o.
+#dispozitivulTau.capitalize# te va potrivi cu #creaturaCuArticol# pe o aplicație de dating pe care n-ai instalat-o.
 Vei vindeca accidental o boală minoră verificându-ți portofoliul de investiții.
 
 
@@ -227,7 +227,7 @@ Cineva va deschide un GoFundMe pentru demnitatea ta, dar nu va atinge obiectivul
 Inima ta va depune o cerere de asigurare despre care știe că va fi respinsă.
 Asta va fi deductibilă fiscal în exact zero dimensiuni.
 Compania ta de asigurări de sănătate va suna doar ca să râdă.
-Un #creatura# va vinde în lipsă perspectivele tale romantice.
+#creaturaCuArticol.capitalize# va vinde în lipsă perspectivele tale romantice.
 Profilul tău de dating se va actualiza singur pentru a reflecta noua realitate.
 O agenție de colectare dintr-o viață anterioară te va ajunge din urmă în sfârșit.
 Doctorul și contabilul tău vor programa o intervenție comună.
@@ -240,7 +240,7 @@ Un #profesionist# va scrie un studiu de caz despre asta.
 
 === sfat ===
 Poartă #culoare# ca să alungi #lucruRau#.
-Dacă vezi un #creatura#, #sfatCreatura#.
+Dacă vezi #creaturaCuArticol#, #sfatCreatura#.
 Mișcarea de putere a zilei: #miscarePutere#.
 Evită #evitare# între orele #numarMic# și #numarMare#.
 Gustarea norocoasă este #mancare#. Consumă-o #adverb#.
@@ -251,7 +251,7 @@ Consultă un #profesionist# înainte de ora #numarMare#.
 Pune #obiectCuArticol# sub pernă pentru vise profetice.
 Ține #culoare# aproape de inimă — culorile te protejează astăzi.
 Fă exact opusul a ceea ce îți spune #dispozitivulTau#.
-Scrie-ți temerile pe #obiect# și aruncă-le spre un #creatura#.
+Scrie-ți temerile pe #obiectCuArticol# și aruncă-le spre #creaturaCuArticol#.
 Stai la #locatie# exact #numarMic# minute pentru claritate.
 Planul tău de rezervă e mai bun decât cel principal. Folosește-l.
 Nu te încrede în nimeni care poartă #culoare# înainte de prânz.
@@ -268,7 +268,7 @@ Nu te îndrăgosti de nimeni al cărui #dispozitiv# e pe #actiuneCorp# — ăla 
 Investește exact #numarMic# lei în ceva ce nu înțelegi. Universul respectă haosul.
 Mănâncă #mancare# înainte de orice decizie romantică.
 Consultă un #profesionist# despre ce face #parteCorpTa# când îți vezi soldul bancar.
-Astăzi, tratează-ți scorul de credit ca pe un #creatura# — hrănește-l, dar nu te încrede în el.
+Astăzi, tratează-ți scorul de credit ca pe #creaturaCuArticol# — hrănește-l, dar nu te încrede în el.
 Trimite companiei tale de asigurări de sănătate un bilet scris de mână care zice doar „#mantra#."
 Evită să discuți despre bani, dragoste sau #subiect# cu oricine poartă #culoare#.
 Inima ta are nevoie de un update de firmware. Repornește-o mâncând #mancare# la #locatie#.

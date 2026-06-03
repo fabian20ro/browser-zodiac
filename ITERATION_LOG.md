@@ -297,3 +297,13 @@
 **Outcome:** Success — build and focused UI tests passed; browser check confirmed dark green/silver and light copper text.
 **Insight:** Unicode zodiac symbols may render as colored emoji unless `U+FE0E` text presentation is appended; color-only CSS is not enough in every browser.
 **Promoted to Lessons Learned:** Yes
+
+---
+
+### [2026-06-03] Fix Romanian article agreement in generated descriptions
+
+**Context:** User reported two final agreement errors in one Romanian horoscope: `pe rățușcă de cauciuc` and `un ceață conștientă`.
+**What happened:** Traced both to parent templates hardcoding article/preposition context around mixed-gender grammar symbols. Added `creaturaCuArticol`, switched affected `creatura` and `obiect` templates to article-bearing variants, rewrote dative/interior forms to avoid impossible case agreement, and removed pasted `170|` line-number artifacts from `ro.txt`. Added grammar validation for pasted line-number artifacts.
+**Outcome:** Success — no remaining searched hardcoded `un/o/unui #creatura#` or bare `pe/unui/un #obiect#` patterns; `npm run validate:grammar`, `npm test`, and `npm run build` pass.
+**Insight:** Romanian article agreement must live in data variants for mixed-gender symbols; validators should catch pasted line-number artifacts because grammar files treat them as valid entries.
+**Promoted to Lessons Learned:** Yes
