@@ -287,3 +287,13 @@
 **Outcome:** Success — `npm test` passes and `npm run build` passes.
 **Insight:** In browser-targeted code tested under Node 26 + jsdom, avoid unqualified `localStorage`; use the window-scoped API and test it explicitly.
 **Promoted to Lessons Learned:** Yes
+
+---
+
+### [2026-06-03] Recolor theme from purple/gold to green/silver/copper
+
+**Context:** User wanted dark theme moved from purple/gold to near-black green with witchcraft-like silver, and light theme text made copper like the title.
+**What happened:** Reworked theme variables in `src/style.css`, updated starfield/card glows, browser theme colors, manifest colors, favicon colors, and forced zodiac glyphs into text presentation so they inherit theme color instead of rendering as purple emoji.
+**Outcome:** Success — build and focused UI tests passed; browser check confirmed dark green/silver and light copper text.
+**Insight:** Unicode zodiac symbols may render as colored emoji unless `U+FE0E` text presentation is appended; color-only CSS is not enough in every browser.
+**Promoted to Lessons Learned:** Yes

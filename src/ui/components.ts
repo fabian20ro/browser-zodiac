@@ -68,7 +68,7 @@ export function createSignCard(
   const label = el('div', 'sign-card__label', ui.yourSign);
 
   const nameRow = el('div', 'sign-card__name-row');
-  const symbol = el('span', 'sign-card__symbol', horoscope.signSymbol);
+  const symbol = el('span', 'sign-card__symbol', `${horoscope.signSymbol}\uFE0E`);
   const name = el('span', 'sign-card__name', ui.signNames[horoscope.sign]);
   const diceBtn = el('button', 'sign-card__randomize', '\u{1F3B2}');
   diceBtn.type = 'button';

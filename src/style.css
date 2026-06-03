@@ -3,21 +3,20 @@
    ================================================ */
 
 :root {
-  --bg-deep: #000000;
-  --bg-card: #0f1a3d;
-  --bg-card-hover: #162450;
-  --gold: #f5c842;
-  --gold-dim: #c9a22e;
-  --title-shadow: 0 0 20px rgba(245, 200, 66, 0.4),
-    0 0 60px rgba(245, 200, 66, 0.15);
-  --purple-light: #b388ff;
-  --purple-mid: #7c4dff;
-  --purple-glow: rgba(124, 77, 255, 0.4);
-  --text-primary: #e8dff5;
-  --text-secondary: #b8a9d1;
-  --text-muted: #7e6c9a;
-  --border-glow: rgba(245, 200, 66, 0.3);
-  --border-card: rgba(179, 136, 255, 0.2);
+  --bg-deep: #020704;
+  --bg-card: #06120c;
+  --bg-card-hover: #0a1b12;
+  --metal: #c8d8cf;
+  --metal-dim: #8fa89a;
+  --title-shadow: 0 0 20px rgba(200, 216, 207, 0.32),
+    0 0 60px rgba(105, 144, 118, 0.18);
+  --green-silver: #b8cfc1;
+  --green-glow: rgba(96, 145, 111, 0.4);
+  --text-primary: #d8e3dc;
+  --text-secondary: #adbeb4;
+  --text-muted: #75897d;
+  --border-glow: rgba(200, 216, 207, 0.26);
+  --border-card: rgba(96, 145, 111, 0.28);
   --radius: 16px;
   --starfield-opacity: 1;
 }
@@ -26,17 +25,16 @@
   --bg-deep: #f0eff4;
   --bg-card: #dde4f5;
   --bg-card-hover: #cdd6ec;
-  --gold: #8a5a00;
-  --gold-dim: #6f4600;
+  --metal: #8a5a00;
+  --metal-dim: #6f4600;
   --title-shadow: 0 0 10px rgba(138, 90, 0, 0.18);
-  --purple-light: #5c33a6;
-  --purple-mid: #5c33a6;
-  --purple-glow: rgba(92, 51, 166, 0.25);
-  --text-primary: #1a1028;
-  --text-secondary: #3d2e5c;
-  --text-muted: #6e5e8a;
+  --green-silver: #8a5a00;
+  --green-glow: rgba(138, 90, 0, 0.24);
+  --text-primary: #5f3c13;
+  --text-secondary: #7a4d17;
+  --text-muted: #9a6a31;
   --border-glow: rgba(184, 134, 11, 0.3);
-  --border-card: rgba(92, 51, 166, 0.2);
+  --border-card: rgba(138, 90, 0, 0.22);
   --starfield-opacity: 0;
 }
 
@@ -74,19 +72,19 @@ body::before {
   background:
     radial-gradient(1px 1px at 10% 20%, rgba(255, 255, 255, 0.6), transparent),
     radial-gradient(1px 1px at 30% 70%, rgba(255, 255, 255, 0.4), transparent),
-    radial-gradient(1.5px 1.5px at 50% 10%, rgba(245, 200, 66, 0.5), transparent),
+    radial-gradient(1.5px 1.5px at 50% 10%, rgba(200, 216, 207, 0.45), transparent),
     radial-gradient(1px 1px at 70% 40%, rgba(255, 255, 255, 0.5), transparent),
-    radial-gradient(1px 1px at 85% 80%, rgba(179, 136, 255, 0.4), transparent),
+    radial-gradient(1px 1px at 85% 80%, rgba(96, 145, 111, 0.45), transparent),
     radial-gradient(1.5px 1.5px at 20% 50%, rgba(255, 255, 255, 0.3), transparent),
-    radial-gradient(1px 1px at 60% 60%, rgba(245, 200, 66, 0.3), transparent),
+    radial-gradient(1px 1px at 60% 60%, rgba(200, 216, 207, 0.3), transparent),
     radial-gradient(1px 1px at 90% 15%, rgba(255, 255, 255, 0.5), transparent),
-    radial-gradient(1px 1px at 5% 90%, rgba(179, 136, 255, 0.3), transparent),
+    radial-gradient(1px 1px at 5% 90%, rgba(96, 145, 111, 0.34), transparent),
     radial-gradient(1.5px 1.5px at 40% 30%, rgba(255, 255, 255, 0.4), transparent),
-    radial-gradient(1px 1px at 75% 55%, rgba(245, 200, 66, 0.4), transparent),
+    radial-gradient(1px 1px at 75% 55%, rgba(200, 216, 207, 0.36), transparent),
     radial-gradient(1px 1px at 55% 85%, rgba(255, 255, 255, 0.3), transparent),
     radial-gradient(1px 1px at 15% 5%, rgba(255, 255, 255, 0.6), transparent),
-    radial-gradient(1px 1px at 95% 50%, rgba(179, 136, 255, 0.5), transparent),
-    radial-gradient(ellipse at 50% 0%, rgba(124, 77, 255, 0.15), transparent 60%);
+    radial-gradient(1px 1px at 95% 50%, rgba(96, 145, 111, 0.5), transparent),
+    radial-gradient(ellipse at 50% 0%, rgba(34, 86, 51, 0.22), transparent 60%);
 }
 
 /* ---- App Container ---- */
@@ -127,12 +125,12 @@ body::before {
 }
 
 .top-bar__btn:hover {
-  border-color: var(--gold-dim);
-  color: var(--gold);
+  border-color: var(--metal-dim);
+  color: var(--metal);
 }
 
 .top-bar__btn:focus-visible {
-  outline: 2px solid var(--gold);
+  outline: 2px solid var(--metal);
   outline-offset: 2px;
 }
 
@@ -146,7 +144,7 @@ body::before {
 
 .header__stars {
   font-size: 1.15rem;
-  color: var(--gold);
+  color: var(--metal);
   letter-spacing: 0.45rem;
   margin-bottom: 0.2rem;
   opacity: 0.7;
@@ -156,7 +154,7 @@ body::before {
   font-family: 'Cinzel', Georgia, serif;
   font-size: clamp(2rem, 8vw, 3.5rem);
   font-weight: 900;
-  color: var(--gold);
+  color: var(--metal);
   text-shadow: var(--title-shadow);
   line-height: 1.1;
   letter-spacing: 0.05em;
@@ -178,23 +176,23 @@ body::before {
   font-size: 0.9rem;
   font-weight: 700;
   padding: 0.65rem 2rem;
-  border: 1px solid var(--gold-dim);
+  border: 1px solid var(--metal-dim);
   border-radius: 999px;
-  background: linear-gradient(135deg, rgba(245, 200, 66, 0.1), rgba(124, 77, 255, 0.1));
-  color: var(--gold);
+  background: linear-gradient(135deg, rgba(200, 216, 207, 0.1), rgba(34, 86, 51, 0.18));
+  color: var(--metal);
   cursor: pointer;
   letter-spacing: 0.08em;
   transition: all 0.25s ease;
-  box-shadow: 0 0 12px rgba(245, 200, 66, 0.1);
+  box-shadow: 0 0 12px rgba(200, 216, 207, 0.1);
 }
 
 .regen-btn:hover {
-  background: linear-gradient(135deg, rgba(245, 200, 66, 0.2), rgba(124, 77, 255, 0.2));
-  box-shadow: 0 0 20px rgba(245, 200, 66, 0.2);
+  background: linear-gradient(135deg, rgba(200, 216, 207, 0.18), rgba(34, 86, 51, 0.3));
+  box-shadow: 0 0 20px rgba(200, 216, 207, 0.18);
 }
 
 .regen-btn:focus-visible {
-  outline: 2px solid var(--gold);
+  outline: 2px solid var(--metal);
   outline-offset: 2px;
 }
 
@@ -248,15 +246,16 @@ body::before {
 .sign-card__symbol {
   font-size: 2rem;
   line-height: 1;
-  filter: drop-shadow(0 0 12px var(--purple-glow));
+  color: var(--metal);
+  filter: drop-shadow(0 0 12px var(--green-glow));
 }
 
 .sign-card__name {
   font-family: 'Cinzel', Georgia, serif;
   font-size: 1.75rem;
   font-weight: 700;
-  color: var(--gold);
-  text-shadow: 0 0 16px rgba(245, 200, 66, 0.3);
+  color: var(--metal);
+  text-shadow: 0 0 16px rgba(200, 216, 207, 0.28);
 }
 
 .sign-card__randomize {
@@ -273,13 +272,13 @@ body::before {
 }
 
 .sign-card__randomize:hover {
-  color: var(--gold);
+  color: var(--metal);
   border-color: var(--border-card);
   animation: diceShake 0.4s ease;
 }
 
 .sign-card__randomize:focus-visible {
-  outline: 2px solid var(--gold);
+  outline: 2px solid var(--metal);
   outline-offset: 2px;
 }
 
@@ -295,8 +294,8 @@ body::before {
 .horoscope-card {
   border-color: var(--border-glow);
   box-shadow:
-    0 0 30px rgba(245, 200, 66, 0.08),
-    inset 0 0 30px rgba(124, 77, 255, 0.05);
+    0 0 30px rgba(200, 216, 207, 0.08),
+    inset 0 0 30px rgba(34, 86, 51, 0.12);
 }
 
 .horoscope-card__heading-row {
@@ -309,7 +308,7 @@ body::before {
 .horoscope-card__heading {
   font-family: 'Cinzel', Georgia, serif;
   font-size: 1.25rem;
-  color: var(--gold);
+  color: var(--metal);
   margin-bottom: 0;
   text-align: center;
   text-transform: uppercase;
@@ -337,18 +336,18 @@ body::before {
 }
 
 .action-btn:hover {
-  color: var(--gold);
+  color: var(--metal);
   border-color: var(--border-card);
-  background: rgba(245, 200, 66, 0.05);
+  background: rgba(200, 216, 207, 0.06);
 }
 
 .action-btn:focus-visible {
-  outline: 2px solid var(--gold);
+  outline: 2px solid var(--metal);
   outline-offset: 2px;
 }
 
 .action-btn--feedback {
-  color: var(--gold);
+  color: var(--metal);
 }
 
 .horoscope-card__text {
@@ -391,7 +390,7 @@ body::before {
 
 .detail-row__value {
   font-size: 0.95rem;
-  color: var(--purple-light);
+  color: var(--green-silver);
 }
 
 /* ---- Divination Card ---- */
@@ -418,11 +417,11 @@ body::before {
 }
 
 .divination-card__toggle:hover {
-  color: var(--gold);
+  color: var(--metal);
 }
 
 .divination-card__toggle:focus-visible {
-  outline: 2px solid var(--gold);
+  outline: 2px solid var(--metal);
   outline-offset: 2px;
 }
 
@@ -447,7 +446,7 @@ body::before {
 
 .footer__generated {
   font-size: 0.8rem;
-  color: var(--gold-dim);
+  color: var(--metal-dim);
   letter-spacing: 0.1em;
   margin-bottom: 0.5rem;
 }
@@ -482,7 +481,7 @@ body::before {
   background: linear-gradient(
     45deg,
     transparent 30%,
-    rgba(245, 200, 66, 0.3) 50%,
+    rgba(200, 216, 207, 0.26) 50%,
     transparent 70%
   );
   mask:
