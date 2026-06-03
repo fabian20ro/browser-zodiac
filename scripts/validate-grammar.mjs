@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const dataDir = resolve(__dirname, '../public/data');
-const locales = ['en', 'ro'];
+const locales = process.argv[2] ? [process.argv[2]] : ['en', 'ro'];
 const minEntriesPerSymbol = 5;
 const sectionRe = /^===\s*(.+?)\s*===$/;
 const fromRe = /^@from\s+(\S+)\s+import\s+\*$/;

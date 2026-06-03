@@ -172,6 +172,7 @@ Your #bodyPart# will start #bodyPartAction# at the worst possible moment.
 You will receive #gift# from #celebrity#.
 A cosmic glitch will make your #lifeAspect# work perfectly for exactly 7 minutes.
 The #cosmicBody# will reveal #secret# through a subtle sign.
+Your #device# will briefly display a message from #celebrity#.
 You will discover a hidden talent for #topic# while avoiding #avoidance#.
 Your shadow will briefly disagree with your direction at #location#.
 A #adjective# fog will settle over your #lifeAspect# and refuse to leave.

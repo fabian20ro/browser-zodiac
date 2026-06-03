@@ -167,12 +167,13 @@ Reflexia ta va clipi cu o altă frecvență decât tine.
 Vei deschide o ușă și vei vedea scurt #locatie# înainte să se schimbe.
 Numărul #numarMic# te va urmări cu ostilitate crescândă.
 Un #creatura# îți va înmâna o chitanță pentru ceva ce n-ai cumpărat.
-#intalnire.capitalize# îți va cere părerea despre #subiect# și chiar va asculta.
-#parteCorpTa.capitalize# va primi o notificare.
-Un plic #adjectiv# va sosi cu numele tău greșit într-un mod măgulitor.
-Vei rezolva din greșeală #subiect# în timp ce-ți căutai cheile.
-WiFi-ul la #locatie# va funcționa doar când nu-l folosești.
-Contul tău bancar îți va trimite o notificare push care scrie doar „serios?"
+   170|#intalnire.capitalize# îți va cere părerea despre #subiect# și chiar va asculta.
+   171|#parteCorpTa.capitalize# va primi o notificare.
+   172|Vei rezolva din greșeală #subiect# în timp ce-ți căutai cheile.
+   173|WiFi-ul la #locatie# va funcționa doar când nu-l folosești.
+   174|#dispozitivulTau.capitalize# va afișa scurt un mesaj de la #celebritate#.
+
+
 O factură #adjectiv# va sosi dintr-o dimensiune în care aparent ai o ipotecă.
 #celebritate.capitalize# îți va trimite o sumă care ridică mai multe întrebări decât răspunsuri.
 #parteCorpTa.capitalize# va detecta o schimbare bruscă în economia locală.
