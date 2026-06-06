@@ -112,6 +112,11 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.capitalize.uppercase#')).toBe('HELLO WORLD');
     });
 
+    it('applies slugify modifier', () => {
+      const engine = makeEngine({ word: ['Hello World!!!'] });
+      expect(engine.expand('#word.slugify#')).toBe('hello-world');
+    });
+
     it('ignores unknown modifiers', () => {
       const engine = makeEngine({ word: ['hello'] });
       expect(engine.expand('#word.nonexistent#')).toBe('hello');
