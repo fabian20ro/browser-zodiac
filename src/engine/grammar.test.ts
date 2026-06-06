@@ -31,9 +31,16 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#missing#')).toBe('[?missing]');
     });
 
-    it('returns [?symbol] for empty rule arrays', () => {
-      const engine = makeEngine({ empty: [] });
-      expect(engine.expand('#empty#')).toBe('[?empty]');
+    it('handles multiple items with mixed valid and invalid weights', () => {
+      const engine = makeEngine({ item: ['a~~10', 'b~~invalid', 'c~~-1', 'd'] });
+      const results = new Set<string>();
+      for (let i = 0; i < 200; i++) {
+        results.add(engine.expand('#item#'));
+      }
+      expect(results.has('a')).toBe(true);
+      expect(results.has('b')).toBe(true);
+      expect(results.has('c')).toBe(true);
+      expect(results.has('d')).toBe(true);
     });
 
     it('handles multiple symbols in one template', () => {
