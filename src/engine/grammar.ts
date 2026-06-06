@@ -72,6 +72,7 @@ export function createGrammarEngine(grammar: Grammar, rng: SeededRandom) {
   addModifier('trim', (s) => s.trim());
   addModifier('collapse-spaces', (s) => s.replace(/\s+/g, ' ').trim());
   addModifier('slugify', (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''));
+  addModifier('reverse', (s) => s.split('').reverse().join(''));
   addModifier('titlecase', (s) => {
     const words = s.trim().split(/\s+/).filter(Boolean);
     return words.map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
