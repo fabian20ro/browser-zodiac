@@ -52,6 +52,7 @@ export const ro: LocalePack = {
       cosmic_platform: 'Platforma cosmică',
       social_connectivity: 'Conectivitate socială',
       cosmic_timezone: 'Fusul orar cosmic',
+      cosmic_mood: 'Starea cosmică',
     },
   },
   grammar: {},

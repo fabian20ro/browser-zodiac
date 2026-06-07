@@ -52,6 +52,7 @@ export const en: LocalePack = {
       cosmic_platform: 'Cosmic Platform',
       social_connectivity: 'Social Connectivity',
       cosmic_timezone: 'Cosmic Timezone',
+      cosmic_mood: 'Cosmic Mood',
     },
   },
   grammar: {},
