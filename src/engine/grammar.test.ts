@@ -103,6 +103,11 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.collapse-spaces#')).toBe('hello world');
     });
 
+    it('applies slugify modifier', () => {
+      const engine = makeEngine({ word: ['  Hello World!  '] });
+      expect(engine.expand('#word.slugify#')).toBe('hello-world');
+    });
+
     it('applies titlecase modifier', () => {
       const engine = makeEngine({ word: ['hello world'] });
       expect(engine.expand('#word.titlecase#')).toBe('Hello World');
