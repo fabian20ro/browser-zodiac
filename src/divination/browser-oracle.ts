@@ -88,7 +88,7 @@ export function readBrowserOracle(): DivinationProfile {
       interpretation: '',
     },
     {
-      key: 'temporal_energy',
+      key: 'cosmic_mood',
       raw: timeOfDay,
       interpretation: '',
     },
