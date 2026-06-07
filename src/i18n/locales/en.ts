@@ -47,7 +47,6 @@ export const en: LocalePack = {
       soul_window: 'Window to Your Soul',
       cultural_destiny: 'Cultural Destiny',
       soul_alignment: 'Soul Alignment',
-      temporal_energy: 'Temporal Energy',
       parallel_lives: 'Parallel Lives',
       cosmic_platform: 'Cosmic Platform',
       social_connectivity: 'Social Connectivity',

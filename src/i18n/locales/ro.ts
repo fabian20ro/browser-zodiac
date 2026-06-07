@@ -47,7 +47,6 @@ export const ro: LocalePack = {
       soul_window: 'Fereastra sufletului',
       cultural_destiny: 'Destinul cultural',
       soul_alignment: 'Alinierea sufletului',
-      temporal_energy: 'Energia temporală',
       parallel_lives: 'Vieți paralele',
       cosmic_platform: 'Platforma cosmică',
       social_connectivity: 'Conectivitate socială',
