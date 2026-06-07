@@ -28,7 +28,7 @@ function detectOS(ua: string): string {
 }
 
 function getColorScheme(): 'dark' | 'light' {
-  if (window.matchMedia?.('(prefers-color-scheme: dark)').matches) return 'dark';
+  if (window.matchMedia?.('(prefers-color-scheme: dark)')?.matches) return 'dark';
   return 'light';
 }
 
