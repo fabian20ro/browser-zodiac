@@ -27,7 +27,7 @@ export const ZODIAC_SIGNS: ZodiacSign[] = [
   'pisces',
 ];
 
-import { SeededRandom } from '../engine/types.ts';
+import type { SeededRandom } from '../engine/types.ts';
 
 export function randomSign(current: ZodiacSign, rng?: SeededRandom): ZodiacSign {
   const others = ZODIAC_SIGNS.filter((s) => s !== current);
