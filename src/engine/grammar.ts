@@ -4,7 +4,7 @@ const MAX_DEPTH = 20;
 const EXPANSION_RE = /#([^#]+)#/g;
 const WEIGHT_SEPARATOR = '~~';
 
-export function createGrammarEngine(grammar: Grammar, rng: SeededRandom) {
+export function createGrammarEngine(grammar: Grammar, rng: SeededRandom, maxDepth = 20) {
   const modifiers: Record<string, Modifier> = {};
 
   function pickWeighted(options: string[]): string {

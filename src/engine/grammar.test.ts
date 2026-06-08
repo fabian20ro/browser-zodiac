@@ -50,6 +50,11 @@ describe('createGrammarEngine', () => {
       });
       expect(engine.expand('#a# and #b#')).toBe('X and Y');
     });
+
+    it('respects the recursion limit', () => {
+      const engine = createGrammarEngine({ a: ['#b#'], b: ['#a#'] }, mulberry32(42), 5);
+      expect(engine.expand('#a#')).toBe('#b#');
+    });
   });
 
   describe('weighted selection', () => {
