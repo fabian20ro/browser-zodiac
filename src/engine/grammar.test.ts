@@ -50,6 +50,11 @@ describe('createGrammarEngine', () => {
       });
       expect(engine.expand('#a# and #b#')).toBe('X and Y');
     });
+
+    it('respects the recursion limit', () => {
+      const engine = createGrammarEngine({ a: ['#b#'], b: ['#a#'] }, mulberry32(42), 5);
+      expect(engine.expand('#a#')).toBe('#b#');
+    });
   });
 
   describe('weighted selection', () => {
@@ -108,9 +113,14 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.slugify#')).toBe('hello-world');
     });
 
-    it('applies titlecase modifier', () => {
-      const engine = makeEngine({ word: ['hello world'] });
-      expect(engine.expand('#word.titlecase#')).toBe('Hello World');
+    it('applies slugify modifier with underscores', () => {
+      const engine = makeEngine({ word: ['hello_world'] });
+      expect(engine.expand('#word.slugify#')).toBe('hello-world');
+    });
+
+    it('applies slugify modifier with emojis', () => {
+      const engine = makeEngine({ word: ['  Hello 🚀 World!  '] });
+      expect(engine.expand('#word.slugify#')).toBe('hello-world');
     });
 
     it('titlecases padded whitespace cleanly', () => {
