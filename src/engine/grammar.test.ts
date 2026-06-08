@@ -124,6 +124,14 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.capitalize.uppercase#')).toBe('HELLO WORLD');
     });
 
+    it('applies modifiers to expanded symbols', () => {
+      const engine = makeEngine({
+        a: ['#b.uppercase#'],
+        b: ['hello'],
+      });
+      expect(engine.expand('#a#')).toBe('HELLO');
+    });
+
     it('applies reverse modifier', () => {
       const engine = makeEngine({ word: ['hello'] });
       expect(engine.expand('#word.reverse#')).toBe('olleh');
