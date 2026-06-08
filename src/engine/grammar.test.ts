@@ -108,9 +108,14 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.slugify#')).toBe('hello-world');
     });
 
-    it('applies titlecase modifier', () => {
-      const engine = makeEngine({ word: ['hello world'] });
-      expect(engine.expand('#word.titlecase#')).toBe('Hello World');
+    it('applies slugify modifier with underscores', () => {
+      const engine = makeEngine({ word: ['hello_world'] });
+      expect(engine.expand('#word.slugify#')).toBe('hello-world');
+    });
+
+    it('applies slugify modifier with emojis', () => {
+      const engine = makeEngine({ word: ['  Hello 🚀 World!  '] });
+      expect(engine.expand('#word.slugify#')).toBe('hello-world');
     });
 
     it('titlecases padded whitespace cleanly', () => {
