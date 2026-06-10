@@ -4,7 +4,8 @@ const MAX_DEPTH = 20;
 const EXPANSION_RE = /#([^#]+)#/g;
 const WEIGHT_SEPARATOR = '~~';
 
-export function createGrammarEngine(grammar: Grammar, rng: SeededRandom, maxDepth = 20) {
+export function createGrammarEngine(grammar: Grammar, rng: SeededRandom, options: { maxDepth?: number } = {}) {
+  const maxDepth = options.maxDepth ?? MAX_DEPTH;
   const modifiers: Record<string, Modifier> = {};
 
   function pickWeighted(options: string[]): string {
@@ -41,7 +42,7 @@ export function createGrammarEngine(grammar: Grammar, rng: SeededRandom, maxDept
   }
 
   function expandOnce(template: string, depth: number): string {
-    if (depth > MAX_DEPTH) return template;
+    console.log("DEBUG: depth:", depth, "maxDepth:", maxDepth); if (depth >= maxDepth) return template;
 
     return template.replace(EXPANSION_RE, (_match, expr: string) => {
       const parts = expr.split('.');
@@ -69,6 +70,7 @@ export function createGrammarEngine(grammar: Grammar, rng: SeededRandom, maxDept
   addModifier('capitalize', (s) => s.charAt(0).toUpperCase() + s.slice(1));
   addModifier('uppercase', (s) => s.toUpperCase());
   addModifier('lowercase', (s) => s.toLowerCase());
+  addModifier('shout', (s) => s.toUpperCase() + '!');
   addModifier('trim', (s) => s.trim());
   addModifier('collapse-spaces', (s) => s.replace(/\s+/g, ' ').trim());
   addModifier('slugify', (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''));

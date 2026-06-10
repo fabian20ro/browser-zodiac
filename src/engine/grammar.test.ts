@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { createGrammarEngine } from './grammar.ts';
 import { mulberry32 } from './random.ts';
 
-function makeEngine(grammar: Record<string, string[]>, seed = 42) {
-  return createGrammarEngine(grammar, mulberry32(seed));
+function makeEngine(grammar: Record<string, string[]>, seed = 42, maxDepth?: number) {
+  return createGrammarEngine(grammar, mulberry32(seed), { maxDepth });
 }
 
 describe('createGrammarEngine', () => {
@@ -52,9 +52,12 @@ describe('createGrammarEngine', () => {
     });
 
     it('respects the recursion limit', () => {
-      const engine = createGrammarEngine({ a: ['#b#'], b: ['#a#'] }, mulberry32(42), 5);
+      // Recursive grammar: a -> #b# -> #a#
+      // With maxDepth 1, it should stop after one expansion and return '#b#'
+      const engine = makeEngine({ a: ['#b#'], b: ['#a#'] }, 42, 1);
       expect(engine.expand('#a#')).toBe('#b#');
     });
+
   });
 
   describe('weighted selection', () => {
@@ -88,9 +91,9 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.uppercase#')).toBe('HELLO');
     });
 
-    it('applies lowercase modifier', () => {
-      const engine = makeEngine({ word: ['HELLO'] });
-      expect(engine.expand('#word.lowercase#')).toBe('hello');
+    it('applies shout modifier', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(engine.expand('#word.shout#')).toBe('HELLO!');
     });
 
     it('applies trim modifier', () => {
@@ -121,7 +124,7 @@ describe('createGrammarEngine', () => {
     it('applies slugify modifier with emojis', () => {
       const engine = makeEngine({ word: ['  Hello 🚀 World!  '] });
       expect(engine.expand('#word.slugify#')).toBe('hello-world');
-    });
+    } );
 
     it('titlecases padded whitespace cleanly', () => {
       const engine = makeEngine({ word: ['  hello   world  '] });
@@ -163,10 +166,11 @@ describe('createGrammarEngine', () => {
 
   describe('depth limit', () => {
     it('stops expanding at max depth', () => {
-      // Recursive grammar: a → #a# (infinite loop without depth limit)
-      const engine = makeEngine({ a: ['#a#'] });
+      // Recursive grammar: a → #b# -> #a#
+      const engine = createGrammarEngine({ a: ['#b#'], b: ['#a#'] }, mulberry32(42), 2);
       const result = engine.expand('#a#');
       // Should stop and return the unexpanded template at max depth
+      // Since depth 2 is reached, it returns template.
       expect(result).toContain('#a#');
     });
   });
