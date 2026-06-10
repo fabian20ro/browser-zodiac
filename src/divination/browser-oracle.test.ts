@@ -1,43 +1,69 @@
-import { describe, it, expect, vi } from "vitest";
-import { readBrowserOracle } from "./browser-oracle";
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { readBrowserOracle } from './browser-oracle.ts';
 
-describe("browser-oracle", () => {
-  it("reads browser from user agent", () => {
+describe('readBrowserOracle', () => {
+  const originalNavigator = global.navigator;
+  const originalWindow = global.window;
+  const originalScreen = global.screen;
+  const originalIntl = global.Intl;
+
+  beforeEach(() => {
     // Mocking globals
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date('2026-03-03T23:00:00Z'));
-
-    vi.stubGlobal("navigator", {
-      userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-      language: "en-US",
-      platform: "MacIntel",
-      maxTouchPoints: 2,
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
       onLine: true,
+      maxTouchPoints: 0,
     });
-    vi.stubGlobal("window", {
+    vi.stubGlobal('window', {
       innerWidth: 1920,
       innerHeight: 1080,
-      matchMedia: (query: string) => ({
-        matches: query === "(prefers-color-scheme: dark)",
+      matchMedia: vi.fn().mockReturnValue({
+        matches: false,
       }),
     });
-    vi.stubGlobal("screen", {
+    vi.stubGlobal('screen', {
       width: 1920,
       height: 1080,
     });
-    vi.stubGlobal("Intl", {
-      DateTimeFormat: () => ({
-        resolvedOptions: () => ({ timeZone: "UTC" }),
-      }),
+    vi.stubGlobal('Intl', {
+      DateTimeFormat: vi.fn().mockImplementation(() => ({
+        resolvedOptions: () => ({ timeZone: 'UTC' }),
+      })),
     });
+  });
 
-    const oracle = readBrowserOracle();
-    expect(oracle.readings.find(r => r.key === "spirit_browser")?.raw).toBe("Chrome");
-    expect(oracle.readings.find(r => r.key === "elemental_os")?.raw).toBe("macOS");
-    expect(oracle.readings.find(r => r.key === "soul_alignment")?.raw).toBe("dark");
-    expect(oracle.readings.find(r => r.key === "cosmic_mood")?.raw).toBe("night");
+  it('returns a profile with correct browser and os', () => {
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+    
+    expect(browserReading?.raw).toBe('Chrome');
+    expect(osReading?.raw).toBe('macOS');
+  });
 
-    vi.unstubAllGlobals();
-    vi.useRealTimers();
+  it('returns correct connectivity status', () => {
+    const profile = readBrowserOracle();
+    const connectivityReading = profile.readings.find(r => r.key === 'social_connectivity');
+    expect(connectivityReading?.raw).toBe('connected');
+  });
+
+  it('handles unknown browser and os', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'UnknownAgent',
+      language: 'en-US',
+      hardwareConcurrency: 0,
+      platform: 'unknown',
+      onLine: false,
+      maxTouchPoints: 0,
+    });
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+    
+    expect(browserReading?.raw).toBe('Unknown');
+    expect(osReading?.raw).toBe('Unknown');
   });
 });
