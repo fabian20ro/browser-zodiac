@@ -4,7 +4,8 @@ const MAX_DEPTH = 20;
 const EXPANSION_RE = /#([^#]+)#/g;
 const WEIGHT_SEPARATOR = '~~';
 
-export function createGrammarEngine(grammar: Grammar, rng: SeededRandom) {
+export function createGrammarEngine(grammar: Grammar, rng: SeededRandom, options: { maxDepth?: number } = {}) {
+  const maxDepth = options.maxDepth ?? MAX_DEPTH;
   const modifiers: Record<string, Modifier> = {};
 
   function pickWeighted(options: string[]): string {
@@ -41,7 +42,7 @@ export function createGrammarEngine(grammar: Grammar, rng: SeededRandom) {
   }
 
   function expandOnce(template: string, depth: number): string {
-    if (depth > MAX_DEPTH) return template;
+    console.log("DEBUG: depth:", depth, "maxDepth:", maxDepth); if (depth >= maxDepth) return template;
 
     return template.replace(EXPANSION_RE, (_match, expr: string) => {
       const parts = expr.split('.');
