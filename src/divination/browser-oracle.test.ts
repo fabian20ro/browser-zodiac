@@ -62,8 +62,15 @@ describe('readBrowserOracle', () => {
     const profile = readBrowserOracle();
     const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
     const osReading = profile.readings.find(r => r.key === 'elemental_os');
-    
+      
     expect(browserReading?.raw).toBe('Unknown');
     expect(osReading?.raw).toBe('Unknown');
+  });
+
+  it('includes tactile_sensibility in readings', () => {
+    const profile = readBrowserOracle();
+    const tactileReading = profile.readings.find(r => r.key === 'tactile_sensibility');
+    expect(tactileReading).toBeDefined();
+    expect(typeof tactileReading?.raw).toBe('string');
   });
 });
