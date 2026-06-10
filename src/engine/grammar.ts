@@ -70,6 +70,7 @@ export function createGrammarEngine(grammar: Grammar, rng: SeededRandom, options
   addModifier('capitalize', (s) => s.charAt(0).toUpperCase() + s.slice(1));
   addModifier('uppercase', (s) => s.toUpperCase());
   addModifier('lowercase', (s) => s.toLowerCase());
+  addModifier('shout', (s) => s.toUpperCase() + '!');
   addModifier('trim', (s) => s.trim());
   addModifier('collapse-spaces', (s) => s.replace(/\s+/g, ' ').trim());
   addModifier('slugify', (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''));

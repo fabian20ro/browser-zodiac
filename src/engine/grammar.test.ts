@@ -91,9 +91,9 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.uppercase#')).toBe('HELLO');
     });
 
-    it('applies lowercase modifier', () => {
-      const engine = makeEngine({ word: ['HELLO'] });
-      expect(engine.expand('#word.lowercase#')).toBe('hello');
+    it('applies shout modifier', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(engine.expand('#word.shout#')).toBe('HELLO!');
     });
 
     it('applies trim modifier', () => {
