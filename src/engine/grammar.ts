@@ -42,7 +42,7 @@ export function createGrammarEngine(grammar: Grammar, rng: SeededRandom, options
   }
 
   function expandOnce(template: string, depth: number): string {
-    console.log("DEBUG: depth:", depth, "maxDepth:", maxDepth); if (depth >= maxDepth) return template;
+    if (depth >= maxDepth) return template;
 
     return template.replace(EXPANSION_RE, (_match, expr: string) => {
       const parts = expr.split('.');
