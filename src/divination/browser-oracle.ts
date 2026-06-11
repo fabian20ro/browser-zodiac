@@ -1,13 +1,6 @@
-export interface DivinationReading {
-  key: string;
-  raw: string;
-  interpretation: string;
-}
-
-export interface DivinationProfile {
-  readings: DivinationReading[];
-  fingerprint: string;
-}
+import type { DivinationReading, DivinationProfile } from './types';
+export type { DivinationProfile };
+import { readingInterpretations } from './interpretations';
 
 function detectBrowser(ua: string): string {
   if (ua.includes('Firefox') || ua.includes('FxiOS')) return 'Firefox';
@@ -28,7 +21,7 @@ function detectOS(ua: string): string {
 }
 
 function getColorScheme(): 'dark' | 'light' {
-  if (window.matchMedia?.('(prefers-color-scheme: dark)')?.matches) return 'dark';
+  if (typeof window !== 'undefined' && window.matchMedia?.('(prefers-color-scheme: dark)')?.matches) return 'dark';
   return 'light';
 }
 
@@ -55,72 +48,77 @@ export function readBrowserOracle(): DivinationProfile {
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Void';
   const windowSize = `${window.innerWidth}x${window.innerHeight}`;
   const touchPoints = navigator.maxTouchPoints || 0;
+  const networkSpeed = (navigator as any).connection?.effectiveType || 'unknown';
 
   const readings: DivinationReading[] = [
     {
       key: 'spirit_browser',
       raw: browser,
-      interpretation: '',
+      interpretation: readingInterpretations['spirit_browser'](browser),
     },
     {
       key: 'elemental_os',
       raw: os,
-      interpretation: '',
+      interpretation: readingInterpretations['elemental_os'](os),
     },
     {
       key: 'life_resolution',
       raw: screenRes,
-      interpretation: '',
+      interpretation: readingInterpretations['life_resolution'](screenRes),
     },
     {
       key: 'soul_window',
       raw: windowSize,
-      interpretation: '',
+      interpretation: readingInterpretations['soul_window'](windowSize),
     },
     {
       key: 'cultural_destiny',
       raw: lang,
-      interpretation: '',
+      interpretation: readingInterpretations['cultural_destiny'](lang),
     },
     {
       key: 'soul_alignment',
       raw: colorScheme,
-      interpretation: '',
+      interpretation: readingInterpretations['soul_alignment'](colorScheme),
     },
     {
       key: 'cosmic_mood',
       raw: timeOfDay,
-      interpretation: '',
+      interpretation: readingInterpretations['cosmic_mood'](timeOfDay),
     },
     {
       key: 'parallel_lives',
       raw: cores > 0 ? String(cores) : 'unknowable',
-      interpretation: '',
+      interpretation: readingInterpretations['parallel_lives'](cores > 0 ? String(cores) : 'unknowable'),
     },
     {
       key: 'cosmic_platform',
       raw: platform,
-      interpretation: '',
+      interpretation: readingInterpretations['cosmic_platform'](platform),
     },
     {
       key: 'social_connectivity',
       raw: online ? 'connected' : 'hermit',
-      interpretation: '',
+      interpretation: readingInterpretations['social_connectivity'](online ? 'connected' : 'hermit'),
     },
     {
       key: 'cosmic_timezone',
       raw: timezone,
-      interpretation: '',
+      interpretation: readingInterpretations['cosmic_timezone'](timezone),
     },
     {
       key: 'tactile_sensibility',
       raw: touchPoints > 0 ? 'sensitive' : 'numb',
-      interpretation: '',
+      interpretation: readingInterpretations['tactile_sensibility'](touchPoints > 0 ? 'sensitive' : 'numb'),
+    },
+    {
+      key: 'network_speed',
+      raw: networkSpeed,
+      interpretation: readingInterpretations['network_speed'](networkSpeed),
     },
   ];
 
-  // Fingerprint from stable properties for sign assignment
-  const fingerprint = `${ua}|${lang}|${screenRes}|${platform}|${timezone}`;
+  const fingerprint = `${ua}|${lang}|${screenRes}|${platform}|${timezone}|${networkSpeed}`;
 
   return { readings, fingerprint };
 }

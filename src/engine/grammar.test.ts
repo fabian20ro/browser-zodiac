@@ -101,9 +101,14 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.shout#')).toBe('HELLO!');
     });
 
-    it('applies trim modifier', () => {
-      const engine = makeEngine({ word: ['  hello  '] });
-      expect(engine.expand('#word.trim#')).toBe('hello');
+    it('applies trim-start modifier', () => {
+      const engine = makeEngine({ word: ['  hello'] });
+      expect(engine.expand('#word.trim-start#')).toBe('hello');
+    });
+
+    it('applies trim-end modifier', () => {
+      const engine = makeEngine({ word: ['hello  '] });
+      expect(engine.expand('#word.trim-end#')).toBe('hello');
     });
 
     it('applies slugify modifier', () => {
