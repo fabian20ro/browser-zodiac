@@ -48,6 +48,7 @@ export function readBrowserOracle(): DivinationProfile {
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Void';
   const windowSize = `${window.innerWidth}x${window.innerHeight}`;
   const touchPoints = navigator.maxTouchPoints || 0;
+  const networkSpeed = (navigator as any).connection?.effectiveType || 'unknown';
 
   const readings: DivinationReading[] = [
     {
@@ -110,9 +111,14 @@ export function readBrowserOracle(): DivinationProfile {
       raw: touchPoints > 0 ? 'sensitive' : 'numb',
       interpretation: readingInterpretations['tactile_sensibility'](touchPoints > 0 ? 'sensitive' : 'numb'),
     },
+    {
+      key: 'network_speed',
+      raw: networkSpeed,
+      interpretation: readingInterpretations['network_speed'](networkSpeed),
+    },
   ];
 
-  const fingerprint = `${ua}|${lang}|${screenRes}|${platform}|${timezone}`;
+  const fingerprint = `${ua}|${lang}|${screenRes}|${platform}|${timezone}|${networkSpeed}`;
 
   return { readings, fingerprint };
 }

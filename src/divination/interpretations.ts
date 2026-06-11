@@ -10,6 +10,7 @@ export const readingInterpretations: Record<string, InterpretationFn> = {
   cosmic_mood: (raw) => `The cosmic mood is currently ${raw}.`,
   parallel_lives: (raw) => `You exist across ${raw} threads.`,
   cosmic_platform: (raw) => `Rooted in the ${raw} plane.`,
+  network_speed: (raw) => `The pace of destiny is ${raw}.`,
   social_connectivity: (raw) => `You are ${raw}.`,
   cosmic_timezone: (raw) => `Temporal flow: ${raw}.`,
   tactile_sensibility: (raw) => `Sensing through ${raw}.`,

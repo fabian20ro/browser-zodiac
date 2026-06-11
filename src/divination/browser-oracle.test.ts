@@ -16,6 +16,9 @@ describe('readBrowserOracle', () => {
       platform: 'MacIntel',
       onLine: true,
       maxTouchPoints: 0,
+      connection: {
+        effectiveType: '4g',
+      },
     });
     vi.stubGlobal('window', {
       innerWidth: 1920,
@@ -50,6 +53,13 @@ describe('readBrowserOracle', () => {
     expect(connectivityReading?.raw).toBe('connected');
   });
 
+  it('includes network_speed in readings', () => {
+    const profile = readBrowserOracle();
+    const networkReading = profile.readings.find(r => r.key === 'network_speed');
+    expect(networkReading).toBeDefined();
+    expect(typeof networkReading?.raw).toBe('string');
+  });
+  
   it('handles unknown browser and os', () => {
     vi.stubGlobal('navigator', {
       userAgent: 'UnknownAgent',
@@ -58,6 +68,9 @@ describe('readBrowserOracle', () => {
       platform: 'unknown',
       onLine: false,
       maxTouchPoints: 0,
+      connection: {
+        effectiveType: 'unknown',
+      },
     });
     const profile = readBrowserOracle();
     const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
