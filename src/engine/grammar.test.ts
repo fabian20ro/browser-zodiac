@@ -43,6 +43,11 @@ describe('createGrammarEngine', () => {
       expect(results.has('d')).toBe(true);
     });
 
+    it('handles unquote modifier', () => {
+      const engine = makeEngine({ word: ['"hello"'] }, 42);
+      expect(engine.expand('#word.unquote#')).toBe('hello');
+    });
+
     it('handles multiple symbols in one template', () => {
       const engine = makeEngine({
         a: ['X'],
