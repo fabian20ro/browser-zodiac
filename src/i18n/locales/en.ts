@@ -55,5 +55,13 @@ export const en: LocalePack = {
       cosmic_mood: 'Cosmic Mood',
     },
   },
-  grammar: {},
+  grammar: {
+    origin: ['A #signName# awaits you.'],
+    warning: ['Beware of #chaos#.'],
+    luckyColor: ['#color#'],
+    compatibility: ['#comp#'],
+    chaos: ['chaos', 'the void', 'shadows'],
+    color: ['Red', 'Blue', 'Gold', 'Silver', 'Violet'],
+    comp: ['Excellent', 'Good', 'Average', 'Poor'],
+  },
 };
