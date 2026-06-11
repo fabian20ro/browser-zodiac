@@ -1,4 +1,5 @@
 import type { DivinationReading, DivinationProfile } from './types';
+export type { DivinationProfile };
 import { readingInterpretations } from './interpretations';
 
 function detectBrowser(ua: string): string {
