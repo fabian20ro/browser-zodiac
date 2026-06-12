@@ -63,6 +63,11 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#a#')).toBe('#b#');
     });
 
+    it('respects a maxDepth of 0', () => {
+      const engine = makeEngine({ a: ['#b#'], b: ['#a#'] }, 42, 0);
+      expect(engine.expand('#a#')).toBe('#a#');
+    });
+
   });
 
   describe('weighted selection', () => {
