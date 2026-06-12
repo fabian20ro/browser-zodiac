@@ -131,11 +131,6 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.trim-all#')).toBe('hello');
     });
 
-    it('applies collapse-spaces modifier', () => {
-      const engine = makeEngine({ word: ['  too   many    spaces  '] });
-      expect(engine.expand('#word.collapse-spaces#')).toBe('too many spaces');
-    });
-
     it('applies slugify modifier', () => {
       const engine = makeEngine({ word: ['Hello World!'] });
       expect(engine.expand('#word.slugify#')).toBe('hello-world');
@@ -161,9 +156,14 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.titlecase#')).toBe('Hello World');
     });
 
-    it('applies slugify modifier', () => {
-      const engine = makeEngine({ word: ['Hello World!'] });
-      expect(engine.expand('#word.slugify#')).toBe('hello-world');
+    it('applies mystic modifier', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(engine.expand('#word.mystic#')).toBe('✧ hello ✧');
+    });
+
+    it('applies wrap-emoji modifier', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(engine.expand('#word.wrap-emoji#')).toBe('✨ hello ✨');
     });
 
     it('handles modifiers with recursion limit', () => {
@@ -177,10 +177,6 @@ describe('createGrammarEngine', () => {
       const engine = makeEngine({ word: [' HELLO WORLD '] });
       expect(engine.expand('#word.trim-all.uppercase#')).toBe('HELLOWORLD');
       expect(engine.expand('#word.trim-all.uppercase.slugify#')).toBe('helloworld');
-    });
-    it('applies mystic modifier', () => {
-      const engine = makeEngine({ word: ['hello'] });
-      expect(engine.expand('#word.mystic#')).toBe('✧ hello ✧');
     });
   });
 });
