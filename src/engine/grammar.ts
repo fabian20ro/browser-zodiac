@@ -80,6 +80,7 @@ export function createGrammarEngine(grammar: Grammar, rng: SeededRandom, options
   addModifier('reverse', (s) => s.split('').reverse().join(''));
   addModifier('unquote', (s) => s.replace(/^["']|["']$/g, ''));
   addModifier('strip-punctuation', (s) => s.replace(/[^\w\s]/gi, ''));
+  addModifier('bang', (s) => `${s}!`);
   addModifier('titlecase', (s) => {
     const words = s.trim().split(/\s+/).filter(Boolean);
     return words.map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
