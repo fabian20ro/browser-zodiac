@@ -126,6 +126,11 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.trim-end#')).toBe('hello');
     });
 
+    it('applies trim-all modifier', () => {
+      const engine = makeEngine({ word: [' h e l l o '] });
+      expect(engine.expand('#word.trim-all#')).toBe('hello');
+    });
+
     it('applies collapse-spaces modifier', () => {
       const engine = makeEngine({ word: ['  too   many    spaces  '] });
       expect(engine.expand('#word.collapse-spaces#')).toBe('too many spaces');
