@@ -156,6 +156,18 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.titlecase#')).toBe('Hello World');
     });
 
+    it('applies slugify modifier', () => {
+      const engine = makeEngine({ word: ['Hello World!'] });
+      expect(engine.expand('#word.slugify#')).toBe('hello-world');
+    });
+
+    it('handles modifiers with recursion limit', () => {
+      // Recursive grammar: a -> #b# -> #a#
+      // With maxDepth 1, it should stop expansion but still apply modifiers to the result.
+      const engine = makeEngine({ a: ['#b#'], b: ['#a#'] }, 42, 1);
+      expect(engine.expand('#a.uppercase#')).toBe('#B#');
+    });
+
     it('applies mystic modifier', () => {
       const engine = makeEngine({ word: ['hello'] });
       expect(engine.expand('#word.mystic#')).toBe('✧ hello ✧');
