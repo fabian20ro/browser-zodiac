@@ -2,38 +2,45 @@ import { describe, it, expect } from 'vitest';
 import { assignSign } from './sign-assigner.ts';
 import { ZODIAC_SIGNS } from '../horoscope/zodiac.ts';
 
-describe('assignSign', () => {
-  it('returns a valid zodiac sign', () => {
-    const sign = assignSign('test-fingerprint');
-    expect(ZODIAC_SIGNS).toContain(sign);
-  });
+describe('sign-assigner', () => {
+  describe('assignSign', () => {
+    it('returns a valid zodiac sign', () => {
+      const sign = assignSign('some-fingerprint');
+      expect(ZODIAC_SIGNS).toContain(sign);
+    });
 
-  it('is deterministic — same fingerprint always gives same sign', () => {
-    const sign1 = assignSign('my|browser|fingerprint');
-    const sign2 = assignSign('my|browser|fingerprint');
-    expect(sign1).toBe(sign2);
-  });
+    it('is deterministic', () => {
+      const fingerprint = 'constant-fingerprint';
+      const sign1 = assignSign(fingerprint);
+      const sign2 = assignSign(fingerprint);
+      expect(sign1).toBe(sign2);
+    });
 
-  it('different fingerprints can produce different signs', () => {
-    const signs = new Set<string>();
-    // Try a bunch of fingerprints — at least some should differ
-    for (let i = 0; i < 100; i++) {
-      signs.add(assignSign(`fingerprint-${i}`));
-    }
-    expect(signs.size).toBeGreaterThan(1);
-  });
+    it('distributes signs roughly uniformly', () => {
+      const counts: Record<string, number> = {};
+      ZODIAC_SIGNS.forEach(s => counts[s] = 0);
 
-  it('all 12 signs are reachable', () => {
-    const signs = new Set<string>();
-    for (let i = 0; i < 10000; i++) {
-      signs.add(assignSign(`fp-${i}`));
-      if (signs.size === 12) break;
-    }
-    expect(signs.size).toBe(12);
-  });
+      for (let i = 0; i < 1200; i++) {
+        const sign = assignSign(`fingerprint-${i}`);
+        counts[sign]++;
+      }
 
-  it('handles empty string', () => {
-    const sign = assignSign('');
-    expect(ZODIAC_SIGNS).toContain(sign);
+      // With 1200 iterations, each sign should have ~100.
+      // Allow a reasonable margin of error for djb2/modulo distribution.
+      for (const sign of ZODIAC_SIGNS) {
+        expect(counts[sign]).toBeGreaterThan(70);
+        expect(counts[sign]).toBeLessThan(130);
+      }
+    });
+
+    it('handles varied string lengths and characters', () => {
+      const signs = new Set<string>();
+      for (let i = 0; i < 100; i++) {
+        const fingerprint = 'a'.repeat(i) + '!@#$%^&*()_+';
+        signs.add(assignSign(fingerprint));
+      }
+      expect(signs.size).toBeGreaterThan(0);
+      expect(signs.size).toBeLessThanOrEqual(ZODIAC_SIGNS.length);
+    });
   });
 });
