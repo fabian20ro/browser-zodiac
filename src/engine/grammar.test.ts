@@ -101,9 +101,19 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.uppercase#')).toBe('HELLO');
     });
 
+    it('applies lowercase modifier', () => {
+      const engine = makeEngine({ word: ['HELLO'] });
+      expect(engine.expand('#word.lowercase#')).toBe('hello');
+    });
+
     it('applies shout modifier', () => {
       const engine = makeEngine({ word: ['hello'] });
       expect(engine.expand('#word.shout#')).toBe('HELLO!');
+    });
+
+    it('applies trim modifier', () => {
+      const engine = makeEngine({ word: [' hello '] });
+      expect(engine.expand('#word.trim#')).toBe('hello');
     });
 
     it('applies trim-start modifier', () => {
@@ -116,6 +126,11 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.trim-end#')).toBe('hello');
     });
 
+    it('applies collapse-spaces modifier', () => {
+      const engine = makeEngine({ word: ['  too   many    spaces  '] });
+      expect(engine.expand('#word.collapse-spaces#')).toBe('too many spaces');
+    });
+
     it('applies slugify modifier', () => {
       const engine = makeEngine({ word: ['Hello World!'] });
       expect(engine.expand('#word.slugify#')).toBe('hello-world');
@@ -126,14 +141,24 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.reverse#')).toBe('olleh');
     });
 
+    it('applies unquote modifier', () => {
+      const engine = makeEngine({ word: ['"hello"'] }, 42);
+      expect(engine.expand('#word.unquote#')).toBe('hello');
+    });
+
+    it('applies strip-punctuation modifier', () => {
+      const engine = makeEngine({ word: ['hello, world!'] });
+      expect(engine.expand('#word.strip-punctuation#')).toBe('hello world');
+    });
+
     it('applies titlecase modifier', () => {
       const engine = makeEngine({ word: ['hello world'] });
       expect(engine.expand('#word.titlecase#')).toBe('Hello World');
     });
 
-    it('applies collapse-spaces modifier', () => {
-      const engine = makeEngine({ word: ['  too   many    spaces  '] });
-      expect(engine.expand('#word.collapse-spaces#')).toBe('too many spaces');
+    it('applies mystic modifier', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(engine.expand('#word.mystic#')).toBe('✧ hello ✧');
     });
   });
 });

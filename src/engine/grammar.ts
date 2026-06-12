@@ -83,6 +83,7 @@ export function createGrammarEngine(grammar: Grammar, rng: SeededRandom, options
     const words = s.trim().split(/\s+/).filter(Boolean);
     return words.map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
   });
+  addModifier('mystic', (s) => `✧ ${s} ✧`);
 
   return { expand, addModifier };
 }
