@@ -173,6 +173,11 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#a.uppercase#')).toBe('#B#');
     });
 
+    it('applies multiple modifiers in sequence', () => {
+      const engine = makeEngine({ word: [' HELLO WORLD '] });
+      expect(engine.expand('#word.trim-all.uppercase#')).toBe('HELLOWORLD');
+      expect(engine.expand('#word.trim-all.uppercase.slugify#')).toBe('helloworld');
+    });
     it('applies mystic modifier', () => {
       const engine = makeEngine({ word: ['hello'] });
       expect(engine.expand('#word.mystic#')).toBe('✧ hello ✧');
