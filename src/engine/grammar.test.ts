@@ -166,9 +166,10 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.mystic#')).toBe('✧ hello ✧');
     });
 
-    it('applies wrap-emoji modifier', () => {
-      const engine = makeEngine({ word: ['hello'] });
-      expect(engine.expand('#word.wrap-emoji#')).toBe('✨ hello ✨');
+    it('applies custom modifier', () => {
+      const engine = createGrammarEngine({ word: ['hello'] }, mulberry32(42));
+      engine.addModifier('custom', (s) => `[${s}]`);
+      expect(engine.expand('#word.custom#')).toBe('[hello]');
     });
 
     it('handles modifiers with recursion limit', () => {
