@@ -118,7 +118,7 @@ export function readBrowserOracle(): DivinationProfile {
     },
   ];
 
-  const fingerprint = `${ua}|${lang}|${screenRes}|${platform}|${timezone}|${networkSpeed}`;
+  const fingerprint = `${ua}|${lang}|${screenRes}|${platform}|${timezone}|${networkSpeed}|${colorScheme}|${timeOfDay}`;
 
   return { readings, fingerprint };
 }

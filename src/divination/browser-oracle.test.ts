@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { readBrowserOracle } from './browser-oracle.ts';
 
 describe('readBrowserOracle', () => {
@@ -8,6 +8,8 @@ describe('readBrowserOracle', () => {
   const originalIntl = global.Intl;
 
   beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2024-01-01T02:00:00'));
     // Mocking globals
     vi.stubGlobal('navigator', {
       userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36',
@@ -38,13 +40,17 @@ describe('readBrowserOracle', () => {
     });
   });
 
-  it('returns a profile with correct browser and os', () => {
+  it('returns a profile with correct browser, os and expanded fingerprint', () => {
     const profile = readBrowserOracle();
     const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
     const osReading = profile.readings.find(r => r.key === 'elemental_os');
     
     expect(browserReading?.raw).toBe('Chrome');
     expect(osReading?.raw).toBe('macOS');
+    // The fingerprint should have the extra parameters: colorScheme and timeOfDay
+    // Expected format: ${ua}|${lang}|${screenRes}|${platform}|${timezone}|${networkSpeed}|${colorScheme}|${timeOfDay}
+    // Based on mocks: Chrome|en-US|1920x1080|MacIntel|UTC|4g|light|deep_night
+    expect(profile.fingerprint).toBe('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36|en-US|1920x1080|MacIntel|UTC|4g|light|deep_night');
   });
 
   it('returns correct connectivity status', () => {
@@ -87,3 +93,8 @@ describe('readBrowserOracle', () => {
     expect(typeof tactileReading?.raw).toBe('string');
   });
 });
+
+afterEach(() => {
+  vi.useRealTimers();
+});
+afterEach(() => { vi.useRealTimers(); });
