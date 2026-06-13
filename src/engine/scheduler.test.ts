@@ -65,7 +65,6 @@ describe('scheduleMidnightGmt', () => {
 
   it('schedules the next run after the first one', () => {
     const callback = vi.fn();
-    // Set time BEFORE calling the function
     vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
     scheduleMidnightGmt(callback);
 
@@ -74,7 +73,7 @@ describe('scheduleMidnightGmt', () => {
 
     // Advance to the next midnight
     vi.setSystemTime(new Date('2026-01-02T23:59:59.000Z'));
-    vi.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(86400000);
     expect(callback).toHaveBeenCalledTimes(2);
   });
 });

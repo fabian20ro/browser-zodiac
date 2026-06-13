@@ -20,7 +20,7 @@ export function scheduleMidnightGmt(callback: () => void): () => void {
 
   function scheduleNext(): void {
     if (cancelled) return;
-    const delay = msUntilNextMidnightGmt(new Date());
+    const delay = Math.max(msUntilNextMidnightGmt(new Date()), 1);
     handle = setTimeout(() => {
       callback();
       scheduleNext();
