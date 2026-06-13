@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { toGmtDateString, msUntilNextMidnightGmt } from './scheduler.ts';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { toGmtDateString, msUntilNextMidnightGmt, scheduleMidnightGmt } from './scheduler.ts';
 
 describe('toGmtDateString', () => {
   it('returns the expected YYYY-MM-DD for a future date', () => {
@@ -23,5 +23,58 @@ describe('msUntilNextMidnightGmt', () => {
     const endOfYear = new Date('2026-12-31T23:59:59.000Z');
     const expected = new Date('2027-01-01T00:00:00.000Z').getTime() - endOfYear.getTime();
     expect(msUntilNextMidnightGmt(endOfYear)).toBe(expected);
+  });
+});
+
+describe('scheduleMidnightGmt', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('calls the callback at midnight', () => {
+    const callback = vi.fn();
+    // Set time BEFORE calling the function
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+    scheduleMidnightGmt(callback);
+
+    // Advance time to just before midnight
+    vi.advanceTimersByTime(999);
+    expect(callback).not.toHaveBeenCalled();
+
+    // Advance to midnight
+    vi.advanceTimersByTime(1);
+    expect(callback).toHaveBeenCalledTimes(1);
+  });
+
+  it('can be cancelled', () => {
+    const callback = vi.fn();
+    // Set time BEFORE calling the function
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+    const cancel = scheduleMidnightGmt(callback);
+
+    vi.advanceTimersByTime(1);
+    cancel();
+    vi.advanceTimersByTime(1);
+    
+    expect(callback).not.toHaveBeenCalled();
+  });
+
+  it('schedules the next run after the first one', () => {
+    const callback = vi.fn();
+    // Set time BEFORE calling the function
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+    scheduleMidnightGmt(callback);
+
+    vi.advanceTimersByTime(1000);
+    expect(callback).toHaveBeenCalledTimes(1);
+
+    // Advance to the next midnight
+    vi.setSystemTime(new Date('2026-01-02T23:59:59.000Z'));
+    vi.advanceTimersByTime(1000);
+    expect(callback).toHaveBeenCalledTimes(2);
   });
 });
