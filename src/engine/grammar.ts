@@ -79,7 +79,7 @@ export function createGrammarEngine(grammar: Grammar, rng: SeededRandom, options
   addModifier('slugify', (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''));
   addModifier('reverse', (s) => s.split('').reverse().join(''));
   addModifier('unquote', (s) => s.replace(/^["']|["']$/g, ''));
-  addModifier('strip-punctuation', (s) => s.replace(/[^\w\s]/gi, ''));
+  addModifier('scrub', (s) => s.replace(/[aeiou]/gi, ''));
   addModifier('bang', (s) => `${s}!`);
   addModifier('titlecase', (s) => {
     const words = s.trim().split(/\s+/).filter(Boolean);

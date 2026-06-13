@@ -43,9 +43,20 @@ describe('createGrammarEngine', () => {
       expect(results.has('d')).toBe(true);
     });
 
-    it('handles unquote modifier', () => {
+    it('applies unquote modifier', () => {
       const engine = makeEngine({ word: ['"hello"'] }, 42);
       expect(engine.expand('#word.unquote#')).toBe('hello');
+    });
+
+    it('applies scrub modifier', () => {
+      const engine = makeEngine({ word: ['hello world'] });
+      expect(engine.expand('#word.scrub#')).toBe('hll wrld');
+    });
+
+    it('handles multiple modifiers in sequence', () => {
+      const engine = makeEngine({ word: [' HELLO WORLD '] });
+      expect(engine.expand('#word.trim-all.uppercase#')).toBe('HELLOWORLD');
+      expect(engine.expand('#word.trim-all.uppercase.slugify#')).toBe('helloworld');
     });
 
     it('handles multiple symbols in one template', () => {
@@ -151,9 +162,15 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.unquote#')).toBe('hello');
     });
 
-    it('applies strip-punctuation modifier', () => {
-      const engine = makeEngine({ word: ['hello, world!'] });
-      expect(engine.expand('#word.strip-punctuation#')).toBe('hello world');
+    it('applies scrub modifier', () => {
+      const engine = makeEngine({ word: ['hello world'] });
+      expect(engine.expand('#word.scrub#')).toBe('hll wrld');
+    });
+
+    it('handles multiple modifiers in sequence', () => {
+      const engine = makeEngine({ word: [' HELLO WORLD '] });
+      expect(engine.expand('#word.trim-all.uppercase#')).toBe('HELLOWORLD');
+      expect(engine.expand('#word.trim-all.uppercase.slugify#')).toBe('helloworld');
     });
 
     it('applies bang modifier', () => {
@@ -178,16 +195,8 @@ describe('createGrammarEngine', () => {
     });
 
     it('handles modifiers with recursion limit', () => {
-      // Recursive grammar: a -> #b# -> #a#
-      // With maxDepth 1, it should stop expansion but still apply modifiers to the result.
       const engine = makeEngine({ a: ['#b#'], b: ['#a#'] }, 42, 1);
       expect(engine.expand('#a.uppercase#')).toBe('#B#');
-    });
-
-    it('applies multiple modifiers in sequence', () => {
-      const engine = makeEngine({ word: [' HELLO WORLD '] });
-      expect(engine.expand('#word.trim-all.uppercase#')).toBe('HELLOWORLD');
-      expect(engine.expand('#word.trim-all.uppercase.slugify#')).toBe('helloworld');
     });
   });
 });
