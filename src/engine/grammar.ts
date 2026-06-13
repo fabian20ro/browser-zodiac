@@ -80,6 +80,7 @@ export function createGrammarEngine(grammar: Grammar, rng: SeededRandom, options
   addModifier('reverse', (s) => s.split('').reverse().join(''));
   addModifier('unquote', (s) => s.replace(/^["']|["']$/g, ''));
   addModifier('scrub', (s) => s.replace(/[aeiou]/gi, ''));
+  addModifier('void', (s) => s.replace(/[aeiou]/gi, '·'));
   addModifier('bang', (s) => `${s}!`);
   addModifier('titlecase', (s) => {
     const words = s.trim().split(/\s+/).filter(Boolean);
