@@ -59,6 +59,11 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.trim-all.uppercase.slugify#')).toBe('helloworld');
     });
 
+    it('applies glitch modifier', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(engine.expand('#word.glitch#')).toBe('h§ll§');
+    });
+
     it('handles multiple symbols in one template', () => {
       const engine = makeEngine({
         a: ['X'],

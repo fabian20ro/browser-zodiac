@@ -89,6 +89,7 @@ export function createGrammarEngine(grammar: Grammar, rng: SeededRandom, options
   addModifier('echo', (s) => `${s} ${s}`);
   addModifier('mystic', (s) => `✧ ${s} ✧`);
   addModifier('wrap-emoji', (s) => `✨ ${s} ✨`);
+  addModifier('glitch', (s) => s.replace(/[aeiou]/gi, '§'));
 
   return { expand, addModifier };
 }
