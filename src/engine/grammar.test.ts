@@ -194,6 +194,11 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.custom#')).toBe('[hello]');
     });
 
+    it('applies echo modifier', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(engine.expand('#word.echo#')).toBe('hello hello');
+    });
+
     it('handles modifiers with recursion limit', () => {
       const engine = makeEngine({ a: ['#b#'], b: ['#a#'] }, 42, 1);
       expect(engine.expand('#a.uppercase#')).toBe('#B#');

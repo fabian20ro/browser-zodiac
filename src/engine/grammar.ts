@@ -85,6 +85,7 @@ export function createGrammarEngine(grammar: Grammar, rng: SeededRandom, options
     const words = s.trim().split(/\s+/).filter(Boolean);
     return words.map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
   });
+  addModifier('echo', (s) => `${s} ${s}`);
   addModifier('mystic', (s) => `✧ ${s} ✧`);
   addModifier('wrap-emoji', (s) => `✨ ${s} ✨`);
 
