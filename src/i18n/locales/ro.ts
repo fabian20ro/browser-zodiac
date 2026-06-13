@@ -54,5 +54,13 @@ export const ro: LocalePack = {
       cosmic_mood: 'Starea cosmică',
     },
   },
-  grammar: {},
+  grammar: {
+    origin: ['Un #signName# te așteaptă.'],
+    warning: ['Atenție la #chaos#.'],
+    luckyColor: ['#color#'],
+    compatibility: ['#comp#'],
+    chaos: ['haos', 'vidul', 'umbre'],
+    color: ['Roșu', 'Albastru', 'Aurit', 'Argintiu', 'Violet'],
+    comp: ['Excelent', 'Bun', 'Medioc', 'slab'],
+  },
 };
