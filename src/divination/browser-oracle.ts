@@ -34,20 +34,20 @@ function getTimeOfDay(hour: number): string {
 }
 
 export function readBrowserOracle(): DivinationProfile {
-  const ua = navigator.userAgent;
+  const ua = navigator?.userAgent || '';
   const browser = detectBrowser(ua);
   const os = detectOS(ua);
-  const screenRes = `${screen.width}x${screen.height}`;
-  const lang = navigator.language.trim();
+  const screenRes = `${screen?.width || 0}x${screen?.height || 0}`;
+  const lang = (navigator?.language || '').trim();
   const colorScheme = getColorScheme();
   const hour = new Date().getHours();
   const timeOfDay = getTimeOfDay(hour);
-  const cores = navigator.hardwareConcurrency || 0;
-  const platform = (navigator.platform || 'unknown').trim() || 'unknown';
-  const online = navigator.onLine;
+  const cores = navigator?.hardwareConcurrency || 0;
+  const platform = (navigator?.platform || 'unknown').trim() || 'unknown';
+  const online = navigator?.onLine ?? false;
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Void';
-  const windowSize = `${window.innerWidth}x${window.innerHeight}`;
-  const touchPoints = navigator.maxTouchPoints || 0;
+  const windowSize = `${window?.innerWidth || 0}x${window?.innerHeight || 0}`;
+  const touchPoints = navigator?.maxTouchPoints || 0;
   const networkSpeed = (navigator as any).connection?.effectiveType || 'unknown';
 
   const readings: DivinationReading[] = [
