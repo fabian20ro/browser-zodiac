@@ -22,7 +22,11 @@ export function scheduleMidnightGmt(callback: () => void): () => void {
     if (cancelled) return;
     const delay = Math.max(msUntilNextMidnightGmt(new Date()), 1);
     handle = setTimeout(() => {
-      callback();
+      try {
+        callback();
+      } catch (e) {
+        console.error("Error in scheduler callback:", e);
+      }
       scheduleNext();
     }, delay);
   }
