@@ -69,6 +69,12 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.case-flip#')).toBe('hELLO wORLD');
     });
 
+    it('allows adding custom modifiers', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      engine.addModifier('shrug', (s) => `${s} ¯\\_(ツ)_/¯`);
+      expect(engine.expand('#word.shrug#')).toBe('hello ¯\\_(ツ)_/¯');
+    });
+
     it('applies bang modifier', () => {
       const engine = makeEngine({ word: ['hello'] });
       expect(engine.expand('#word.bang#')).toBe('hello!');
