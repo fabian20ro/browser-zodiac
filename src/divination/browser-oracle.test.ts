@@ -59,11 +59,11 @@ describe('readBrowserOracle', () => {
     expect(connectivityReading?.raw).toBe('connected');
   });
 
-  it('includes network_speed in readings', () => {
+  it('includes cosmic_noise in readings', () => {
     const profile = readBrowserOracle();
-    const networkReading = profile.readings.find(r => r.key === 'network_speed');
-    expect(networkReading).toBeDefined();
-    expect(typeof networkReading?.raw).toBe('string');
+    const noiseReading = profile.readings.find(r => r.key === 'cosmic_noise');
+    expect(noiseReading).toBeDefined();
+    expect(typeof noiseReading?.raw).toBe('string');
   });
   
   it('handles missing navigator language', () => {

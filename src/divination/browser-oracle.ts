@@ -107,6 +107,11 @@ export function readBrowserOracle(): DivinationProfile {
       interpretation: readingInterpretations['cosmic_timezone'](timezone),
     },
     {
+      key: 'cosmic_noise',
+      raw: navigator?.userAgent.length.toString() || 'unknown',
+      interpretation: readingInterpretations['cosmic_noise'](navigator?.userAgent.length.toString() || 'unknown'),
+    },
+    {
       key: 'tactile_sensibility',
       raw: touchPoints > 0 ? 'sensitive' : 'numb',
       interpretation: readingInterpretations['tactile_sensibility'](touchPoints > 0 ? 'sensitive' : 'numb'),
