@@ -59,9 +59,17 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.trim-all.uppercase.slugify#')).toBe('helloworld');
     });
 
-    it('applies glitch modifier', () => {
+    it('applies reverse modifier', () => {
       const engine = makeEngine({ word: ['hello'] });
-      expect(engine.expand('#word.glitch#')).toBe('h§ll§');
+      expect(engine.expand('#word.reverse#')).toBe('olleh');
+    });
+    it('applies void modifier', () => {
+      const engine = makeEngine({ word: ['hello world'] });
+      expect(engine.expand('#word.void#')).toBe('h·ll· w·rld');
+    });
+    it('applies bang modifier', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(engine.expand('#word.bang#')).toBe('hello!');
     });
 
     it('handles multiple symbols in one template', () => {
