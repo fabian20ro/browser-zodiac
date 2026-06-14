@@ -108,8 +108,8 @@ export function readBrowserOracle(): DivinationProfile {
     },
     {
       key: 'cosmic_noise',
-      raw: navigator?.userAgent.length.toString() || 'unknown',
-      interpretation: readingInterpretations['cosmic_noise'](navigator?.userAgent.length.toString() || 'unknown'),
+      raw: ua.length.toString(),
+      interpretation: readingInterpretations['cosmic_noise'](ua.length.toString() || 'unknown'),
     },
     {
       key: 'tactile_sensibility',
