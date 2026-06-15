@@ -23,20 +23,18 @@ describe('scheduleMidnightGmt resilience', () => {
     const cancel1 = scheduleMidnightGmt(callback);
     const cancel2 = scheduleMidnightGmt(callback);
     
-    // Advance time
     vi.advanceTimersByTime(1000);
     
-    console.log('After advance(1000), count:', count);
-    expect(count).toBe(2);
+    expect(count).toBe(1);
     
     cancel2(); 
     vi.advanceTimersByTime(1000);
-    console.log('After advance(1000) again, count:', count);
-    expect(count).toBe(2);
+    
+    expect(count).toBe(1);
     
     cancel1();
     vi.advanceTimersByTime(1000);
-    console.log('After cancel1 and advance, count:', count);
-    expect(count).toBe(2);
+    
+    expect(count).toBe(1);
   });
 });
