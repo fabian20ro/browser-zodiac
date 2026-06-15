@@ -76,4 +76,14 @@ describe('scheduleMidnightGmt', () => {
     vi.advanceTimersByTime(86400000);
     expect(callback).toHaveBeenCalledTimes(2);
   });
+
+  it('logs an error when the callback throws', () => {
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const callback = () => { throw new Error('Test error'); };
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+    scheduleMidnightGmt(callback);
+    vi.advanceTimersByTime(1000);
+    expect(consoleSpy).toHaveBeenCalledWith("Error in scheduler callback:", expect.any(Error));
+    consoleSpy.mockRestore();
+  });
 });
