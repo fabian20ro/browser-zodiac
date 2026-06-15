@@ -89,8 +89,6 @@ describe('createGrammarEngine', () => {
     });
 
     it('respects the recursion limit', () => {
-      // Recursive grammar: a -> #b# -> #a#
-      // With maxDepth 1, it should stop after one expansion and return '#b#'
       const engine = makeEngine({ a: ['#b#'], b: ['#a#'] }, 42, 1);
       expect(engine.expand('#a#')).toBe('#b#');
     });
@@ -108,6 +106,21 @@ describe('createGrammarEngine', () => {
     it('handles case-flip with unicode', () => {
       const engine = makeEngine({ word: ['ß'] }, 42);
       expect(engine.expand('#word.case-flip#')).toBe('SS');
+    });
+
+    it('applies void modifier', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(engine.expand('#word.void#')).toBe('h·ll·');
+    });
+
+    it('applies glitch modifier', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(engine.expand('#word.glitch#')).toBe('h§ll§');
+    });
+
+    it('applies mystic modifier', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(engine.expand('#word.mystic#')).toBe('✧ hello ✧');
     });
   });
 });
