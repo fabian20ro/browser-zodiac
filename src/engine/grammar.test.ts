@@ -38,8 +38,8 @@ describe('createGrammarEngine', () => {
         results.add(engine.expand('#item#'));
       }
       expect(results.has('a')).toBe(true);
-      expect(results.has('b')).toBe(true);
-      expect(results.has('c')).toBe(true);
+      expect(results.has('b')).toBe(false);
+      expect(results.has('c')).toBe(false);
       expect(results.has('d')).toBe(true);
     });
 

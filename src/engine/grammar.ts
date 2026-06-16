@@ -17,8 +17,8 @@ export function createGrammarEngine(grammar: Grammar, rng: SeededRandom, options
         if (!isNaN(weight) && weight > 0) {
           return { text: opt.slice(0, sepIdx), weight };
         }
-        // If invalid weight, strip the separator and treat as weight 1
-        return { text: opt.slice(0, sepIdx), weight: 1 };
+        // If invalid weight, strip the separator and treat as weight 0
+        return { text: opt.slice(0, sepIdx), weight: 0 };
       }
       return { text: opt, weight: 1 };
     });
