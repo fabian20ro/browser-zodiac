@@ -13,5 +13,6 @@ export const readingInterpretations: Record<string, InterpretationFn> = {
   network_speed: (raw) => `The pace of destiny is ${raw}.`,
   social_connectivity: (raw) => `You are ${raw}.`,
   cosmic_timezone: (raw) => `Temporal flow: ${raw}.`,
+  cosmic_noise: (raw) => `The cosmic echo vibrates at ${raw}.`,
   tactile_sensibility: (raw) => `Sensing through ${raw}.`,
 };

@@ -11,25 +11,37 @@ export function toGmtDateString(date: Date): string {
 }
 
 /**
+ * A singleton to manage the scheduler loop.
+ */
+let activeHandle: ReturnType<typeof setTimeout> | undefined;
+
+/**
  * Schedules `callback` to fire at each GMT midnight.
  * Returns a cancel function.
+ * If called while a scheduler is already running, the previous one is cancelled.
  */
 export function scheduleMidnightGmt(callback: () => void): () => void {
-  let handle: ReturnType<typeof setTimeout>;
-  let cancelled = false;
+  if (activeHandle) {
+    clearTimeout(activeHandle);
+  }
 
   function scheduleNext(): void {
-    if (cancelled) return;
-    const delay = msUntilNextMidnightGmt(new Date());
-    handle = setTimeout(() => {
-      callback();
+    const delay = Math.max(msUntilNextMidnightGmt(new Date()), 1);
+    activeHandle = setTimeout(() => {
+      try {
+        callback();
+      } catch (e) {
+        console.error("Error in scheduler callback:", e);
+      }
       scheduleNext();
     }, delay);
   }
 
   scheduleNext();
   return () => {
-    cancelled = true;
-    clearTimeout(handle);
+    if (activeHandle) {
+      clearTimeout(activeHandle);
+      activeHandle = undefined;
+    }
   };
 }

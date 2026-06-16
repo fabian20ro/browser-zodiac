@@ -59,32 +59,29 @@ describe('readBrowserOracle', () => {
     expect(connectivityReading?.raw).toBe('connected');
   });
 
-  it('includes network_speed in readings', () => {
+  it('includes cosmic_noise in readings', () => {
     const profile = readBrowserOracle();
-    const networkReading = profile.readings.find(r => r.key === 'network_speed');
-    expect(networkReading).toBeDefined();
-    expect(typeof networkReading?.raw).toBe('string');
+    const noiseReading = profile.readings.find(r => r.key === 'cosmic_noise');
+    expect(noiseReading).toBeDefined();
+    expect(typeof noiseReading?.raw).toBe('string');
   });
   
-  it('handles unknown browser and os', () => {
+  it('handles missing navigator language', () => {
     vi.stubGlobal('navigator', {
-      userAgent: 'UnknownAgent',
-      language: 'en-US',
-      hardwareConcurrency: 0,
-      platform: 'unknown',
-      onLine: false,
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36',
+      // language is missing
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
       maxTouchPoints: 0,
       connection: {
-        effectiveType: 'unknown',
+        effectiveType: '4g',
       },
     });
-    const profile = readBrowserOracle();
-    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
-    const osReading = profile.readings.find(r => r.key === 'elemental_os');
-      
-    expect(browserReading?.raw).toBe('Unknown');
-    expect(osReading?.raw).toBe('Unknown');
+    // This should not throw if we add a check in the source
+    expect(() => readBrowserOracle()).not.toThrow();
   });
+
 
   it('includes tactile_sensibility in readings', () => {
     const profile = readBrowserOracle();

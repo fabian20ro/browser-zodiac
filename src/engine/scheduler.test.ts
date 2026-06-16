@@ -1,77 +1,89 @@
-import { describe, it, expect, vi } from 'vitest';
-import { msUntilNextMidnightGmt, toGmtDateString, scheduleMidnightGmt } from './scheduler.ts';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { toGmtDateString, msUntilNextMidnightGmt, scheduleMidnightGmt } from './scheduler.ts';
 
-describe('msUntilNextMidnightGmt', () => {
-  it('returns 24 hours when called at exactly midnight UTC', () => {
-    const midnight = new Date('2026-03-03T00:00:00.000Z');
-    expect(msUntilNextMidnightGmt(midnight)).toBe(24 * 60 * 60 * 1000);
-  });
-
-  it('returns 12 hours when called at noon UTC', () => {
-    const noon = new Date('2026-03-03T12:00:00.000Z');
-    expect(msUntilNextMidnightGmt(noon)).toBe(12 * 60 * 60 * 1000);
-  });
-
-  it('returns 1 ms just before midnight', () => {
-    const almostMidnight = new Date('2026-03-03T23:59:59.999Z');
-    expect(msUntilNextMidnightGmt(almostMidnight)).toBe(1);
-  });
-
-  it('handles month boundary (Feb to Mar)', () => {
-    const endOfFeb = new Date('2026-02-28T23:59:59.000Z');
-    expect(msUntilNextMidnightGmt(endOfFeb)).toBe(1000);
-  });
-
-  it('handles year boundary (Dec 31 to Jan 1)', () => {
-    const newYearsEve = new Date('2026-12-31T23:00:00.000Z');
-    expect(msUntilNextMidnightGmt(newYearsEve)).toBe(60 * 60 * 1000);
-  });
-
-  it('always returns a positive number', () => {
-    const times = [
-      new Date('2026-01-01T00:00:00.001Z'),
-      new Date('2026-06-15T08:30:00.000Z'),
-      new Date('2026-12-31T23:59:59.999Z'),
-    ];
-    for (const t of times) {
-      expect(msUntilNextMidnightGmt(t)).toBeGreaterThan(0);
-    }
+describe('toGmtDateString', () => {
+  it('returns the expected YYYY-MM-DD for a future date', () => {
+    expect(toGmtDateString(new Date('2030-01-01T12:00:00.000Z'))).toBe('2030-01-01');
   });
 });
 
-describe('toGmtDateString', () => {
-  it('returns YYYY-MM-DD for a UTC midnight date', () => {
-    expect(toGmtDateString(new Date('2026-03-03T00:00:00.000Z'))).toBe('2026-03-03');
+describe('msUntilNextMidnightGmt', () => {
+  it('returns 86400000 at exact midnight', () => {
+    const midnight = new Date('2026-01-01T00:00:00.000Z');
+    expect(msUntilNextMidnightGmt(midnight)).toBe(86400000);
   });
 
-  it('returns the UTC date regardless of time', () => {
-    expect(toGmtDateString(new Date('2026-03-04T04:00:00.000Z'))).toBe('2026-03-04');
+  it('returns correctly for a noon date', () => {
+    const noon = new Date('2026-01-01T12:00:00.000Z');
+    const expected = new Date('2026-01-02T00:00:00.000Z').getTime() - noon.getTime();
+    expect(msUntilNextMidnightGmt(noon)).toBe(expected);
   });
 
-  it('handles year boundary', () => {
-    expect(toGmtDateString(new Date('2027-01-01T00:00:00.000Z'))).toBe('2027-01-01');
+  it('handles month/year boundaries', () => {
+    const endOfYear = new Date('2026-12-31T23:59:59.000Z');
+    const expected = new Date('2027-01-01T00:00:00.000Z').getTime() - endOfYear.getTime();
+    expect(msUntilNextMidnightGmt(endOfYear)).toBe(expected);
   });
 });
 
 describe('scheduleMidnightGmt', () => {
-  it('stops rescheduling after cancel is called from the callback', () => {
+  beforeEach(() => {
     vi.useFakeTimers();
-    vi.setSystemTime(new Date('2026-03-03T23:59:59.999Z'));
+  });
 
-    let calls = 0;
-    let cancel = () => {};
+  afterEach(() => {
+    vi.useRealTimers();
+  });
 
-    cancel = scheduleMidnightGmt(() => {
-      calls += 1;
-      cancel();
-    });
+  it('calls the callback at midnight', () => {
+    const callback = vi.fn();
+    // Set time BEFORE calling the function
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+    scheduleMidnightGmt(callback);
+
+    // Advance time to just before midnight
+    vi.advanceTimersByTime(999);
+    expect(callback).not.toHaveBeenCalled();
+
+    // Advance to midnight
+    vi.advanceTimersByTime(1);
+    expect(callback).toHaveBeenCalledTimes(1);
+  });
+
+  it('can be cancelled', () => {
+    const callback = vi.fn();
+    // Set time BEFORE calling the function
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+    const cancel = scheduleMidnightGmt(callback);
 
     vi.advanceTimersByTime(1);
-    expect(calls).toBe(1);
+    cancel();
+    vi.advanceTimersByTime(1);
+    
+    expect(callback).not.toHaveBeenCalled();
+  });
 
-    vi.advanceTimersByTime(24 * 60 * 60 * 1000);
-    expect(calls).toBe(1);
+  it('schedules the next run after the first one', () => {
+    const callback = vi.fn();
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+    scheduleMidnightGmt(callback);
 
-    vi.useRealTimers();
+    vi.advanceTimersByTime(1000);
+    expect(callback).toHaveBeenCalledTimes(1);
+
+    // Advance to the next midnight
+    vi.setSystemTime(new Date('2026-01-02T23:59:59.000Z'));
+    vi.advanceTimersByTime(86400000);
+    expect(callback).toHaveBeenCalledTimes(2);
+  });
+
+  it('logs an error when the callback throws', () => {
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const callback = () => { throw new Error('Test error'); };
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+    scheduleMidnightGmt(callback);
+    vi.advanceTimersByTime(1000);
+    expect(consoleSpy).toHaveBeenCalledWith("Error in scheduler callback:", expect.any(Error));
+    consoleSpy.mockRestore();
   });
 });

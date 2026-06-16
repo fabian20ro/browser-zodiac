@@ -79,12 +79,18 @@ export function createGrammarEngine(grammar: Grammar, rng: SeededRandom, options
   addModifier('slugify', (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''));
   addModifier('reverse', (s) => s.split('').reverse().join(''));
   addModifier('unquote', (s) => s.replace(/^["']|["']$/g, ''));
-  addModifier('strip-punctuation', (s) => s.replace(/[^\w\s]/gi, ''));
+  addModifier('scrub', (s) => s.replace(/[aeiou]/gi, ''));
+  addModifier('void', (s) => s.replace(/[aeiou]/gi, '·'));
+  addModifier('bang', (s) => `${s}!`);
   addModifier('titlecase', (s) => {
     const words = s.trim().split(/\s+/).filter(Boolean);
     return words.map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
   });
+  addModifier('echo', (s) => `${s} ${s}`);
   addModifier('mystic', (s) => `✧ ${s} ✧`);
+  addModifier('wrap-emoji', (s) => `✨ ${s} ✨`);
+  addModifier('glitch', (s) => s.replace(/[aeiou]/gi, '§'));
+  addModifier('case-flip', (s) => s.split('').map(c => c === c.toUpperCase() ? c.toLowerCase() : c.toUpperCase()).join(''));
 
   return { expand, addModifier };
 }

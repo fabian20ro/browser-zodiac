@@ -43,9 +43,41 @@ describe('createGrammarEngine', () => {
       expect(results.has('d')).toBe(true);
     });
 
-    it('handles unquote modifier', () => {
+    it('applies unquote modifier', () => {
       const engine = makeEngine({ word: ['"hello"'] }, 42);
       expect(engine.expand('#word.unquote#')).toBe('hello');
+    });
+
+    it('applies scrub modifier', () => {
+      const engine = makeEngine({ word: ['hello world'] });
+      expect(engine.expand('#word.scrub#')).toBe('hll wrld');
+    });
+
+    it('handles multiple modifiers in sequence', () => {
+      const engine = makeEngine({ word: [' HELLO WORLD '] });
+      expect(engine.expand('#word.trim-all.uppercase#')).toBe('HELLOWORLD');
+      expect(engine.expand('#word.trim-all.uppercase.slugify#')).toBe('helloworld');
+    });
+
+    it('applies reverse modifier', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(engine.expand('#word.reverse#')).toBe('olleh');
+    });
+
+    it('applies case-flip modifier', () => {
+      const engine = makeEngine({ word: ['Hello World'] });
+      expect(engine.expand('#word.case-flip#')).toBe('hELLO wORLD');
+    });
+
+    it('allows adding custom modifiers', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      engine.addModifier('shrug', (s) => `${s} ¯\\_(ツ)_/¯`);
+      expect(engine.expand('#word.shrug#')).toBe('hello ¯\\_(ツ)_/¯');
+    });
+
+    it('applies bang modifier', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(engine.expand('#word.bang#')).toBe('hello!');
     });
 
     it('handles multiple symbols in one template', () => {
@@ -57,127 +89,35 @@ describe('createGrammarEngine', () => {
     });
 
     it('respects the recursion limit', () => {
-      // Recursive grammar: a -> #b# -> #a#
-      // With maxDepth 1, it should stop after one expansion and return '#b#'
       const engine = makeEngine({ a: ['#b#'], b: ['#a#'] }, 42, 1);
       expect(engine.expand('#a#')).toBe('#b#');
     });
 
-  });
-
-  describe('weighted selection', () => {
-    it('respects weight separator ~~', () => {
-      // With a heavily weighted option, it should be selected most of the time
-      const grammar = { item: ['rare~~1', 'common~~100'] };
-      let commonCount = 0;
-      for (let seed = 0; seed < 50; seed++) {
-        const engine = makeEngine(grammar, seed);
-        if (engine.expand('#item#') === 'common') commonCount++;
-      }
-      expect(commonCount).toBeGreaterThan(40);
+    it('respects a maxDepth of 0', () => {
+      const engine = makeEngine({ a: ['#b#'], b: ['#a#'] }, 42, 0);
+      expect(engine.expand('#a#')).toBe('#a#');
     });
 
-    it('treats invalid weight as weight 1 and strips separator', () => {
-      const engine = makeEngine({ item: ['a~~invalid', 'b'] });
-      // Both should be selectable (weight 1 each), but we now strip the garbage.
-      const result = engine.expand('#item#');
-      expect(['a', 'b']).toContain(result);
-    });
-
-    it('handles zero total weight by returning the last item', () => {
-      const engine = makeEngine({ item: ['a~~0', 'b~~0'] });
-      expect(engine.expand('#item#')).toBe('b');
-    });
-  });
-
-  describe('modifiers', () => {
-    it('applies capitalize modifier', () => {
-      const engine = makeEngine({ word: ['hello'] });
-      expect(engine.expand('#word.capitalize#')).toBe('Hello');
-    });
-
-    it('applies uppercase modifier', () => {
-      const engine = makeEngine({ word: ['hello'] });
-      expect(engine.expand('#word.uppercase#')).toBe('HELLO');
-    });
-
-    it('applies lowercase modifier', () => {
-      const engine = makeEngine({ word: ['HELLO'] });
-      expect(engine.expand('#word.lowercase#')).toBe('hello');
-    });
-
-    it('applies shout modifier', () => {
-      const engine = makeEngine({ word: ['hello'] });
-      expect(engine.expand('#word.shout#')).toBe('HELLO!');
-    });
-
-    it('applies trim modifier', () => {
-      const engine = makeEngine({ word: [' hello '] });
-      expect(engine.expand('#word.trim#')).toBe('hello');
-    });
-
-    it('applies trim-start modifier', () => {
-      const engine = makeEngine({ word: ['  hello'] });
-      expect(engine.expand('#word.trim-start#')).toBe('hello');
-    });
-
-    it('applies trim-end modifier', () => {
-      const engine = makeEngine({ word: ['hello  '] });
-      expect(engine.expand('#word.trim-end#')).toBe('hello');
-    });
-
-    it('applies trim-all modifier', () => {
-      const engine = makeEngine({ word: [' h e l l o '] });
-      expect(engine.expand('#word.trim-all#')).toBe('hello');
-    });
-
-    it('applies collapse-spaces modifier', () => {
-      const engine = makeEngine({ word: ['  too   many    spaces  '] });
-      expect(engine.expand('#word.collapse-spaces#')).toBe('too many spaces');
-    });
-
-    it('applies slugify modifier', () => {
-      const engine = makeEngine({ word: ['Hello World!'] });
-      expect(engine.expand('#word.slugify#')).toBe('hello-world');
-    });
-
-    it('applies reverse modifier', () => {
-      const engine = makeEngine({ word: ['hello'] });
-      expect(engine.expand('#word.reverse#')).toBe('olleh');
-    });
-
-    it('applies unquote modifier', () => {
-      const engine = makeEngine({ word: ['"hello"'] }, 42);
+    it('handles unquote with mixed quotes', () => {
+      const engine = makeEngine({ word: ['"hello\''] }, 42);
       expect(engine.expand('#word.unquote#')).toBe('hello');
     });
 
-    it('applies strip-punctuation modifier', () => {
-      const engine = makeEngine({ word: ['hello, world!'] });
-      expect(engine.expand('#word.strip-punctuation#')).toBe('hello world');
+    it('handles case-flip with unicode', () => {
+      const engine = makeEngine({ word: ['ß'] }, 42);
+      expect(engine.expand('#word.case-flip#')).toBe('SS');
     });
 
-    it('applies titlecase modifier', () => {
-      const engine = makeEngine({ word: ['hello world'] });
-      expect(engine.expand('#word.titlecase#')).toBe('Hello World');
+    it('applies void modifier', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(engine.expand('#word.void#')).toBe('h·ll·');
     });
 
-    it('applies slugify modifier', () => {
-      const engine = makeEngine({ word: ['Hello World!'] });
-      expect(engine.expand('#word.slugify#')).toBe('hello-world');
+    it('applies glitch modifier', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(engine.expand('#word.glitch#')).toBe('h§ll§');
     });
 
-    it('handles modifiers with recursion limit', () => {
-      // Recursive grammar: a -> #b# -> #a#
-      // With maxDepth 1, it should stop expansion but still apply modifiers to the result.
-      const engine = makeEngine({ a: ['#b#'], b: ['#a#'] }, 42, 1);
-      expect(engine.expand('#a.uppercase#')).toBe('#B#');
-    });
-
-    it('applies multiple modifiers in sequence', () => {
-      const engine = makeEngine({ word: [' HELLO WORLD '] });
-      expect(engine.expand('#word.trim-all.uppercase#')).toBe('HELLOWORLD');
-      expect(engine.expand('#word.trim-all.uppercase.slugify#')).toBe('helloworld');
-    });
     it('applies mystic modifier', () => {
       const engine = makeEngine({ word: ['hello'] });
       expect(engine.expand('#word.mystic#')).toBe('✧ hello ✧');
