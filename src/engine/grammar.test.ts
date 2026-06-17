@@ -108,6 +108,10 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.case-flip#')).toBe('SS');
     });
 
+    it('applies celebrate modifier', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(engine.expand('#word.celebrate#')).toBe('🎉 hello 🎉');
+    });
     it('applies slugify and reverse modifiers', () => {
       const engine = makeEngine({ word: ['Hello World!'] });
       expect(engine.expand('#word.slugify.reverse#')).toBe('dlrow-olleh');

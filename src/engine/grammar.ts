@@ -89,6 +89,7 @@ export function createGrammarEngine(grammar: Grammar, rng: SeededRandom, options
   addModifier('echo', (s) => `${s} ${s}`);
   addModifier('mystic', (s) => `✧ ${s} ✧`);
   addModifier('wrap-emoji', (s) => `✨ ${s} ✨`);
+  addModifier('celebrate', (s) => `🎉 ${s} 🎉`);
   addModifier('glitch', (s) => s.replace(/[aeiou]/gi, '§'));
   addModifier('case-flip', (s) => s.split('').map(c => c === c.toUpperCase() ? c.toLowerCase() : c.toUpperCase()).join(''));
 
