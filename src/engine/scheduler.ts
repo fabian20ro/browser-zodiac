@@ -27,9 +27,9 @@ export function scheduleMidnightGmt(callback: () => void): () => void {
 
   function scheduleNext(): void {
     const delay = Math.max(msUntilNextMidnightGmt(new Date()), 1);
-    activeHandle = setTimeout(() => {
+    activeHandle = setTimeout(async () => {
       try {
-        callback();
+        await callback();
       } catch (e) {
         console.error("Error in scheduler callback:", e);
       }

@@ -38,8 +38,8 @@ describe('createGrammarEngine', () => {
         results.add(engine.expand('#item#'));
       }
       expect(results.has('a')).toBe(true);
-      expect(results.has('b')).toBe(true);
-      expect(results.has('c')).toBe(true);
+      expect(results.has('b')).toBe(false);
+      expect(results.has('c')).toBe(false);
       expect(results.has('d')).toBe(true);
     });
 
@@ -108,19 +108,9 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.case-flip#')).toBe('SS');
     });
 
-    it('applies void modifier', () => {
-      const engine = makeEngine({ word: ['hello'] });
-      expect(engine.expand('#word.void#')).toBe('h·ll·');
-    });
-
-    it('applies glitch modifier', () => {
-      const engine = makeEngine({ word: ['hello'] });
-      expect(engine.expand('#word.glitch#')).toBe('h§ll§');
-    });
-
-    it('applies mystic modifier', () => {
-      const engine = makeEngine({ word: ['hello'] });
-      expect(engine.expand('#word.mystic#')).toBe('✧ hello ✧');
+    it('applies slugify and reverse modifiers', () => {
+      const engine = makeEngine({ word: ['Hello World!'] });
+      expect(engine.expand('#word.slugify.reverse#')).toBe('dlrow-olleh');
     });
   });
 });

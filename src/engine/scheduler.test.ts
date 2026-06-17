@@ -63,17 +63,17 @@ describe('scheduleMidnightGmt', () => {
     expect(callback).not.toHaveBeenCalled();
   });
 
-  it('schedules the next run after the first one', () => {
+  it('schedules the next run after the first one', async () => {
     const callback = vi.fn();
     vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
     scheduleMidnightGmt(callback);
 
-    vi.advanceTimersByTime(1000);
+    await vi.advanceTimersByTimeAsync(1000);
     expect(callback).toHaveBeenCalledTimes(1);
 
     // Advance to the next midnight
     vi.setSystemTime(new Date('2026-01-02T23:59:59.000Z'));
-    vi.advanceTimersByTime(86400000);
+    await vi.advanceTimersByTimeAsync(86400000);
     expect(callback).toHaveBeenCalledTimes(2);
   });
 
