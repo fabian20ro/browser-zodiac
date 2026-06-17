@@ -74,7 +74,7 @@ export function createGrammarEngine(grammar: Grammar, rng: SeededRandom, options
   addModifier('trim', (s) => s.trim());
   addModifier('trim-start', (s) => s.trimStart());
   addModifier('trim-end', (s) => s.trimEnd());
-  addModifier('trim-all', (s) => s.replace(/\s/g, ''));
+  addModifier('trim-all', (s) => s.trim().replace(/\s+/g, ' '));
   addModifier('collapse-spaces', (s) => s.replace(/\s+/g, ' ').trim());
   addModifier('slugify', (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''));
   addModifier('reverse', (s) => s.split('').reverse().join(''));
