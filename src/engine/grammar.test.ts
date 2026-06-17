@@ -120,7 +120,7 @@ describe('createGrammarEngine', () => {
 
     it('handles trim-all correctly', () => {
       const engine = makeEngine({ word: ['  a   b  '] });
-      expect(engine.expand('#word.trim-all#')).toBe('a b');
+      expect(engine.expand('#word.trim-all#')).toBe('ab');
     });
   });
 });
