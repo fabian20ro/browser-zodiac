@@ -3,6 +3,7 @@ import type { Grammar, Modifier, SeededRandom } from './types.ts';
 // Baseline pass
 const EXPANSION_RE = /#([^#]+)#/g;
 const WEIGHT_SEPARATOR = '~~';
+const MAX_DEPTH = 10;
 
 export function createGrammarEngine(grammar: Grammar, rng: SeededRandom, options: { maxDepth?: number } = {}) {
   const maxDepth = options.maxDepth ?? MAX_DEPTH;
