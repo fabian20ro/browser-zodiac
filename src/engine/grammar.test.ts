@@ -152,5 +152,10 @@ describe('createGrammarEngine', () => {
       const engine = makeEngine({ word: ['hello'] });
       expect(engine.expand('#word.shout#')).toBe('HELLO!');
     });
+
+    it('applies wrap-emoji modifier', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(engine.expand('#word.wrap-emoji#')).toBe('✨ hello ✨');
+    });
   });
 });
