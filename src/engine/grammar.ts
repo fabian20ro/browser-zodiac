@@ -1,6 +1,6 @@
 import type { Grammar, Modifier, SeededRandom } from './types.ts';
 
-const MAX_DEPTH = 20;
+// Baseline pass
 const EXPANSION_RE = /#([^#]+)#/g;
 const WEIGHT_SEPARATOR = '~~';
 
