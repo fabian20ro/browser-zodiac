@@ -43,6 +43,11 @@ describe('createGrammarEngine', () => {
       expect(results.has('d')).toBe(true);
     });
 
+    it('returns the first item if total weight is zero', () => {
+      const engine = makeEngine({ item: ['a~~0', 'b~~0'] });
+      expect(engine.expand('#item#')).toBe('a');
+    });
+
     it('applies unquote modifier', () => {
       const engine = makeEngine({ word: ['"hello"'] }, 42);
       expect(engine.expand('#word.unquote#')).toBe('hello');
