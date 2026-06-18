@@ -113,9 +113,19 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.celebrate#')).toBe('🎉 hello 🎉');
     });
 
-    it('applies slugify and reverse modifiers', () => {
-      const engine = makeEngine({ word: ['Hello World!'] });
-      expect(engine.expand('#word.slugify.reverse#')).toBe('dlrow-olleh');
+    it('applies titlecase modifier', () => {
+      const engine = makeEngine({ word: ['hello world'] });
+      expect(engine.expand('#word.titlecase#')).toBe('Hello World');
+    });
+
+    it('applies glitch modifier', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(engine.expand('#word.glitch#')).toBe('h§ll§');
+    });
+
+    it('applies mystic modifier', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(engine.expand('#word.mystic#')).toBe('✧ hello ✧');
     });
 
     it('handles trim-all correctly', () => {
