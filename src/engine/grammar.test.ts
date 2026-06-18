@@ -98,6 +98,11 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#a#')).toBe('#a#');
     });
 
+    it('does not apply modifiers if maxDepth is reached', () => {
+      const engine = makeEngine({ a: ['hello'] }, 42, 0);
+      expect(engine.expand('#a.uppercase#')).toBe('#a.uppercase#');
+    });
+
     it('handles unquote with mixed quotes', () => {
       const engine = makeEngine({ word: ['"hello\''] }, 42);
       expect(engine.expand('#word.unquote#')).toBe('hello');
