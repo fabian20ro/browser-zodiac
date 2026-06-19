@@ -44,10 +44,10 @@ describe('scheduleMidnightGmt resilience', () => {
     vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
     const cancel1 = scheduleMidnightGmt(asyncCallback);
     
-    vi.advanceTimersByTime(1000); 
+    await vi.advanceTimersByTimeAsync(1000); 
     
     scheduleMidnightGmt(asyncCallback); 
-
+    
     await vi.advanceTimersByTimeAsync(1000); 
     await vi.advanceTimersByTimeAsync(86400000); 
     

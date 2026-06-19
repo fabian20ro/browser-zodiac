@@ -15,6 +15,7 @@ export function toGmtDateString(date: Date): string {
  */
 let activeHandle: ReturnType<typeof setTimeout> | undefined;
 let activeLoopId = 0;
+let isLoopRunning = false;
 
 /**
  * Schedules `callback` to fire at each GMT midnight.
@@ -31,6 +32,8 @@ export function scheduleMidnightGmt(callback: () => void): () => void {
   function scheduleNext(): void {
     const delay = Math.max(msUntilNextMidnightGmt(new Date()), 1);
     activeHandle = setTimeout(async () => {
+      if (loopId !== activeLoopId || isLoopRunning) return;
+      isLoopRunning = true;
       try {
         await callback();
       } catch (e) {
@@ -38,6 +41,9 @@ export function scheduleMidnightGmt(callback: () => void): () => void {
       }
       if (loopId === activeLoopId) {
         scheduleNext();
+        isLoopRunning = false;
+      } else {
+        isLoopRunning = false;
       }
     }, delay);
   }
