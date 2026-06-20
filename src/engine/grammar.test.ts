@@ -80,6 +80,11 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.case-flip#')).toBe('hELLO wORLD');
     });
 
+    it('applies sentencecase modifier', () => {
+      const engine = makeEngine({ word: ['HELLO WORLD'] });
+      expect(engine.expand('#word.sentencecase#')).toBe('Hello world');
+    });
+
     it('allows adding custom modifiers', () => {
       const engine = makeEngine({ word: ['hello'] });
       engine.addModifier('shrug', (s) => `${s} ¯\\_(ツ)_/¯`);

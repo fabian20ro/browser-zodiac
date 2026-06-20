@@ -70,6 +70,7 @@ export function createGrammarEngine(grammar: Grammar, rng: SeededRandom, options
   // Register default modifiers
   addModifier('capitalize', (s) => s.charAt(0).toUpperCase() + s.slice(1));
   addModifier('uppercase', (s) => s.toUpperCase());
+  addModifier('sentencecase', (s) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase());
   addModifier('lowercase', (s) => s.toLowerCase());
   addModifier('shout', (s) => s.toUpperCase() + '!');
   addModifier('trim', (s) => s.trim());
