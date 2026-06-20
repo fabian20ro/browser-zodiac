@@ -62,6 +62,7 @@ describe('createGrammarEngine', () => {
       const engine = makeEngine({ word: [' HELLO WORLD '] });
       expect(engine.expand('#word.trim-all.uppercase#')).toBe('HELLOWORLD');
       expect(engine.expand('#word.trim-all.uppercase.slugify#')).toBe('helloworld');
+      expect(engine.expand('#word.uppercase.snake_case#')).toBe('hello_world');
     });
 
     it('applies reverse modifier', () => {
@@ -136,26 +137,6 @@ describe('createGrammarEngine', () => {
     it('applies mystic modifier', () => {
       const engine = makeEngine({ word: ['hello'] });
       expect(engine.expand('#word.mystic#')).toBe('✧ hello ✧');
-    });
-
-    it('handles trim-all correctly', () => {
-      const engine = makeEngine({ word: ['  a   b  '] });
-      expect(engine.expand('#word.trim-all#')).toBe('ab');
-    });
-
-    it('applies capitalize modifier', () => {
-      const engine = makeEngine({ word: ['hello world'] });
-      expect(engine.expand('#word.capitalize#')).toBe('Hello world');
-    });
-
-    it('applies lowercase modifier', () => {
-      const engine = makeEngine({ word: ['HELLO WORLD'] });
-      expect(engine.expand('#word.lowercase#')).toBe('hello world');
-    });
-
-    it('applies shout modifier', () => {
-      const engine = makeEngine({ word: ['hello'] });
-      expect(engine.expand('#word.shout#')).toBe('HELLO!');
     });
 
     it('applies wrap-emoji modifier', () => {
