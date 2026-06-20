@@ -70,6 +70,11 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.reverse#')).toBe('olleh');
     });
 
+    it('applies reverse modifier with unicode', () => {
+      const engine = makeEngine({ word: ['hello 🌍'] });
+      expect(engine.expand('#word.reverse#')).toBe('🌍 olleh');
+    });
+
     it('applies case-flip modifier', () => {
       const engine = makeEngine({ word: ['Hello World'] });
       expect(engine.expand('#word.case-flip#')).toBe('hELLO wORLD');

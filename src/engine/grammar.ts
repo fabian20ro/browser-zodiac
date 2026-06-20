@@ -78,7 +78,7 @@ export function createGrammarEngine(grammar: Grammar, rng: SeededRandom, options
   addModifier('trim-all', (s) => s.trim().replace(/\s+/g, ''));
   addModifier('slugify', (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''));
   addModifier('snake_case', (s) => s.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_'));
-  addModifier('reverse', (s) => s.split('').reverse().join(''));
+  addModifier('reverse', (s) => Array.from(s).reverse().join(''));
   addModifier('unquote', (s) => s.replace(/^["']|["']$/g, ''));
   addModifier('scrub', (s) => s.replace(/[aeiou]/gi, ''));
   addModifier('void', (s) => s.replace(/[aeiou]/gi, '·'));
