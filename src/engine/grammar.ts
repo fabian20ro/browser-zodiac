@@ -1,8 +1,9 @@
 import type { Grammar, Modifier, SeededRandom } from './types.ts';
 
-const MAX_DEPTH = 20;
+// Baseline pass
 const EXPANSION_RE = /#([^#]+)#/g;
 const WEIGHT_SEPARATOR = '~~';
+const MAX_DEPTH = 10;
 
 export function createGrammarEngine(grammar: Grammar, rng: SeededRandom, options: { maxDepth?: number } = {}) {
   const maxDepth = options.maxDepth ?? MAX_DEPTH;
@@ -75,8 +76,8 @@ export function createGrammarEngine(grammar: Grammar, rng: SeededRandom, options
   addModifier('trim-start', (s) => s.trimStart());
   addModifier('trim-end', (s) => s.trimEnd());
   addModifier('trim-all', (s) => s.trim().replace(/\s+/g, ''));
-  addModifier('collapse-spaces', (s) => s.replace(/\s+/g, ' ').trim());
   addModifier('slugify', (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''));
+  addModifier('snake_case', (s) => s.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_'));
   addModifier('reverse', (s) => s.split('').reverse().join(''));
   addModifier('unquote', (s) => s.replace(/^["']|["']$/g, ''));
   addModifier('scrub', (s) => s.replace(/[aeiou]/gi, ''));

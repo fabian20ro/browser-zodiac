@@ -43,6 +43,11 @@ describe('createGrammarEngine', () => {
       expect(results.has('d')).toBe(true);
     });
 
+    it('returns the first item if total weight is zero', () => {
+      const engine = makeEngine({ item: ['a~~0', 'b~~0'] });
+      expect(engine.expand('#item#')).toBe('a');
+    });
+
     it('applies unquote modifier', () => {
       const engine = makeEngine({ word: ['"hello"'] }, 42);
       expect(engine.expand('#word.unquote#')).toBe('hello');
@@ -57,6 +62,7 @@ describe('createGrammarEngine', () => {
       const engine = makeEngine({ word: [' HELLO WORLD '] });
       expect(engine.expand('#word.trim-all.uppercase#')).toBe('HELLOWORLD');
       expect(engine.expand('#word.trim-all.uppercase.slugify#')).toBe('helloworld');
+      expect(engine.expand('#word.uppercase.snake_case#')).toBe('hello_world');
     });
 
     it('applies reverse modifier', () => {
@@ -98,6 +104,11 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#a#')).toBe('#a#');
     });
 
+    it('does not apply modifiers if maxDepth is reached', () => {
+      const engine = makeEngine({ a: ['hello'] }, 42, 0);
+      expect(engine.expand('#a.uppercase#')).toBe('#a.uppercase#');
+    });
+
     it('handles unquote with mixed quotes', () => {
       const engine = makeEngine({ word: ['"hello\''] }, 42);
       expect(engine.expand('#word.unquote#')).toBe('hello');
@@ -113,14 +124,24 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.celebrate#')).toBe('🎉 hello 🎉');
     });
 
-    it('applies slugify and reverse modifiers', () => {
-      const engine = makeEngine({ word: ['Hello World!'] });
-      expect(engine.expand('#word.slugify.reverse#')).toBe('dlrow-olleh');
+    it('applies titlecase modifier', () => {
+      const engine = makeEngine({ word: ['hello world'] });
+      expect(engine.expand('#word.titlecase#')).toBe('Hello World');
     });
 
-    it('handles trim-all correctly', () => {
-      const engine = makeEngine({ word: ['  a   b  '] });
-      expect(engine.expand('#word.trim-all#')).toBe('ab');
+    it('applies glitch modifier', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(engine.expand('#word.glitch#')).toBe('h§ll§');
+    });
+
+    it('applies mystic modifier', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(engine.expand('#word.mystic#')).toBe('✧ hello ✧');
+    });
+
+    it('applies wrap-emoji modifier', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(engine.expand('#word.wrap-emoji#')).toBe('✨ hello ✨');
     });
   });
 });

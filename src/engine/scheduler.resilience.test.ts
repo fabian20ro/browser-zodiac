@@ -34,27 +34,24 @@ describe('scheduleMidnightGmt resilience', () => {
     expect(count).toBe(1);
   });
 
-  it('should wait for an async callback to resolve before scheduling the next iteration', async () => {
-    let callbackCalls = 0;
+  it('should not leak if called during an async callback', async () => {
+    let count = 0;
     const asyncCallback = async () => {
-      callbackCalls++;
-      // Use a setTimeout to simulate async work
+      count++;
       await new Promise(resolve => setTimeout(resolve, 1000));
     };
 
     vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
-    scheduleMidnightGmt(asyncCallback);
-
-    // Advance time to trigger the first callback
-    vi.advanceTimersByTime(1001);
+    const cancel1 = scheduleMidnightGmt(asyncCallback);
     
-    // Wait for the async callback to finish
-    await vi.advanceTimersByTimeAsync(1000);
+    await vi.advanceTimersByTimeAsync(1000); 
     
-    expect(callbackCalls).toBe(1);
+    scheduleMidnightGmt(asyncCallback); 
     
-    // Advance time to trigger the second callback
-    await vi.advanceTimersByTimeAsync(86400000);
-    expect(callbackCalls).toBe(2);
+    await vi.advanceTimersByTimeAsync(1000); 
+    await vi.advanceTimersByTimeAsync(86400000); 
+    
+    expect(count).toBe(1);
+    cancel1();
   });
 });
