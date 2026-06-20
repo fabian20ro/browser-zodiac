@@ -28,11 +28,20 @@ export function scheduleMidnightGmt(callback: () => void): () => void {
     clearTimeout(activeHandle);
   }
   const loopId = ++activeLoopId;
+  let iteration = 0;
+  let wasStartedDuringLoop = isLoopRunning;
 
   function scheduleNext(): void {
     const delay = Math.max(msUntilNextMidnightGmt(new Date()), 1);
     activeHandle = setTimeout(async () => {
-      if (loopId !== activeLoopId || isLoopRunning) return;
+      if (loopId !== activeLoopId) return;
+
+      iteration++;
+      if (iteration === 1 && wasStartedDuringLoop) {
+        scheduleNext();
+        return;
+      }
+
       isLoopRunning = true;
       try {
         await callback();
@@ -40,8 +49,8 @@ export function scheduleMidnightGmt(callback: () => void): () => void {
         console.error("Error in scheduler callback:", e);
       }
       if (loopId === activeLoopId) {
-        scheduleNext();
         isLoopRunning = false;
+        scheduleNext();
       } else {
         isLoopRunning = false;
       }
@@ -54,6 +63,5 @@ export function scheduleMidnightGmt(callback: () => void): () => void {
       clearTimeout(activeHandle);
       activeHandle = undefined;
     }
-    // We don't need to kill the callback, it will check loopId
   };
 }
