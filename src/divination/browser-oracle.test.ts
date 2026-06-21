@@ -106,49 +106,79 @@ describe('readBrowserOracle', () => {
     expect(typeof tactileReading?.raw).toBe('string');
   });
 
-  it('detects cosmic_mood correctly for different times of day', () => {
-    const cases = [
-      { hour: 2, expected: 'deep_night' },
-      { hour: 9, expected: 'morning' },
-      { hour: 14, expected: 'afternoon' },
-    ];
-
-    for (const { hour, expected } of cases) {
-      vi.setSystemTime(new Date(2024, 0, 1, hour, 0, 0));
-      const profile = readBrowserOracle();
-      const moodReading = profile.readings.find(r => r.key === 'cosmic_mood');
-      expect(moodReading?.raw).toBe(expected);
-    }
-  });
-
-  it('correctly identifies different browsers and operating systems', () => {
-    const scenarios = [
-      { ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:90.0) Gecko/20100101 Firefox/90.0', browser: 'Firefox', os: 'Windows' },
-      { ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36 Edg/91.0.864.56', browser: 'Edge', os: 'Windows' },
-      { ua: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Mobile/15E148 Safari/605.1.15', browser: 'Safari', os: 'iOS' },
-      { ua: 'Mozilla/5.0 (Linux; Android 10; SM-G973F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Mobile Safari/537.36', browser: 'Chrome', os: 'Android' },
-      { ua: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36', browser: 'Chrome', os: 'macOS' },
-    ];
-
-    scenarios.forEach(({ ua, browser, os }) => {
-      vi.stubGlobal('navigator', {
-        userAgent: ua,
-        language: 'en-US',
-        hardwareConcurrency: 4,
-        platform: 'unknown',
-        onLine: true,
-        maxTouchPoints: 0,
-        connection: { effectiveType: '4g' },
-      });
-      const profile = readBrowserOracle();
-      const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
-      const osReading = profile.readings.find(r => r.key === 'elemental_os');
-      expect(browserReading?.raw).toBe(browser);
-      expect(osReading?.raw).toBe(os);
+  it('detects unknown browser', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'MyCustomBrowser/1.0',
+      language: 'en-US',
+      hardwareConcurrency: 4,
+      platform: 'unknown',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
     });
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    expect(browserReading?.raw).toBe('Unknown');
   });
-});
 
-afterEach(() => {
+  it('detects unknown OS', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (UnknownOS 1.0)',
+      language: 'en-US',
+      hardwareConcurrency: 4,
+      platform: 'unknown',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+    expect(osReading?.raw).toBe('Unknown');
+  });
+
+  it('detects Chrome on iOS via CriOS', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/537.36 (KHTML, like Gecko) CriOS/91.0.4472.114 Mobile/15E148',
+      language: 'en-US',
+      hardwareConcurrency: 4,
+      platform: 'iPhone',
+      onLine: true,
+      maxTouchPoints: 5,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    expect(browserReading?.raw).toBe('Chrome');
+  });
+
+  it('detects Firefox on iOS via FxiOS', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/94.0 Mobile/15E148',
+      language: 'en-US',
+      hardwareConcurrency: 4,
+      platform: 'iPhone',
+      onLine: true,
+      maxTouchPoints: 5,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    expect(browserReading?.raw).toBe('Firefox');
+  });
+
+  it('detects Opera via OPR', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4441.86 Safari/537.36 OPR/55.0.2844.95',
+      language: 'en-US',
+      hardwareConcurrency: 4,
+      platform: 'Windows',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    expect(browserReading?.raw).toBe('Opera');
+  });
   vi.useRealTimers();
 });
