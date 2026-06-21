@@ -16,6 +16,15 @@ describe('sign-assigner', () => {
       expect(sign1).toBe(sign2);
     });
 
+    it('handles empty string', () => {
+      expect(assignSign('')).toBe('virgo');
+    });
+
+    it('handles very long strings', () => {
+      const longString = 'a'.repeat(10000);
+      expect(ZODIAC_SIGNS).toContain(assignSign(longString));
+    });
+
     it('distributes signs roughly uniformly', () => {
       const counts: Record<string, number> = {};
       ZODIAC_SIGNS.forEach(s => counts[s] = 0);

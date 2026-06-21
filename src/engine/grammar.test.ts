@@ -70,9 +70,19 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.reverse#')).toBe('olleh');
     });
 
+    it('applies reverse modifier with unicode', () => {
+      const engine = makeEngine({ word: ['hello 🌍'] });
+      expect(engine.expand('#word.reverse#')).toBe('🌍 olleh');
+    });
+
     it('applies case-flip modifier', () => {
       const engine = makeEngine({ word: ['Hello World'] });
       expect(engine.expand('#word.case-flip#')).toBe('hELLO wORLD');
+    });
+
+    it('applies sentencecase modifier', () => {
+      const engine = makeEngine({ word: ['HELLO WORLD'] });
+      expect(engine.expand('#word.sentencecase#')).toBe('Hello world');
     });
 
     it('allows adding custom modifiers', () => {
@@ -143,5 +153,14 @@ describe('createGrammarEngine', () => {
       const engine = makeEngine({ word: ['hello'] });
       expect(engine.expand('#word.wrap-emoji#')).toBe('✨ hello ✨');
     });
+
+    it('handles slugify and snake_case edge cases', () => {
+      const engine = makeEngine({ word: [' Hello! World_ '] });
+      // slugify: hello-world
+      expect(engine.expand('#word.slugify#')).toBe('hello-world');
+      // snake_case: hello_world_
+      expect(engine.expand('#word.snake_case#')).toBe('hello_world_');
+    });
+
   });
 });
