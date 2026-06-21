@@ -153,5 +153,14 @@ describe('createGrammarEngine', () => {
       const engine = makeEngine({ word: ['hello'] });
       expect(engine.expand('#word.wrap-emoji#')).toBe('✨ hello ✨');
     });
+
+    it('handles slugify and snake_case edge cases', () => {
+      const engine = makeEngine({ word: [' Hello! World_ '] });
+      // slugify: hello-world
+      expect(engine.expand('#word.slugify#')).toBe('hello-world');
+      // snake_case: hello_world_
+      expect(engine.expand('#word.snake_case#')).toBe('hello_world_');
+    });
+
   });
 });
