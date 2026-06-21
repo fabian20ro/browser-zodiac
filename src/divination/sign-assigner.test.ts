@@ -51,5 +51,17 @@ describe('sign-assigner', () => {
       expect(signs.size).toBeGreaterThan(0);
       expect(signs.size).toBeLessThanOrEqual(ZODIAC_SIGNS.length);
     });
+
+    it('handles unicode/emojis', () => {
+      const emojiString = '🌟🌙✨';
+      const sign = assignSign(emojiString);
+      expect(ZODIAC_SIGNS).toContain(sign);
+    });
+
+    it('handles non-latin characters', () => {
+      const nonLatinString = 'こんにちは';
+      const sign = assignSign(nonLatinString);
+      expect(ZODIAC_SIGNS).toContain(sign);
+    });
   });
 });
