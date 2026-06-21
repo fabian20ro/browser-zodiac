@@ -82,6 +82,22 @@ describe('readBrowserOracle', () => {
     expect(() => readBrowserOracle()).not.toThrow();
   });
 
+  it('returns correct connectivity status for offline mode', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: false,
+      maxTouchPoints: 0,
+      connection: {
+        effectiveType: '4g',
+      },
+    });
+    const profile = readBrowserOracle();
+    const connectivityReading = profile.readings.find(r => r.key === 'social_connectivity');
+    expect(connectivityReading?.raw).toBe('hermit');
+  });
 
   it('includes tactile_sensibility in readings', () => {
     const profile = readBrowserOracle();
