@@ -16,6 +16,13 @@ describe('sign-assigner', () => {
       expect(sign1).toBe(sign2);
     });
 
+    it('test debug', () => {
+      console.log('sign(test):', assignSign('test'));
+    });
+    it('test emoji debug', () => {
+      console.log('sign(emoji):', assignSign('🌟'));
+    });
+
     it('handles empty string', () => {
       expect(assignSign('')).toBe('virgo');
     });
