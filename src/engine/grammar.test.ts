@@ -134,26 +134,6 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.celebrate#')).toBe('🎉 hello 🎉');
     });
 
-    it('applies titlecase modifier', () => {
-      const engine = makeEngine({ word: ['hello world'] });
-      expect(engine.expand('#word.titlecase#')).toBe('Hello World');
-    });
-
-    it('applies glitch modifier', () => {
-      const engine = makeEngine({ word: ['hello'] });
-      expect(engine.expand('#word.glitch#')).toBe('h§ll§');
-    });
-
-    it('applies mystic modifier', () => {
-      const engine = makeEngine({ word: ['hello'] });
-      expect(engine.expand('#word.mystic#')).toBe('✧ hello ✧');
-    });
-
-    it('applies wrap-emoji modifier', () => {
-      const engine = makeEngine({ word: ['hello'] });
-      expect(engine.expand('#word.wrap-emoji#')).toBe('✨ hello ✨');
-    });
-
     it('handles slugify and snake_case edge cases', () => {
       const engine = makeEngine({ word: [' Hello! World_ '] });
       // slugify: hello-world
@@ -162,5 +142,21 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.snake_case#')).toBe('hello_world_');
     });
 
+    it('applies void and echo modifiers', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(engine.expand('#word.void.echo#')).toBe('h·ll· h·ll·');
+    });
+
+    it('applies capitalize modifier', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(engine.expand('#word.capitalize#')).toBe('Hello');
+    });
+
+    it('applies trim modifiers', () => {
+      const engine = makeEngine({ word: ['  hello  '] });
+      expect(engine.expand('#word.trim#')).toBe('hello');
+      expect(engine.expand('#word.trim-start#')).toBe('hello  ');
+      expect(engine.expand('#word.trim-end#')).toBe('  hello');
+    });
   });
 });
