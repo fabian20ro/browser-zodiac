@@ -16,11 +16,11 @@ describe('sign-assigner', () => {
       expect(sign1).toBe(sign2);
     });
 
-    it('test debug', () => {
-      console.log('sign(test):', assignSign('test'));
+    it('returns taurus for "test"', () => {
+      expect(assignSign('test')).toBe('taurus');
     });
-    it('test emoji debug', () => {
-      console.log('sign(emoji):', assignSign('🌟'));
+    it('returns sagittarius for "🌟"', () => {
+      expect(assignSign('🌟')).toBe('sagittarius');
     });
 
     it('handles empty string', () => {
