@@ -67,10 +67,10 @@ describe('sign-assigner', () => {
       expect(seenSigns.size).toBe(ZODIAC_SIGNS.length);
     });
 
-    it('handles non-latin characters', () => {
-      const nonLatinString = 'こんにちは';
-      const sign = assignSign(nonLatinString);
+    it('handles strings with null characters', () => {
+      const sign = assignSign('abc\0def');
       expect(ZODIAC_SIGNS).toContain(sign);
     });
+
   });
 });
