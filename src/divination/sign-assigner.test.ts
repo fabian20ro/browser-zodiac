@@ -16,6 +16,13 @@ describe('sign-assigner', () => {
       expect(sign1).toBe(sign2);
     });
 
+    it('returns taurus for "test"', () => {
+      expect(assignSign('test')).toBe('taurus');
+    });
+    it('returns sagittarius for "🌟"', () => {
+      expect(assignSign('🌟')).toBe('sagittarius');
+    });
+
     it('handles empty string', () => {
       expect(assignSign('')).toBe('virgo');
     });
@@ -34,8 +41,6 @@ describe('sign-assigner', () => {
         counts[sign]++;
       }
 
-      // With 1200 iterations, each sign should have ~100.
-      // Allow a reasonable margin of error for djb2/modulo distribution.
       for (const sign of ZODIAC_SIGNS) {
         expect(counts[sign]).toBeGreaterThan(70);
         expect(counts[sign]).toBeLessThan(130);
@@ -50,6 +55,25 @@ describe('sign-assigner', () => {
       }
       expect(signs.size).toBeGreaterThan(0);
       expect(signs.size).toBeLessThanOrEqual(ZODIAC_SIGNS.length);
+    });
+
+    it('ensures all zodiac signs are reachable', () => {
+      const seenSigns = new Set<string>();
+      for (let i = 0; i < 500; i++) {
+        seenSigns.add(assignSign(`fingerprint-${i}`));
+      }
+      expect(seenSigns.size).toBe(ZODIAC_SIGNS.length);
+    });
+
+    it('handles strings with null characters', () => {
+      const sign = assignSign('abc\0def');
+      expect(ZODIAC_SIGNS).toContain(sign);
+    });
+
+    it('is invariant to unicode normalization', () => {
+      const s1 = 'é';
+      const s2 = 'e\u0301';
+      expect(assignSign(s1)).toBe(assignSign(s2));
     });
   });
 });

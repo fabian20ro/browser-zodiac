@@ -105,9 +105,171 @@ describe('readBrowserOracle', () => {
     expect(tactileReading).toBeDefined();
     expect(typeof tactileReading?.raw).toBe('string');
   });
-});
 
-afterEach(() => {
-  vi.useRealTimers();
+  it('detects unknown browser', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'MyCustomBrowser/1.0',
+      language: 'en-US',
+      hardwareConcurrency: 4,
+      platform: 'unknown',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    expect(browserReading?.raw).toBe('Unknown');
+  });
+
+  it('detects unknown OS', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (UnknownOS 1.0)',
+      language: 'en-US',
+      hardwareConcurrency: 4,
+      platform: 'unknown',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+    expect(osReading?.raw).toBe('Unknown');
+  });
+
+  it('detects Chrome on iOS via CriOS', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/537.36 (KHTML, like Gecko) CriOS/91.0.4472.114 Mobile/15E148',
+      language: 'en-US',
+      hardwareConcurrency: 4,
+      platform: 'iPhone',
+      onLine: true,
+      maxTouchPoints: 5,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    expect(browserReading?.raw).toBe('Chrome');
+  });
+
+  it('detects Firefox on iOS via FxiOS', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/94.0 Mobile/15E148',
+      language: 'en-US',
+      hardwareConcurrency: 4,
+      platform: 'iPhone',
+      onLine: true,
+      maxTouchPoints: 5,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    expect(browserReading?.raw).toBe('Firefox');
+  });
+
+  it('detects Opera via OPR', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4441.86 Safari/537.36 OPR/55.0.2844.95',
+      language: 'en-US',
+      hardwareConcurrency: 4,
+      platform: 'Windows NT 10.0; Win64; x64',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    expect(browserReading?.raw).toBe('Opera');
+  });
+
+  it('detects Opera via Opera keyword', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Opera/9.80',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'Windows',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    expect(browserReading?.raw).toBe('Opera');
+  });
+
+  it('detects Safari', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Version/14.0 Safari/605.1.15',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    expect(browserReading?.raw).toBe('Safari');
+  });
+
+  it('detects macOS', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4449.82 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+    expect(osReading?.raw).toBe('macOS');
+  });
+
+  it('detects Linux when Linux is present', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Linux',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'Linux',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+    expect(osReading?.raw).toBe('Linux');
+  });
+
+  it('handles empty user agent', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: '',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+    expect(browserReading?.raw).toBe('Unknown');
+    expect(osReading?.raw).toBe('Unknown');
+  });
+
+  it('handles zero hardware concurrency', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 0,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const parallelReading = profile.readings.find(r => r.key === 'parallel_lives');
+    expect(parallelReading?.raw).toBe('unknowable');
+  });
 });
-afterEach(() => { vi.useRealTimers(); });
