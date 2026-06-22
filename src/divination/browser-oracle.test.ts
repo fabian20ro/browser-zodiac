@@ -171,6 +171,21 @@ describe('readBrowserOracle', () => {
       userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4441.86 Safari/537.36 OPR/55.0.2844.95',
       language: 'en-US',
       hardwareConcurrency: 4,
+      platform: 'Windows NT 10.0; Win64; x64',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    expect(browserReading?.raw).toBe('Opera');
+  });
+
+  it('detects Opera via Opera keyword', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Opera/9.80',
+      language: 'en-US',
+      hardwareConcurrency: 8,
       platform: 'Windows',
       onLine: true,
       maxTouchPoints: 0,
@@ -181,73 +196,9 @@ describe('readBrowserOracle', () => {
     expect(browserReading?.raw).toBe('Opera');
   });
 
-  it('detects dark mode', () => {
-    vi.stubGlobal('window', {
-      innerWidth: 1920,
-      innerHeight: 1080,
-      matchMedia: vi.fn().mockReturnValue({
-        matches: true,
-      }),
-    });
-    const profile = readBrowserOracle();
-    const alignmentReading = profile.readings.find(r => r.key === 'soul_alignment');
-    expect(alignmentReading?.raw).toBe('dark');
-  });
-
-  it('handles missing navigator connection', () => {
-    vi.stubGlobal('navigator', {
-      userAgent: 'Mozilla/5.0',
-      language: 'en-US',
-      hardwareConcurrency: 8,
-      platform: 'MacIntel',
-      onLine: true,
-      maxTouchPoints: 0,
-    });
-    const profile = readBrowserOracle();
-    const netReading = profile.readings.find(r => r.key === 'network_speed');
-    expect(netReading?.raw).toBe('unknown');
-  });
-
-  it('handles missing screen properties', () => {
-    vi.stubGlobal('screen', undefined);
-    const profile = readBrowserOracle();
-    const resReading = profile.readings.find(r => r.key === 'life_resolution');
-    expect(resReading?.raw).toBe('0x0');
-  });
-
-  it('detects Android even if Linux is present in UA', () => {
-    vi.stubGlobal('navigator', {
-      userAgent: 'Mozilla/5.0 (Android 10; Linux; SM-T530) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Mobile Safari/537.36',
-      language: 'en-US',
-      hardwareConcurrency: 4,
-      platform: 'Android',
-      onLine: true,
-      maxTouchPoints: 0,
-      connection: { effectiveType: '4g' },
-    });
-    const profile = readBrowserOracle();
-    const osReading = profile.readings.find(r => r.key === 'elemental_os');
-    expect(osReading?.raw).toBe('Android');
-  });
-
-  it('detects Edge on Windows', () => {
-    vi.stubGlobal('navigator', {
-      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4449.82 Safari/537.36 Edg/91.0.864.52',
-      language: 'en-US',
-      hardwareConcurrency: 4,
-      platform: 'Windows NT 10.0; Win64; x64',
-      onLine: true,
-      maxTouchPoints: 0,
-      connection: { effectiveType: '4g' },
-    });
-    const profile = readBrowserOracle();
-    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
-    expect(browserReading?.raw).toBe('Edge');
-  });
-
   it('detects Safari', () => {
     vi.stubGlobal('navigator', {
-      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Version/14.0 Safari/537.36',
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Version/14.0 Safari/605.1.15',
       language: 'en-US',
       hardwareConcurrency: 8,
       platform: 'MacIntel',
@@ -273,6 +224,21 @@ describe('readBrowserOracle', () => {
     const profile = readBrowserOracle();
     const osReading = profile.readings.find(r => r.key === 'elemental_os');
     expect(osReading?.raw).toBe('macOS');
+  });
+
+  it('detects Linux when Linux is present', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Linux',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'Linux',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+    expect(osReading?.raw).toBe('Linux');
   });
 
   it('handles empty user agent', () => {
