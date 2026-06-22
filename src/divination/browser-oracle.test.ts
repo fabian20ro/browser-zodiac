@@ -278,4 +278,36 @@ describe('readBrowserOracle', () => {
     const osReading = profile.readings.find(r => r.key === 'elemental_os');
     expect(osReading?.raw).toBe('macOS');
   });
+
+  it('handles empty user agent', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: '',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+    expect(browserReading?.raw).toBe('Unknown');
+    expect(osReading?.raw).toBe('Unknown');
+  });
+
+  it('handles zero hardware concurrency', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 0,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const parallelReading = profile.readings.find(r => r.key === 'parallel_lives');
+    expect(parallelReading?.raw).toBe('unknowable');
+  });
 });
