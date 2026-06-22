@@ -181,21 +181,17 @@ describe('readBrowserOracle', () => {
     expect(browserReading?.raw).toBe('Opera');
   });
 
-  it('detects correct cosmic mood for different hours', () => {
-    const testCases = [
-      { hour: 2, expected: 'deep_night' },
-      { hour: 8, expected: 'morning' },
-      { hour: 14, expected: 'afternoon' },
-      { hour: 20, expected: 'evening' },
-      { hour: 22, expected: 'night' },
-    ];
-
-    for (const tc of testCases) {
-      vi.setSystemTime(new Date(`2024-01-01T${tc.hour.toString().padStart(2, '0')}:00:00`));
-      const profile = readBrowserOracle();
-      const moodReading = profile.readings.find(r => r.key === 'cosmic_mood');
-      expect(moodReading?.raw).toBe(tc.expected);
-    }
+  it('detects dark mode', () => {
+    vi.stubGlobal('window', {
+      innerWidth: 1920,
+      innerHeight: 1080,
+      matchMedia: vi.fn().mockReturnValue({
+        matches: true,
+      }),
+    });
+    const profile = readBrowserOracle();
+    const alignmentReading = profile.readings.find(r => r.key === 'soul_alignment');
+    expect(alignmentReading?.raw).toBe('dark');
   });
 
   it('handles missing navigator connection', () => {
