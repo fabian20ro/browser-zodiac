@@ -198,7 +198,7 @@ describe('readBrowserOracle', () => {
 
   it('detects Safari', () => {
     vi.stubGlobal('navigator', {
-      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Version/14.0 Safari/605.1.15',
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Version/14.0 Safari/537.36',
       language: 'en-US',
       hardwareConcurrency: 8,
       platform: 'MacIntel',
@@ -209,6 +209,40 @@ describe('readBrowserOracle', () => {
     const profile = readBrowserOracle();
     const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
     expect(browserReading?.raw).toBe('Safari');
+  });
+
+  it('detects Edge on Windows', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4441.82 Safari/537.36 Edg/91.0.864.59',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'Windows',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+    expect(browserReading?.raw).toBe('Edge');
+    expect(osReading?.raw).toBe('Windows');
+  });
+
+  it('detects Android', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Linux; Android 10; SM-G973F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4449.82 Mobile Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'Android',
+      onLine: true,
+      maxTouchPoints: 5,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+    expect(browserReading?.raw).toBe('Chrome');
+    expect(osReading?.raw).toBe('Android');
   });
 
   it('detects macOS', () => {
