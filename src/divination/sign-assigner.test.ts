@@ -41,8 +41,6 @@ describe('sign-assigner', () => {
         counts[sign]++;
       }
 
-      // With 1200 iterations, each sign should have ~100.
-      // Allow a reasonable margin of error for djb2/modulo distribution.
       for (const sign of ZODIAC_SIGNS) {
         expect(counts[sign]).toBeGreaterThan(70);
         expect(counts[sign]).toBeLessThan(130);
@@ -72,5 +70,10 @@ describe('sign-assigner', () => {
       expect(ZODIAC_SIGNS).toContain(sign);
     });
 
+    it('is invariant to unicode normalization', () => {
+      const s1 = 'é';
+      const s2 = 'e\u0301';
+      expect(assignSign(s1)).toBe(assignSign(s2));
+    });
   });
 });
