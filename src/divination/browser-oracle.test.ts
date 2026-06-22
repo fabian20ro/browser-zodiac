@@ -180,5 +180,42 @@ describe('readBrowserOracle', () => {
     const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
     expect(browserReading?.raw).toBe('Opera');
   });
-  vi.useRealTimers();
+
+  it('detects correct cosmic mood for different hours', () => {
+    const testCases = [
+      { hour: 2, expected: 'deep_night' },
+      { hour: 8, expected: 'morning' },
+      { hour: 14, expected: 'afternoon' },
+      { hour: 20, expected: 'evening' },
+      { hour: 22, expected: 'night' },
+    ];
+
+    for (const tc of testCases) {
+      vi.setSystemTime(new Date(`2024-01-01T${tc.hour.toString().padStart(2, '0')}:00:00`));
+      const profile = readBrowserOracle();
+      const moodReading = profile.readings.find(r => r.key === 'cosmic_mood');
+      expect(moodReading?.raw).toBe(tc.expected);
+    }
+  });
+
+  it('handles missing navigator connection', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+    });
+    const profile = readBrowserOracle();
+    const netReading = profile.readings.find(r => r.key === 'network_speed');
+    expect(netReading?.raw).toBe('unknown');
+  });
+
+  it('handles missing screen properties', () => {
+    vi.stubGlobal('screen', undefined);
+    const profile = readBrowserOracle();
+    const resReading = profile.readings.find(r => r.key === 'life_resolution');
+    expect(resReading?.raw).toBe('0x0');
+  });
 });
