@@ -59,10 +59,12 @@ describe('sign-assigner', () => {
       expect(signs.size).toBeLessThanOrEqual(ZODIAC_SIGNS.length);
     });
 
-    it('handles unicode/emojis', () => {
-      const emojiString = '🌟🌙✨';
-      const sign = assignSign(emojiString);
-      expect(ZODIAC_SIGNS).toContain(sign);
+    it('ensures all zodiac signs are reachable', () => {
+      const seenSigns = new Set<string>();
+      for (let i = 0; i < 500; i++) {
+        seenSigns.add(assignSign(`fingerprint-${i}`));
+      }
+      expect(seenSigns.size).toBe(ZODIAC_SIGNS.length);
     });
 
     it('handles non-latin characters', () => {
