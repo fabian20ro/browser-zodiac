@@ -134,6 +134,26 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.celebrate#')).toBe('🎉 hello 🎉');
     });
 
+    it('applies titlecase modifier', () => {
+      const engine = makeEngine({ word: ['hello world'] });
+      expect(engine.expand('#word.titlecase#')).toBe('Hello World');
+    });
+
+    it('applies mystic modifier', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(engine.expand('#word.mystic#')).toBe('✧ hello ✧');
+    });
+
+    it('applies wrap-emoji modifier', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(engine.expand('#word.wrap-emoji#')).toBe('✨ hello ✨');
+    });
+
+    it('applies glitch modifier', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(engine.expand('#word.glitch#')).toBe('h§ll§');
+    });
+
     it('handles slugify and snake_case edge cases', () => {
       const engine = makeEngine({ word: [' Hello! World_ '] });
       // slugify: hello-world
