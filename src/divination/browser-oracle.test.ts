@@ -136,19 +136,19 @@ describe('readBrowserOracle', () => {
     expect(osReading?.raw).toBe('Unknown');
   });
 
-  it('detects Chrome on iOS via CriOS', () => {
+  it('detects iPod as iOS', () => {
     vi.stubGlobal('navigator', {
-      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/537.36 (KHTML, like Gecko) CriOS/91.0.4472.114 Mobile/15E148',
+      userAgent: 'Mozilla/5.0 (iPod; iPodOS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Mobile/15E148',
       language: 'en-US',
-      hardwareConcurrency: 4,
-      platform: 'iPhone',
+      hardwareConcurrency: 2,
+      platform: 'iPod',
       onLine: true,
-      maxTouchPoints: 5,
+      maxTouchPoints: 1,
       connection: { effectiveType: '4g' },
     });
     const profile = readBrowserOracle();
-    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
-    expect(browserReading?.raw).toBe('Chrome');
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+    expect(osReading?.raw).toBe('iOS');
   });
 
   it('detects Firefox on iOS via FxiOS', () => {
