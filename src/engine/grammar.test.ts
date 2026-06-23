@@ -158,5 +158,19 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.trim-start#')).toBe('hello  ');
       expect(engine.expand('#word.trim-end#')).toBe('  hello');
     });
+
+    it('handles mixed quotes with unquote modifier', () => {
+      const engine = makeEngine({ word: ['"hello\''] }, 42);
+      expect(engine.expand('#word.unquote#')).toBe('hello');
+    });
+
+    it('handles complex nested expansions with multiple modifiers', () => {
+      const engine = makeEngine({
+        a: ['#b.uppercase#'],
+        b: ['#c.slugify#'],
+        c: ['Hello World']
+      }, 42, 3);
+      expect(engine.expand('#a#')).toBe('HELLO-WORLD');
+    });
   });
 });
