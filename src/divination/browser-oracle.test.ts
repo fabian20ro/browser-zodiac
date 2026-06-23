@@ -292,18 +292,20 @@ describe('readBrowserOracle', () => {
     expect(osReading?.raw).toBe('Unknown');
   });
 
-  it('handles zero hardware concurrency', () => {
-    vi.stubGlobal('navigator', {
-      userAgent: 'Mozilla/5.0',
-      language: 'en-US',
-      hardwareConcurrency: 0,
-      platform: 'MacIntel',
-      onLine: true,
-      maxTouchPoints: 0,
-      connection: { effectiveType: '4g' },
+  it('handles detection of dark mode and evening time', () => {
+    vi.stubGlobal('window', {
+      innerWidth: 1920,
+      innerHeight: 1080,
+      matchMedia: vi.fn().mockReturnValue({
+        matches: true,
+      }),
     });
+    vi.setSystemTime(new Date('2024-01-01T19:00:00'));
     const profile = readBrowserOracle();
-    const parallelReading = profile.readings.find(r => r.key === 'parallel_lives');
-    expect(parallelReading?.raw).toBe('unknowable');
+    const alignmentReading = profile.readings.find(r => r.key === 'soul_alignment');
+    const moodReading = profile.readings.find(r => r.key === 'cosmic_mood');
+    expect(alignmentReading?.raw).toBe('dark');
+    expect(moodReading?.raw).toBe('evening');
   });
+
 });
