@@ -77,7 +77,14 @@ describe('sign-assigner', () => {
     });
 
     it('is case-insensitive', () => {
-      expect(assignSign('John')).toBe(assignSign('john'));
+      const variants = [
+        'John',
+        'john',
+        'JoHn',
+        'jOHn',
+      ];
+      const results = new Set(variants.map(assignSign));
+      expect(results.size).toBe(1);
     });
   });
 });
