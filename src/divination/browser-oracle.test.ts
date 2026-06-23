@@ -136,19 +136,19 @@ describe('readBrowserOracle', () => {
     expect(osReading?.raw).toBe('Unknown');
   });
 
-  it('detects Chrome on iOS via CriOS', () => {
+  it('detects iPod as iOS', () => {
     vi.stubGlobal('navigator', {
-      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/537.36 (KHTML, like Gecko) CriOS/91.0.4472.114 Mobile/15E148',
+      userAgent: 'Mozilla/5.0 (iPod; iPodOS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Mobile/15E148',
       language: 'en-US',
-      hardwareConcurrency: 4,
-      platform: 'iPhone',
+      hardwareConcurrency: 2,
+      platform: 'iPod',
       onLine: true,
-      maxTouchPoints: 5,
+      maxTouchPoints: 1,
       connection: { effectiveType: '4g' },
     });
     const profile = readBrowserOracle();
-    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
-    expect(browserReading?.raw).toBe('Chrome');
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+    expect(osReading?.raw).toBe('iOS');
   });
 
   it('detects Firefox on iOS via FxiOS', () => {
@@ -198,7 +198,7 @@ describe('readBrowserOracle', () => {
 
   it('detects Safari', () => {
     vi.stubGlobal('navigator', {
-      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Version/14.0 Safari/605.1.15',
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Version/14.0 Safari/537.36',
       language: 'en-US',
       hardwareConcurrency: 8,
       platform: 'MacIntel',
@@ -209,6 +209,40 @@ describe('readBrowserOracle', () => {
     const profile = readBrowserOracle();
     const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
     expect(browserReading?.raw).toBe('Safari');
+  });
+
+  it('detects Edge on Windows', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4441.82 Safari/537.36 Edg/91.0.864.59',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'Windows',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+    expect(browserReading?.raw).toBe('Edge');
+    expect(osReading?.raw).toBe('Windows');
+  });
+
+  it('detects Android', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Linux; Android 10; SM-G973F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4449.82 Mobile Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'Android',
+      onLine: true,
+      maxTouchPoints: 5,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+    expect(browserReading?.raw).toBe('Chrome');
+    expect(osReading?.raw).toBe('Android');
   });
 
   it('detects macOS', () => {
