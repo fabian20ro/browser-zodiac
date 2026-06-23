@@ -75,5 +75,9 @@ describe('sign-assigner', () => {
       const s2 = 'e\u0301';
       expect(assignSign(s1)).toBe(assignSign(s2));
     });
+
+    it('is case-insensitive', () => {
+      expect(assignSign('John')).toBe(assignSign('john'));
+    });
   });
 });
