@@ -99,11 +99,11 @@ describe('readBrowserOracle', () => {
     expect(connectivityReading?.raw).toBe('hermit');
   });
 
-  it('includes tactile_sensibility in readings', () => {
+  it('includes cosmic_focus in readings', () => {
     const profile = readBrowserOracle();
-    const tactileReading = profile.readings.find(r => r.key === 'tactile_sensibility');
-    expect(tactileReading).toBeDefined();
-    expect(typeof tactileReading?.raw).toBe('string');
+    const focusReading = profile.readings.find(r => r.key === 'cosmic_focus');
+    expect(focusReading).toBeDefined();
+    expect(typeof focusReading?.raw).toBe('string');
   });
 
   it('detects unknown browser', () => {
