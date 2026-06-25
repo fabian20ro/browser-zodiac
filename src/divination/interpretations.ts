@@ -14,6 +14,7 @@ export const readingInterpretations: Record<string, InterpretationFn> = {
   social_connectivity: (raw) => `You are ${raw}.`,
   cosmic_timezone: (raw) => `Temporal flow: ${raw}.`,
   cosmic_noise: (raw) => `The cosmic echo vibrates at ${raw}.`,
+  cosmic_focus: (raw) => `Your cosmic focus is ${raw}.`,
   tactile_sensibility: (raw) => `Sensing through ${raw}.`,
   vibration_intensity: (raw) => `Vibration level: ${raw}.`,
 };

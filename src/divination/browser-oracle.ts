@@ -112,9 +112,9 @@ export function readBrowserOracle(): DivinationProfile {
       interpretation: readingInterpretations['cosmic_noise'](ua.length.toString() || 'unknown'),
     },
     {
-      key: 'vibration_intensity',
-      raw: ua.length.toString(),
-      interpretation: readingInterpretations['vibration_intensity'](ua.length.toString() || 'unknown'),
+      key: 'cosmic_focus',
+      raw: (navigator as any).deviceMemory?.toString() || 'unknown',
+      interpretation: readingInterpretations['cosmic_focus']((navigator as any).deviceMemory?.toString() || 'unknown'),
     },
     {
       key: 'tactile_sensibility',
