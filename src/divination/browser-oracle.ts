@@ -97,11 +97,6 @@ export function readBrowserOracle(): DivinationProfile {
       interpretation: readingInterpretations['vibration_intensity'](cores > 0 ? String(cores) : 'unknowable'),
     },
     {
-      key: 'vibration_intensity',
-      raw: cores > 0 ? String(cores) : 'unknowable',
-      interpretation: readingInterpretations['vibration_intensity'](cores > 0 ? String(cores) : 'unknowable'),
-    },
-    {
       key: 'cosmic_resonance',
       raw: online ? 'harmonious' : 'discordant',
       interpretation: readingInterpretations['cosmic_resonance'](online ? 'harmonious' : 'discordant'),
