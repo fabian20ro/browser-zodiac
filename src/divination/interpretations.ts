@@ -17,4 +17,5 @@ export const readingInterpretations: Record<string, InterpretationFn> = {
   cosmic_focus: (raw) => `Your cosmic focus is ${raw}.`,
   tactile_sensibility: (raw) => `Sensing through ${raw}.`,
   vibration_intensity: (raw) => `Vibration level: ${raw}.`,
+  cosmic_resonance: (raw) => `The cosmic resonance is ${raw}.`,
 };
