@@ -98,6 +98,16 @@ export function readBrowserOracle(): DivinationProfile {
       interpretation: readingInterpretations['vibration_intensity'](cores > 0 ? String(cores) : 'unknowable'),
     },
     {
+      key: 'network_speed',
+      raw: networkSpeed,
+      interpretation: readingInterpretations['network_speed'](networkSpeed),
+    },
+    {
+      key: 'cosmic_latency',
+      raw: (navigator as any).connection?.rtt?.toString() || 'unknown',
+      interpretation: readingInterpretations['cosmic_latency']((navigator as any).connection?.rtt?.toString() || 'unknown'),
+    },
+    {
       key: 'cosmic_resonance',
       raw: online ? 'harmonious' : 'discordant',
       interpretation: readingInterpretations['cosmic_resonance'](online ? 'harmonious' : 'discordant'),
@@ -131,11 +141,6 @@ export function readBrowserOracle(): DivinationProfile {
       key: 'tactile_sensibility',
       raw: touchPoints > 0 ? 'sensitive' : 'numb',
       interpretation: readingInterpretations['tactile_sensibility'](touchPoints > 0 ? 'sensitive' : 'numb'),
-    },
-    {
-      key: 'network_speed',
-      raw: networkSpeed,
-      interpretation: readingInterpretations['network_speed'](networkSpeed),
     },
     {
       key: 'pixel_density',
