@@ -48,9 +48,9 @@ describe('readBrowserOracle', () => {
     expect(browserReading?.raw).toBe('Chrome');
     expect(osReading?.raw).toBe('macOS');
     // The fingerprint should have the extra parameters: colorScheme and timeOfDay
-    // Expected format: ${ua}|${lang}|${screenRes}|${platform}|${timezone}|${networkSpeed}|${colorScheme}|${timeOfDay}
-    // Based on mocks: Chrome|en-US|1920x1080|MacIntel|UTC|4g|light|deep_night
-    expect(profile.fingerprint).toBe('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36|en-US|1920x1080|MacIntel|UTC|4g|light|deep_night');
+    // Expected format: ${ua}|${lang}|${screenRes}|${platform}|${timezone}|${networkSpeed}|${colorScheme}|${timeOfDay}|${devicePixelRatio}
+    // Based on mocks: Chrome|en-US|1920x1080|MacIntel|UTC|4g|light|deep_night|1
+    expect(profile.fingerprint).toBe('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36|en-US|1920x1080|MacIntel|UTC|4g|light|deep_night|1');
   });
 
   it('returns correct connectivity status', () => {

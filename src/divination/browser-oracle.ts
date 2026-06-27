@@ -49,6 +49,7 @@ export function readBrowserOracle(): DivinationProfile {
   const windowSize = `${window?.innerWidth || 0}x${window?.innerHeight || 0}`;
   const touchPoints = navigator?.maxTouchPoints || 0;
   const networkSpeed = (navigator as any).connection?.effectiveType || 'unknown';
+  const devicePixelRatio = window?.devicePixelRatio || 1;
 
   const readings: DivinationReading[] = [
     {
@@ -136,9 +137,14 @@ export function readBrowserOracle(): DivinationProfile {
       raw: networkSpeed,
       interpretation: readingInterpretations['network_speed'](networkSpeed),
     },
+    {
+      key: 'pixel_density',
+      raw: devicePixelRatio.toString(),
+      interpretation: readingInterpretations['pixel_density'](devicePixelRatio.toString()),
+    },
   ];
 
-  const fingerprint = `${ua}|${lang}|${screenRes}|${platform}|${timezone}|${networkSpeed}|${colorScheme}|${timeOfDay}`;
+  const fingerprint = `${ua}|${lang}|${screenRes}|${platform}|${timezone}|${networkSpeed}|${colorScheme}|${timeOfDay}|${devicePixelRatio}`;
 
   return { readings, fingerprint };
 }
