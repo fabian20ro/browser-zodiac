@@ -20,4 +20,5 @@ export const readingInterpretations: Record<string, InterpretationFn> = {
   pixel_density: (raw) => `The reality density is ${raw}x.`,
   cosmic_resonance: (raw) => `The cosmic resonance is ${raw}.`,
   cosmic_latency: (raw) => `The temporal delay of fate is ${raw}.`,
+  zodiac_fate: (raw) => `Your celestial path is guided by ${raw}.`,
 };
