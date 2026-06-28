@@ -49,6 +49,7 @@ export function readBrowserOracle(): DivinationProfile {
   const windowSize = `${window?.innerWidth || 0}x${window?.innerHeight || 0}`;
   const touchPoints = navigator?.maxTouchPoints || 0;
   const networkSpeed = (navigator as any).connection?.effectiveType || 'unknown';
+  const devicePixelRatio = window?.devicePixelRatio || 1;
 
   const readings: DivinationReading[] = [
     {
@@ -97,9 +98,14 @@ export function readBrowserOracle(): DivinationProfile {
       interpretation: readingInterpretations['vibration_intensity'](cores > 0 ? String(cores) : 'unknowable'),
     },
     {
-      key: 'vibration_intensity',
-      raw: cores > 0 ? String(cores) : 'unknowable',
-      interpretation: readingInterpretations['vibration_intensity'](cores > 0 ? String(cores) : 'unknowable'),
+      key: 'network_speed',
+      raw: networkSpeed,
+      interpretation: readingInterpretations['network_speed'](networkSpeed),
+    },
+    {
+      key: 'cosmic_latency',
+      raw: (navigator as any).connection?.rtt?.toString() || 'unknown',
+      interpretation: readingInterpretations['cosmic_latency']((navigator as any).connection?.rtt?.toString() || 'unknown'),
     },
     {
       key: 'cosmic_resonance',
@@ -137,13 +143,13 @@ export function readBrowserOracle(): DivinationProfile {
       interpretation: readingInterpretations['tactile_sensibility'](touchPoints > 0 ? 'sensitive' : 'numb'),
     },
     {
-      key: 'network_speed',
-      raw: networkSpeed,
-      interpretation: readingInterpretations['network_speed'](networkSpeed),
+      key: 'pixel_density',
+      raw: devicePixelRatio.toString(),
+      interpretation: readingInterpretations['pixel_density'](devicePixelRatio.toString()),
     },
   ];
 
-  const fingerprint = `${ua}|${lang}|${screenRes}|${platform}|${timezone}|${networkSpeed}|${colorScheme}|${timeOfDay}`;
+  const fingerprint = `${ua}|${lang}|${screenRes}|${platform}|${timezone}|${networkSpeed}|${colorScheme}|${timeOfDay}|${devicePixelRatio}`;
 
   return { readings, fingerprint };
 }
