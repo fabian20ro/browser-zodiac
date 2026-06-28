@@ -211,6 +211,20 @@ describe('readBrowserOracle', () => {
     expect(browserReading?.raw).toBe('Safari');
   });
 
+  it('detects pixel density correctly', () => {
+    vi.stubGlobal('window', {
+      innerWidth: 1920,
+      innerHeight: 1080,
+      devicePixelRatio: 2,
+      matchMedia: vi.fn().mockReturnValue({
+        matches: false,
+      }),
+    });
+    const profile = readBrowserOracle();
+    const pixelReading = profile.readings.find(r => r.key === 'pixel_density');
+    expect(pixelReading?.raw).toBe('2');
+  });
+
   it('detects Edge on Windows', () => {
     vi.stubGlobal('navigator', {
       userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4441.82 Safari/537.36 Edg/91.0.864.59',
