@@ -326,6 +326,22 @@ describe('readBrowserOracle', () => {
     expect(osReading?.raw).toBe('Unknown');
   });
 
+  it('detects device memory correctly', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+      deviceMemory: 8,
+    });
+    const profile = readBrowserOracle();
+    const focusReading = profile.readings.find(r => r.key === 'cosmic_focus');
+    expect(focusReading?.raw).toBe('8');
+  });
+
   it('handles detection of dark mode and evening time', () => {
     vi.stubGlobal('window', {
       innerWidth: 1920,
