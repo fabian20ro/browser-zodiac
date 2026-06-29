@@ -104,6 +104,13 @@ describe('sign-assigner', () => {
      expect(sign1).toBe(sign2);
     });
 
+    it('is insensitive to the time part of the date', () => {
+      const fingerprint = 'fingerprint';
+      const date1 = new Date('2024-01-01T10:00:00Z');
+      const date2 = new Date('2024-01-01T23:59:59Z');
+      expect(assignDailySign(fingerprint, date1)).toBe(assignDailySign(fingerprint, date2));
+    });
+
     it('is time-varying', () => {
      const fingerprint = 'constant-fingerprint';
      const date1 = new Date('2024-01-01');

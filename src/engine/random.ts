@@ -15,7 +15,7 @@ export function mulberry32(seed: number): SeededRandom {
 export function hashString(str: string): number {
   let hash = 5381;
   for (let i = 0; i < str.length; i++) {
-    hash = ((hash << 5) + hash + str.charCodeAt(i)) | 0;
+    hash = (hash * 33 + str.charCodeAt(i)) | 0;
   }
   return hash >>> 0;
 }
