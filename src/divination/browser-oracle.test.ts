@@ -241,8 +241,10 @@ describe('readBrowserOracle', () => {
     const profile = readBrowserOracle();
     const latencyReading = profile.readings.find(r => r.key === 'cosmic_latency');
     const resonanceReading = profile.readings.find(r => r.key === 'cosmic_resonance');
+    const luckReading = profile.readings.find(r => r.key === 'cosmic_luck');
     expect(latencyReading?.raw).toBe('50');
     expect(resonanceReading?.raw).toBe('harmonious');
+    expect(luckReading?.raw).toBe('auspicious');
   });
 
   it('detects Edge on Windows', () => {
