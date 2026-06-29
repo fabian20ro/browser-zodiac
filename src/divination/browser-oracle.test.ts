@@ -225,6 +225,26 @@ describe('readBrowserOracle', () => {
     expect(pixelReading?.raw).toBe('2');
   });
 
+  it('handles cosmic_latency and cosmic_resonance', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: {
+        effectiveType: '4g',
+        rtt: 50,
+      },
+    });
+    const profile = readBrowserOracle();
+    const latencyReading = profile.readings.find(r => r.key === 'cosmic_latency');
+    const resonanceReading = profile.readings.find(r => r.key === 'cosmic_resonance');
+    expect(latencyReading?.raw).toBe('50');
+    expect(resonanceReading?.raw).toBe('harmonious');
+  });
+
   it('detects Edge on Windows', () => {
     vi.stubGlobal('navigator', {
       userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4441.82 Safari/537.36 Edg/91.0.864.59',
