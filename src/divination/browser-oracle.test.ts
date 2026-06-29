@@ -358,4 +358,20 @@ describe('readBrowserOracle', () => {
     expect(moodReading?.raw).toBe('evening');
   });
 
+  it('detects night time of day', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    vi.setSystemTime(new Date('2024-01-01T22:00:00'));
+    const profile = readBrowserOracle();
+    const moodReading = profile.readings.find(r => r.key === 'cosmic_mood');
+    expect(moodReading?.raw).toBe('night');
+  });
+
 });
