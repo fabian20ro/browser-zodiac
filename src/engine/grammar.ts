@@ -51,7 +51,7 @@ export function createGrammarEngine(grammar: Grammar, rng: SeededRandom, options
       const mods = parts.slice(1);
 
       const rules = grammar[symbol];
-      if (!rules || rules.length === 0) return `[?${symbol}]`;
+      if (!Array.isArray(rules) || rules.length === 0) return `[?${symbol}]`;
 
       const chosen = pickWeighted(rules);
       const expanded = expandOnce(chosen, depth + 1);
