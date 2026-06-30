@@ -376,4 +376,34 @@ describe('readBrowserOracle', () => {
     expect(moodReading?.raw).toBe('night');
   });
 
+  it('detects tactile_sensibility correctly', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 5,
+    });
+    const profile = readBrowserOracle();
+    const tactileReading = profile.readings.find(r => r.key === 'tactile_sensibility');
+    expect(tactileReading?.raw).toBe('sensitive');
+  });
+
+  it('handles missing rtt in connection', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: {
+        effectiveType: '4g',
+      },
+    });
+    const profile = readBrowserOracle();
+    const latencyReading = profile.readings.find(r => r.key === 'cosmic_latency');
+    expect(latencyReading?.raw).toBe('unknown');
+  });
 });
