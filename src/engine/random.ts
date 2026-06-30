@@ -6,7 +6,7 @@ export function mulberry32(seed: number): SeededRandom {
   return () => {
     s = (s + 0x6d2b79f5) | 0;
     let t = Math.imul(s ^ (s >>> 15), s | 1);
-    t = (t + Math.imul(t ^ (t >>> 7), 0x243f6a88)) ^ t;
+    t = (t + Math.imul(t ^ (t >>> 7), 0x243f6a88)) | 0;
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
