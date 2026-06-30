@@ -113,6 +113,11 @@ export function readBrowserOracle(): DivinationProfile {
       interpretation: readingInterpretations['cosmic_resonance'](online ? 'harmonious' : 'discordant'),
     },
     {
+      key: 'cosmic_luck',
+      raw: online ? 'auspicious' : 'ominous',
+      interpretation: readingInterpretations['cosmic_luck'](online ? 'auspicious' : 'ominous'),
+    },
+    {
       key: 'cosmic_platform',
       raw: platform,
       interpretation: readingInterpretations['cosmic_platform'](platform),
