@@ -22,5 +22,5 @@ export function hashString(str: string): number {
 
 /** Create a daily seed from date string + extra salt */
 export function dailySeed(dateStr: string, salt: string): number {
-  return hashString(`${dateStr}:${salt}`);
+  return hashString(dateStr + ':' + salt);
 }

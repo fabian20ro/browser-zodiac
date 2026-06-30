@@ -14,7 +14,7 @@ describe('mulberry32', () => {
   it('is deterministic — same seed produces same sequence', () => {
     const rng1 = mulberry32(12345);
     const rng2 = mulberry32(12345);
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 100; i++) {
       expect(rng1()).toBe(rng2());
     }
   });
