@@ -406,4 +406,41 @@ describe('readBrowserOracle', () => {
     const latencyReading = profile.readings.find(r => r.key === 'cosmic_latency');
     expect(latencyReading?.raw).toBe('unknown');
   });
+
+  it('handles zero hardware concurrency', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 0,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: {
+        effectiveType: '4g',
+      },
+    });
+    const profile = readBrowserOracle();
+    const parallelLivesReading = profile.readings.find(r => r.key === 'parallel_lives');
+    const vibrationIntensityReading = profile.readings.find(r => r.key === 'vibration_intensity');
+
+    expect(parallelLivesReading?.raw).toBe('unknowable');
+    expect(vibrationIntensityReading?.raw).toBe('unknowable');
+  });
+
+  it('calculates cosmic_noise from user agent length', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: '12345',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: {
+        effectiveType: '4g',
+      },
+    });
+    const profile = readBrowserOracle();
+    const noiseReading = profile.readings.find(r => r.key === 'cosmic_noise');
+    expect(noiseReading?.raw).toBe('5');
+  });
 });
