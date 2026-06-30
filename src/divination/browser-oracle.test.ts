@@ -225,6 +225,26 @@ describe('readBrowserOracle', () => {
     expect(pixelReading?.raw).toBe('2');
   });
 
+  it('detects soul_window and life_resolution correctly', () => {
+    vi.stubGlobal('window', {
+      innerWidth: 800,
+      innerHeight: 600,
+      devicePixelRatio: 2,
+      matchMedia: vi.fn().mockReturnValue({
+        matches: false,
+      }),
+    });
+    vi.stubGlobal('screen', {
+      width: 1024,
+      height: 768,
+    });
+    const profile = readBrowserOracle();
+    const windowReading = profile.readings.find(r => r.key === 'soul_window');
+    const resolutionReading = profile.readings.find(r => r.key === 'life_resolution');
+    expect(windowReading?.raw).toBe('800x600');
+    expect(resolutionReading?.raw).toBe('1024x768');
+  });
+
   it('handles cosmic_latency and cosmic_resonance', () => {
     vi.stubGlobal('navigator', {
       userAgent: 'Mozilla/5.0',
