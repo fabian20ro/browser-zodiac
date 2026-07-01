@@ -499,4 +499,78 @@ describe('readBrowserOracle', () => {
     const latencyReading = profile.readings.find(r => r.key === 'cosmic_latency');
     expect(latencyReading?.raw).toBe('unknown');
   });
+
+  it('prioritises Edge over Chrome when both keywords appear in UA', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4441.82 Safari/537.36 Edg/91.0.864.59',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'Windows',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    expect(browserReading?.raw).toBe('Edge');
+  });
+
+  it('prioritises Firefox over Chrome when both keywords appear in UA', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101 Firefox/91.0 Chrome/91.0.4472.124',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'Windows',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    expect(browserReading?.raw).toBe('Firefox');
+  });
+
+  it('prioritises iOS detection over Linux in a mixed UA', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/91.0.4472.78 Mobile/15E148',
+      language: 'en-US',
+      hardwareConcurrency: 4,
+      platform: 'iPhone',
+      onLine: true,
+      maxTouchPoints: 5,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+    expect(osReading?.raw).toBe('iOS');
+  });
+
+  it('returns the full reading list when all navigator fields are populated', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      deviceMemory: 8,
+      connection: { effectiveType: '5g', rtt: 20 },
+    });
+    vi.stubGlobal('window', {
+      innerWidth: 1920,
+      innerHeight: 1080,
+      devicePixelRatio: 2,
+      matchMedia: vi.fn().mockReturnValue({ matches: false }),
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.length).toBe(20);
+    const keys = profile.readings.map(r => r.key);
+    expect(keys).toEqual(expect.arrayContaining([
+      'spirit_browser', 'elemental_os', 'life_resolution', 'soul_window',
+      'cultural_destiny', 'soul_alignment', 'cosmic_mood', 'parallel_lives',
+      'vibration_intensity', 'network_speed', 'cosmic_latency', 'cosmic_resonance',
+      'cosmic_luck', 'cosmic_platform', 'social_connectivity', 'cosmic_timezone',
+      'cosmic_noise', 'cosmic_focus', 'tactile_sensibility', 'pixel_density',
+    ]));
+  });
 });
