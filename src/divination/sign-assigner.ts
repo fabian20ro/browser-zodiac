@@ -26,3 +26,10 @@ export function assignSignWithSymbol(fingerprint: string): { sign: ZodiacSign; s
   const sign = assignSign(fingerprint);
   return { sign, symbol: ZODIAC_SYMBOLS[sign] };
 }
+
+/**
+ * Assigns signs to a batch of fingerprints. Useful for reading multiple people at once.
+ */
+export function assignSigns(fingerprints: string[]): ZodiacSign[] {
+  return fingerprints.map(assignSign);
+}

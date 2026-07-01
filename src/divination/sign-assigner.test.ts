@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { assignSign, assignDailySign, assignSignWithSymbol } from './sign-assigner.ts';
+import { assignSign, assignDailySign, assignSignWithSymbol, assignSigns } from './sign-assigner.ts';
 import { ZODIAC_SIGNS, ZODIAC_SYMBOLS } from '../horoscope/zodiac.ts';
 
 describe('sign-assigner', () => {
@@ -142,6 +142,36 @@ describe('sign-assigner', () => {
     it('returns a sign and its corresponding symbol', () => {
       const result = assignSignWithSymbol('test');
       expect(ZODIAC_SYMBOLS[result.sign]).toBe(result.symbol);
+    });
+  });
+
+  describe('assignSigns', () => {
+    it('returns an array of signs for each fingerprint', () => {
+      const fingerprints = ['alice', 'bob', 'carol'];
+      const signs = assignSigns(fingerprints);
+      expect(signs).toHaveLength(3);
+      for (const sign of signs) {
+        expect(ZODIAC_SIGNS).toContain(sign);
+      }
+    });
+
+    it('handles empty array', () => {
+      expect(assignSigns([])).toEqual([]);
+    });
+
+    it('is deterministic', () => {
+      const fingerprints = ['alice', 'bob'];
+      const signs1 = assignSigns(fingerprints);
+      const signs2 = assignSigns(fingerprints);
+      expect(signs1).toEqual(signs2);
+    });
+
+    it('returns valid zodiac signs', () => {
+      const fingerprints = Array.from({ length: 50 }, (_, i) => `user-${i}`);
+      const signs = assignSigns(fingerprints);
+      for (const sign of signs) {
+        expect(ZODIAC_SIGNS).toContain(sign);
+      }
     });
   });
 });
