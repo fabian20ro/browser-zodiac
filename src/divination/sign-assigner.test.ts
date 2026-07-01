@@ -118,6 +118,24 @@ describe('sign-assigner', () => {
      expect(sign1).toBeDefined();
      expect(sign2).toBeDefined();
     });
+
+    it('returns different signs for different dates with the same fingerprint', () => {
+     const fingerprint = 'daily-test-fingerprint';
+     const seenDays: string[] = [];
+     let foundTwoDifferent = false;
+     for (let dayOffset = 0; dayOffset < 365; dayOffset++) {
+       const date = new Date(2024, 0, 1 + dayOffset);
+       const sign = assignDailySign(fingerprint, date);
+       if (!seenDays.includes(sign)) {
+         seenDays.push(sign);
+         if (seenDays.length >= 2) {
+           foundTwoDifferent = true;
+           break;
+         }
+       }
+     }
+     expect(foundTwoDifferent).toBe(true);
+    });
     });
 
   describe('assignSignWithSymbol', () => {
