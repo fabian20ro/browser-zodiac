@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { assignSign } from './sign-assigner.ts';
-import { assignDailySign } from './sign-assigner.ts';
-import { ZODIAC_SIGNS } from '../horoscope/zodiac.ts';
+import { assignSign, assignDailySign, assignSignWithSymbol } from './sign-assigner.ts';
+import { ZODIAC_SIGNS, ZODIAC_SYMBOLS } from '../horoscope/zodiac.ts';
 
 describe('sign-assigner', () => {
   describe('assignSign', () => {
@@ -88,9 +87,8 @@ describe('sign-assigner', () => {
       expect(results.size).toBe(1);
     });
     });
-    });
 
-    describe('assignDailySign', () => {
+  describe('assignDailySign', () => {
     it('returns a valid zodiac sign', () => {
      const sign = assignDailySign('some-fingerprint', new Date('2024-01-01'));
      expect(ZODIAC_SIGNS).toContain(sign);
@@ -105,10 +103,10 @@ describe('sign-assigner', () => {
     });
 
     it('is insensitive to the time part of the date', () => {
-      const fingerprint = 'fingerprint';
-      const date1 = new Date('2024-01-01T10:00:00Z');
-      const date2 = new Date('2024-01-01T23:59:59Z');
-      expect(assignDailySign(fingerprint, date1)).toBe(assignDailySign(fingerprint, date2));
+     const fingerprint = 'fingerprint';
+     const date1 = new Date('2024-01-01T10:00:00Z');
+     const date2 = new Date('2024-01-01T23:59:59Z');
+     expect(assignDailySign(fingerprint, date1)).toBe(assignDailySign(fingerprint, date2));
     });
 
     it('is time-varying', () => {
@@ -117,10 +115,15 @@ describe('sign-assigner', () => {
      const date2 = new Date('2025-01-01');
      const sign1 = assignDailySign(fingerprint, date1);
      const sign2 = assignDailySign(fingerprint, date2);
-     // We don't assert sign1 !== sign2 because collisions are possible,
-     // but for a specific fingerprint it's a common observation.
-     // For testing purposes, let's just ensure it's at least producing values.
      expect(sign1).toBeDefined();
      expect(sign2).toBeDefined();
     });
     });
+
+  describe('assignSignWithSymbol', () => {
+    it('returns a sign and its corresponding symbol', () => {
+      const result = assignSignWithSymbol('test');
+      expect(ZODIAC_SYMBOLS[result.sign]).toBe(result.symbol);
+    });
+  });
+});

@@ -225,6 +225,26 @@ describe('readBrowserOracle', () => {
     expect(pixelReading?.raw).toBe('2');
   });
 
+  it('detects soul_window and life_resolution correctly', () => {
+    vi.stubGlobal('window', {
+      innerWidth: 800,
+      innerHeight: 600,
+      devicePixelRatio: 2,
+      matchMedia: vi.fn().mockReturnValue({
+        matches: false,
+      }),
+    });
+    vi.stubGlobal('screen', {
+      width: 1024,
+      height: 768,
+    });
+    const profile = readBrowserOracle();
+    const windowReading = profile.readings.find(r => r.key === 'soul_window');
+    const resolutionReading = profile.readings.find(r => r.key === 'life_resolution');
+    expect(windowReading?.raw).toBe('800x600');
+    expect(resolutionReading?.raw).toBe('1024x768');
+  });
+
   it('handles cosmic_latency and cosmic_resonance', () => {
     vi.stubGlobal('navigator', {
       userAgent: 'Mozilla/5.0',
@@ -376,4 +396,71 @@ describe('readBrowserOracle', () => {
     expect(moodReading?.raw).toBe('night');
   });
 
+  it('detects tactile_sensibility correctly', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 5,
+    });
+    const profile = readBrowserOracle();
+    const tactileReading = profile.readings.find(r => r.key === 'tactile_sensibility');
+    expect(tactileReading?.raw).toBe('sensitive');
+  });
+
+  it('handles missing rtt in connection', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: {
+        effectiveType: '4g',
+      },
+    });
+    const profile = readBrowserOracle();
+    const latencyReading = profile.readings.find(r => r.key === 'cosmic_latency');
+    expect(latencyReading?.raw).toBe('unknown');
+  });
+
+  it('handles zero hardware concurrency', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 0,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: {
+        effectiveType: '4g',
+      },
+    });
+    const profile = readBrowserOracle();
+    const parallelLivesReading = profile.readings.find(r => r.key === 'parallel_lives');
+    const vibrationIntensityReading = profile.readings.find(r => r.key === 'vibration_intensity');
+
+    expect(parallelLivesReading?.raw).toBe('unknowable');
+    expect(vibrationIntensityReading?.raw).toBe('unknowable');
+  });
+
+  it('calculates cosmic_noise from user agent length', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: '12345',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: {
+        effectiveType: '4g',
+      },
+    });
+    const profile = readBrowserOracle();
+    const noiseReading = profile.readings.find(r => r.key === 'cosmic_noise');
+    expect(noiseReading?.raw).toBe('5');
+  });
 });
