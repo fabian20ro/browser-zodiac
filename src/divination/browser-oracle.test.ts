@@ -316,6 +316,21 @@ describe('readBrowserOracle', () => {
     expect(osReading?.raw).toBe('Android');
   });
 
+  it('prioritises Android over Linux in a mixed UA', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 Chrome/120.0 Mobile Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'Linux armv8l',
+      onLine: true,
+      maxTouchPoints: 5,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+    expect(osReading?.raw).toBe('Android');
+  });
+
   it('detects macOS', () => {
     vi.stubGlobal('navigator', {
       userAgent: 'Mozilla/5.0 (Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4449.82 Safari/537.36',
@@ -575,6 +590,35 @@ describe('readBrowserOracle', () => {
     const profile = readBrowserOracle();
     const osReading = profile.readings.find(r => r.key === 'elemental_os');
     expect(osReading?.raw).toBe('iOS');
+  });
+
+  it('falls back to "unknown" for cosmic_platform when platform is whitespace', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: '   ',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const platformReading = profile.readings.find(r => r.key === 'cosmic_platform');
+    expect(platformReading?.raw).toBe('unknown');
+  });
+
+  it('falls back to "unknown" for cosmic_focus when deviceMemory is absent from navigator entirely', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+    });
+    const profile = readBrowserOracle();
+    const focusReading = profile.readings.find(r => r.key === 'cosmic_focus');
+    expect(focusReading?.raw).toBe('unknown');
   });
 
   it('returns the full reading list when all navigator fields are populated', () => {
