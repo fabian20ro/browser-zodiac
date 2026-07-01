@@ -500,6 +500,23 @@ describe('readBrowserOracle', () => {
     expect(latencyReading?.raw).toBe('unknown');
   });
 
+  it('handles missing navigator object gracefully (SSR scenario)', () => {
+    vi.stubGlobal('navigator', undefined);
+    vi.stubGlobal('window', undefined);
+    vi.stubGlobal('screen', undefined);
+
+    expect(() => readBrowserOracle()).not.toThrow();
+
+    const profile = readBrowserOracle();
+    expect(profile).toBeDefined();
+    expect(profile.readings.length).toBeGreaterThan(0);
+
+    // All readings should have string raw values (no crashes)
+    for (const reading of profile.readings) {
+      expect(typeof reading.raw).toBe('string');
+    }
+  });
+
   it('prioritises Edge over Chrome when both keywords appear in UA', () => {
     vi.stubGlobal('navigator', {
       userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4441.82 Safari/537.36 Edg/91.0.864.59',
