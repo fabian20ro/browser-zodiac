@@ -605,4 +605,14 @@ describe('readBrowserOracle', () => {
       'cosmic_noise', 'cosmic_focus', 'tactile_sensibility', 'pixel_density',
     ]));
   });
+
+  it('every reading has an interpreted string and no undefined raw values (regression guard)', () => {
+    const profile = readBrowserOracle();
+    for (const reading of profile.readings) {
+      expect(typeof reading.interpretation).toBe('string');
+      expect(reading.raw).not.toBe(undefined);
+      // interpretations are resolved strings produced by calling readingInterpretations[key](raw)
+      // if a key is added without an interpretation fn, the call site would throw — this guards that.
+    }
+  });
 });
