@@ -48,7 +48,8 @@ export function readBrowserOracle(): DivinationProfile {
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Void';
   const windowSize = `${window?.innerWidth || 0}x${window?.innerHeight || 0}`;
   const touchPoints = navigator?.maxTouchPoints || 0;
-  const networkSpeed = (navigator as any).connection?.effectiveType || 'unknown';
+  const navConn = navigator && (navigator as any).connection;
+  const networkSpeed = navConn?.effectiveType || 'unknown';
   const devicePixelRatio = window?.devicePixelRatio || 1;
 
   const readings: DivinationReading[] = [
@@ -104,8 +105,8 @@ export function readBrowserOracle(): DivinationProfile {
     },
     {
       key: 'cosmic_latency',
-      raw: (navigator as any).connection?.rtt?.toString() || 'unknown',
-      interpretation: readingInterpretations['cosmic_latency']((navigator as any).connection?.rtt?.toString() || 'unknown'),
+      raw: navigator ? ((navigator as any).connection?.rtt?.toString() || 'unknown') : 'unknown',
+      interpretation: readingInterpretations['cosmic_latency'](navigator ? ((navigator as any).connection?.rtt?.toString() || 'unknown') : 'unknown'),
     },
     {
       key: 'cosmic_resonance',
@@ -139,8 +140,8 @@ export function readBrowserOracle(): DivinationProfile {
     },
     {
       key: 'cosmic_focus',
-      raw: (navigator as any).deviceMemory?.toString() || 'unknown',
-      interpretation: readingInterpretations['cosmic_focus']((navigator as any).deviceMemory?.toString() || 'unknown'),
+      raw: navigator ? ((navigator as any).deviceMemory?.toString() || 'unknown') : 'unknown',
+      interpretation: readingInterpretations['cosmic_focus'](navigator ? ((navigator as any).deviceMemory?.toString() || 'unknown') : 'unknown'),
     },
     {
       key: 'tactile_sensibility',
