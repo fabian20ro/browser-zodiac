@@ -463,4 +463,25 @@ describe('readBrowserOracle', () => {
     const noiseReading = profile.readings.find(r => r.key === 'cosmic_noise');
     expect(noiseReading?.raw).toBe('5');
   });
+
+  it('handles missing navigator.connection gracefully', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: undefined,
+    });
+    const profile = readBrowserOracle();
+    expect(profile).toBeDefined();
+    expect(profile.readings.length).toBeGreaterThan(0);
+
+    const speedReading = profile.readings.find(r => r.key === 'network_speed');
+    expect(speedReading?.raw).toBe('unknown');
+
+    const latencyReading = profile.readings.find(r => r.key === 'cosmic_latency');
+    expect(latencyReading?.raw).toBe('unknown');
+  });
 });
