@@ -396,6 +396,21 @@ describe('readBrowserOracle', () => {
     expect(moodReading?.raw).toBe('night');
   });
 
+  it('detects iPad as iOS via detectOS', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1',
+      language: 'en-US',
+      hardwareConcurrency: 4,
+      platform: 'iPad',
+      onLine: true,
+      maxTouchPoints: 5,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+    expect(osReading?.raw).toBe('iOS');
+  });
+
   it('detects tactile_sensibility correctly', () => {
     vi.stubGlobal('navigator', {
       userAgent: 'Mozilla/5.0',
