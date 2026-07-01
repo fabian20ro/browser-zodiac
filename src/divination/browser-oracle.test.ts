@@ -577,6 +577,21 @@ describe('readBrowserOracle', () => {
     expect(osReading?.raw).toBe('iOS');
   });
 
+  it('falls back to "unknown" for cosmic_platform when platform is whitespace', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: '   ',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const platformReading = profile.readings.find(r => r.key === 'cosmic_platform');
+    expect(platformReading?.raw).toBe('unknown');
+  });
+
   it('returns the full reading list when all navigator fields are populated', () => {
     vi.stubGlobal('navigator', {
       userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36',
