@@ -659,4 +659,19 @@ describe('readBrowserOracle', () => {
       // if a key is added without an interpretation fn, the call site would throw — this guards that.
     }
   });
+
+  it('returns cosmic_timezone from resolved Intl options and includes it in fingerprint', () => {
+    vi.stubGlobal('Intl', {
+      DateTimeFormat: vi.fn().mockImplementation(() => ({
+        resolvedOptions: () => ({ timeZone: 'America/New_York' }),
+      })),
+    });
+    const profile = readBrowserOracle();
+    const tzReading = profile.readings.find(r => r.key === 'cosmic_timezone');
+    expect(tzReading?.raw).toBe('America/New_York');
+
+    // Fingerprint format: ${ua}|${lang}|${screenRes}|${platform}|${timezone}|${networkSpeed}|${colorScheme}|${timeOfDay}|${devicePixelRatio}
+    const fingerprintParts = profile.fingerprint.split('|');
+    expect(fingerprintParts[4]).toBe('America/New_York');
+  });
 });
