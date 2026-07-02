@@ -20,6 +20,12 @@ function detectOS(ua: string): string {
   return 'Unknown';
 }
 
+function detectMobile(os: string): boolean {
+  if (os === 'iOS') return true;
+  if (os === 'Android') return true;
+  return false;
+}
+
 function getColorScheme(): 'dark' | 'light' {
   if (typeof window !== 'undefined' && window.matchMedia?.('(prefers-color-scheme: dark)')?.matches) return 'dark';
   return 'light';
@@ -161,7 +167,8 @@ export function readBrowserOracle(): DivinationProfile {
     },
   ];
 
-  const fingerprint = `${ua}|${lang}|${screenRes}|${platform}|${timezone}|${networkSpeed}|${colorScheme}|${timeOfDay}|${devicePixelRatio}`;
+  const mobileIndicator = detectMobile(os) ? 'mobile' : 'desktop';
+  const fingerprint = `${ua}|${lang}|${screenRes}|${platform}|${timezone}|${networkSpeed}|${colorScheme}|${timeOfDay}|${devicePixelRatio}|${mobileIndicator}`;
 
   return { readings, fingerprint };
 }
