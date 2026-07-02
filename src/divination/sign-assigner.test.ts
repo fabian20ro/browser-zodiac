@@ -109,14 +109,23 @@ describe('sign-assigner', () => {
      expect(assignDailySign(fingerprint, date1)).toBe(assignDailySign(fingerprint, date2));
     });
 
+    it('works with a dynamically created Date object', () => {
+     const fingerprint = 'dynamic-date-test';
+     const now = new Date();
+     const sign = assignDailySign(fingerprint, now);
+     expect(ZODIAC_SIGNS).toContain(sign);
+     // Second call with same dynamic date must be deterministic
+     const nowCopy = new Date(now.getTime());
+     expect(assignDailySign(fingerprint, nowCopy)).toBe(sign);
+    });
+
     it('is time-varying', () => {
      const fingerprint = 'constant-fingerprint';
      const date1 = new Date('2024-01-01');
      const date2 = new Date('2025-01-01');
      const sign1 = assignDailySign(fingerprint, date1);
      const sign2 = assignDailySign(fingerprint, date2);
-     expect(sign1).toBeDefined();
-     expect(sign2).toBeDefined();
+     expect(sign1).not.toBe(sign2);
     });
 
     it('returns different signs for different dates with the same fingerprint', () => {

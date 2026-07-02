@@ -20,6 +20,12 @@ function detectOS(ua: string): string {
   return 'Unknown';
 }
 
+function detectMobile(os: string): boolean {
+  if (os === 'iOS') return true;
+  if (os === 'Android') return true;
+  return false;
+}
+
 function getColorScheme(): 'dark' | 'light' {
   if (typeof window !== 'undefined' && window.matchMedia?.('(prefers-color-scheme: dark)')?.matches) return 'dark';
   return 'light';
@@ -51,6 +57,7 @@ export function readBrowserOracle(): DivinationProfile {
   const navConn = navigator && (navigator as any).connection;
   const networkSpeed = navConn?.effectiveType || 'unknown';
   const devicePixelRatio = window?.devicePixelRatio || 1;
+  const timezoneOffsetMinutes = navigator ? new Date().getTimezoneOffset() : null;
 
   const readings: DivinationReading[] = [
     {
@@ -153,9 +160,15 @@ export function readBrowserOracle(): DivinationProfile {
       raw: devicePixelRatio.toString(),
       interpretation: readingInterpretations['pixel_density'](devicePixelRatio.toString()),
     },
+    {
+      key: 'cosmic_timezone_offset',
+      raw: timezoneOffsetMinutes !== null ? String(timezoneOffsetMinutes) : 'unknown',
+      interpretation: readingInterpretations['cosmic_timezone_offset'](timezoneOffsetMinutes !== null ? String(timezoneOffsetMinutes) : 'unknown'),
+    },
   ];
 
-  const fingerprint = `${ua}|${lang}|${screenRes}|${platform}|${timezone}|${networkSpeed}|${colorScheme}|${timeOfDay}|${devicePixelRatio}`;
+  const mobileIndicator = detectMobile(os) ? 'mobile' : 'desktop';
+  const fingerprint = `${ua}|${lang}|${screenRes}|${platform}|${timezone}|${networkSpeed}|${colorScheme}|${timeOfDay}|${devicePixelRatio}|${mobileIndicator}`;
 
   return { readings, fingerprint };
 }

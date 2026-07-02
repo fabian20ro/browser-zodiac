@@ -198,6 +198,15 @@ describe('createGrammarEngine', () => {
       expect(() => engine.expand('##.uppercase#')).toThrow(/empty or malformed/);
     });
 
+    it('throws on empty rule entry in grammar', () => {
+      expect(() => makeEngine({ word: ['', 'valid'] })).toThrow(/Empty rule entry/);
+      expect(() => makeEngine({ word: ['   '] })).toThrow(/Empty rule entry/);
+    });
+
+    it('throws on invalid symbol name in grammar', () => {
+      expect(() => makeEngine({ '123bad': ['hello'] })).toThrow(/Invalid grammar symbol/);
+    });
+
     it('throws on empty modifier between dots', () => {
       const engine = makeEngine({ word: ['hello'] });
       expect(() => engine.expand('#word..uppercase#')).toThrow(/malformed name/);

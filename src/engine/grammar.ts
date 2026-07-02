@@ -5,7 +5,25 @@ const EXPANSION_RE = /#([^#]+)#/g;
 const WEIGHT_SEPARATOR = '~~';
 const MAX_DEPTH = 10;
 
+function validateGrammar(grammar: Grammar): void {
+  for (const symbol of Object.keys(grammar)) {
+    if (!/^[a-zA-Z_][a-zA-Z0-9_-]*$/.test(symbol)) {
+      throw new Error(`Invalid grammar symbol name: '${symbol}'`);
+    }
+    const rules = grammar[symbol];
+    if (Array.isArray(rules)) {
+      for (let i = 0; i < rules.length; i++) {
+        const entry = rules[i];
+        if (typeof entry !== 'string' || !entry.trim()) {
+          throw new Error(`Empty rule entry in symbol '${symbol}' at index ${i}`);
+        }
+      }
+    }
+  }
+}
+
 export function createGrammarEngine(grammar: Grammar, rng: SeededRandom, options: { maxDepth?: number } = {}) {
+  validateGrammar(grammar);
   const maxDepth = options.maxDepth ?? MAX_DEPTH;
   const modifiers: Record<string, Modifier> = {};
 
