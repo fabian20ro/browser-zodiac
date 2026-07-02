@@ -1008,4 +1008,22 @@ describe('readBrowserOracle', () => {
     const alignmentReading = profile.readings.find(r => r.key === 'soul_alignment');
     expect(alignmentReading?.raw).toBe('light');
   });
+
+  it('detectMobile classifies iOS as mobile via fingerprint indicator', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) Mobile Safari/604.1',
+      language: 'en-US',
+      hardwareConcurrency: 4,
+      platform: 'iPhone',
+      onLine: true,
+      maxTouchPoints: 5,
+    });
+    vi.stubGlobal('window', { innerWidth: 375, innerHeight: 812, devicePixelRatio: 3, matchMedia: undefined });
+    vi.stubGlobal('screen', { width: 375, height: 812 });
+
+    const profile = readBrowserOracle();
+    // Fingerprint format field index 9 (0-based): mobileIndicator — produced by detectMobile(os)
+    const fingerprintFields = profile.fingerprint.split('|');
+    expect(fingerprintFields[9]).toBe('mobile');
+  });
 });
