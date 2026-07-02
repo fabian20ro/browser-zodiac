@@ -192,5 +192,20 @@ describe('createGrammarEngine', () => {
       }, 42, 3);
       expect(engine.expand('#a#')).toBe('HELLO-WORLD');
     });
+
+    it('throws on empty symbol name', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(() => engine.expand('##.uppercase#')).toThrow(/empty or malformed/);
+    });
+
+    it('throws on empty modifier between dots', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(() => engine.expand('#word..uppercase#')).toThrow(/malformed name/);
+    });
+
+    it('throws on symbol with invalid characters', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(() => engine.expand('#123abc#')).toThrow(/empty or malformed/);
+    });
   });
 });

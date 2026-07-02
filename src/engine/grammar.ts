@@ -48,7 +48,15 @@ export function createGrammarEngine(grammar: Grammar, rng: SeededRandom, options
     return template.replace(EXPANSION_RE, (_match, expr: string) => {
       const parts = expr.split('.');
       const symbol = parts[0];
+      if (!symbol || !/^[a-zA-Z_][a-zA-Z0-9_-]*$/.test(symbol)) {
+        throw new Error(`Invalid grammar expression in '#${expr}#': empty or malformed symbol name`);
+      }
       const mods = parts.slice(1);
+      for (const mod of mods) {
+        if (!mod || !/^[a-zA-Z_][a-zA-Z0-9_-]*$/.test(mod)) {
+          throw new Error(`Invalid modifier in '#${expr}#': malformed name '${mod}'`);
+        }
+      }
 
       const rules = grammar[symbol];
       if (!Array.isArray(rules) || rules.length === 0) return `[?${symbol}]`;
