@@ -51,6 +51,7 @@ export function readBrowserOracle(): DivinationProfile {
   const navConn = navigator && (navigator as any).connection;
   const networkSpeed = navConn?.effectiveType || 'unknown';
   const devicePixelRatio = window?.devicePixelRatio || 1;
+  const timezoneOffsetMinutes = navigator ? new Date().getTimezoneOffset() : null;
 
   const readings: DivinationReading[] = [
     {
@@ -152,6 +153,11 @@ export function readBrowserOracle(): DivinationProfile {
       key: 'pixel_density',
       raw: devicePixelRatio.toString(),
       interpretation: readingInterpretations['pixel_density'](devicePixelRatio.toString()),
+    },
+    {
+      key: 'cosmic_timezone_offset',
+      raw: timezoneOffsetMinutes !== null ? String(timezoneOffsetMinutes) : 'unknown',
+      interpretation: readingInterpretations['cosmic_timezone_offset'](timezoneOffsetMinutes !== null ? String(timezoneOffsetMinutes) : 'unknown'),
     },
   ];
 

@@ -639,7 +639,7 @@ describe('readBrowserOracle', () => {
       matchMedia: vi.fn().mockReturnValue({ matches: false }),
     });
     const profile = readBrowserOracle();
-    expect(profile.readings.length).toBe(20);
+    expect(profile.readings.length).toBe(21);
     const keys = profile.readings.map(r => r.key);
     expect(keys).toEqual(expect.arrayContaining([
       'spirit_browser', 'elemental_os', 'life_resolution', 'soul_window',
@@ -647,7 +647,30 @@ describe('readBrowserOracle', () => {
       'vibration_intensity', 'network_speed', 'cosmic_latency', 'cosmic_resonance',
       'cosmic_luck', 'cosmic_platform', 'social_connectivity', 'cosmic_timezone',
       'cosmic_noise', 'cosmic_focus', 'tactile_sensibility', 'pixel_density',
+      'cosmic_timezone_offset',
     ]));
+  });
+
+  it('exposes cosmic_timezone_offset as minutes east of UTC and falls back to "unknown" in SSR', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko)',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+    });
+    vi.stubGlobal('window', { innerWidth: 1920, innerHeight: 1080, devicePixelRatio: 1, matchMedia: vi.fn().mockReturnValue({ matches: false }) });
+    const profile = readBrowserOracle();
+    const offsetReading = profile.readings.find(r => r.key === 'cosmic_timezone_offset');
+    expect(offsetReading).toBeDefined();
+    // In the Node/JSDOM test environment, getTimezoneOffset() returns minutes east of UTC.
+    expect(typeof offsetReading?.raw).toBe('string');
+
+    vi.stubGlobal('navigator', undefined);
+    const ssrProfile = readBrowserOracle();
+    const ssrOffsetReading = ssrProfile.readings.find(r => r.key === 'cosmic_timezone_offset');
+    expect(ssrOffsetReading?.raw).toBe('unknown');
   });
 
   it('every reading has an interpreted string and no undefined raw values (regression guard)', () => {
