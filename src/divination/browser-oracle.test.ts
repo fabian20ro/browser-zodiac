@@ -729,4 +729,61 @@ describe('readBrowserOracle', () => {
     const fingerprintParts = profile.fingerprint.split('|');
     expect(fingerprintParts[4]).toBe('America/New_York');
   });
+
+  it('handles missing screen object gracefully — returns 0x0 resolution and still detects browser', () => {
+    vi.stubGlobal('screen', undefined);
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91.0 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    vi.stubGlobal('window', { innerWidth: 1920, innerHeight: 1080, devicePixelRatio: 1, matchMedia: undefined });
+
+    const profile = readBrowserOracle();
+    expect(profile).toBeDefined();
+
+    // screenRes fallback is `${screen?.width || 0}x${screen?.height || 0}` → '0x0'
+    const resReading = profile.readings.find(r => r.key === 'life_resolution');
+    expect(resReading?.raw).toBe('0x0');
+
+    // Browser detection still works from UA alone
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    expect(browserReading?.raw).toBe('Chrome');
+
+    // Fingerprint should still be well-formed with 0x0 placeholder
+    expect(profile.fingerprint).toContain('0x0');
+  });
+
+  it('detects Chrome even when window.matchMedia is null or undefined', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 4,
+      platform: 'Linux x86_64',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: 'wifi' },
+    });
+    vi.stubGlobal('screen', { width: 1440, height: 900 });
+
+    // matchMedia is null — getColorScheme() should fall through to 'light'
+    vi.stubGlobal('window', {
+      innerWidth: 1440,
+      innerHeight: 900,
+      devicePixelRatio: 1,
+      matchMedia: null,
+    });
+
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    expect(browserReading?.raw).toBe('Chrome');
+
+    // getColorScheme returns 'light' when matchMedia is falsy
+    const alignmentReading = profile.readings.find(r => r.key === 'soul_alignment');
+    expect(alignmentReading?.raw).toBe('light');
+  });
 });
