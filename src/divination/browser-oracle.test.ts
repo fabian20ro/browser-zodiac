@@ -683,6 +683,38 @@ describe('readBrowserOracle', () => {
     }
   });
 
+  it('detects morning time of day (hour >=6, <12)', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    vi.setSystemTime(new Date('2024-01-01T09:00:00'));
+    const profile = readBrowserOracle();
+    const moodReading = profile.readings.find(r => r.key === 'cosmic_mood');
+    expect(moodReading?.raw).toBe('morning');
+  });
+
+  it('detects afternoon time of day (hour >=12, <17)', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    vi.setSystemTime(new Date('2024-01-01T14:30:00'));
+    const profile = readBrowserOracle();
+    const moodReading = profile.readings.find(r => r.key === 'cosmic_mood');
+    expect(moodReading?.raw).toBe('afternoon');
+  });
+
   it('returns cosmic_timezone from resolved Intl options and includes it in fingerprint', () => {
     vi.stubGlobal('Intl', {
       DateTimeFormat: vi.fn().mockImplementation(() => ({
