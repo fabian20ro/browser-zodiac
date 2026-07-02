@@ -115,8 +115,7 @@ describe('sign-assigner', () => {
      const date2 = new Date('2025-01-01');
      const sign1 = assignDailySign(fingerprint, date1);
      const sign2 = assignDailySign(fingerprint, date2);
-     expect(sign1).toBeDefined();
-     expect(sign2).toBeDefined();
+     expect(sign1).not.toBe(sign2);
     });
 
     it('returns different signs for different dates with the same fingerprint', () => {
