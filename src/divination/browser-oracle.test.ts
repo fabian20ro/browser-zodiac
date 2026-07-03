@@ -1149,4 +1149,39 @@ describe('readBrowserOracle', () => {
     const profile = readBrowserOracle();
     expect(profile.readings.find(r => r.key === 'cosmic_mood')?.raw).toBe('night');
   });
+
+  it('detects Edge via EdgiOS keyword', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148 EdgiOS/120.0',
+      language: 'en-US',
+      hardwareConcurrency: 4,
+      platform: 'iPhone',
+      onLine: true,
+      maxTouchPoints: 5,
+      connection: { effectiveType: '5g' },
+    });
+    vi.stubGlobal('screen', { width: 375, height: 812 });
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    expect(browserReading?.raw).toBe('Edge');
+    // iOS must be detected too; mobile indicator should reflect this
+    const fingerprintFields = profile.fingerprint.split('|');
+    expect(fingerprintFields[9]).toBe('mobile');
+  });
+
+  it('detects Edge via EdgiOS keyword (non-iPhone UA)', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/91.0.864.70 Mobile Safari/537.36 EdgiOS/120.0',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'Windows NT 10.0; Win64; x64',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    expect(browserReading?.raw).toBe('Edge');
+  });
+
 });
