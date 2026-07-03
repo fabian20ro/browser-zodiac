@@ -23,4 +23,5 @@ export const readingInterpretations: Record<string, InterpretationFn> = {
   cosmic_luck: (raw) => `Your luck is currently ${raw}.`,
   zodiac_fate: (raw) => `Your celestial path is guided by ${raw}.`,
   cosmic_timezone_offset: (raw) => `The temporal alignment is ${raw} minutes from cosmic noon.`,
+  cosmic_thriftiness: (raw) => `The cosmos consumes with a ${raw} hand.`,
 };
