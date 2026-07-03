@@ -1288,4 +1288,18 @@ describe('readBrowserOracle', () => {
     expect(profile2.readings.find(r => r.key === 'cosmic_thriftiness')?.raw).toBe('lavish');
   });
 
+  it('detects thrifty when saveData is true (strict equality)', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g', saveData: true },
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'cosmic_thriftiness')?.raw).toBe('thrifty');
+  });
+
 });
