@@ -661,6 +661,27 @@ describe('readBrowserOracle', () => {
     for (const reading of profile.readings) {
       expect(typeof reading.raw).toBe('string');
     }
+
+    // When navigator is undefined, onLine defaults to false via `?? false`,
+    // so disconnected-fallback interpretations must apply:
+    const resonanceReading = profile.readings.find(r => r.key === 'cosmic_resonance');
+    expect(resonanceReading?.raw).toBe('discordant');
+
+    const connectivityReading = profile.readings.find(r => r.key === 'social_connectivity');
+    expect(connectivityReading?.raw).toBe('hermit');
+
+    const luckReading = profile.readings.find(r => r.key === 'cosmic_luck');
+    expect(luckReading?.raw).toBe('ominous');
+
+    // Browser and OS should both fall back to Unknown on empty UA string.
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    expect(browserReading?.raw).toBe('Unknown');
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+    expect(osReading?.raw).toBe('Unknown');
+
+    // Zero cores means parallel/vibration readings fall back to "unknowable".
+    const parallelReading = profile.readings.find(r => r.key === 'parallel_lives');
+    expect(parallelReading?.raw).toBe('unknowable');
   });
 
   it('prioritises Edge over Chrome when both keywords appear in UA', () => {
