@@ -1353,4 +1353,24 @@ describe('readBrowserOracle', () => {
     expect(profile.readings.find(r => r.key === 'cosmic_thriftiness')?.raw).toBe('thrifty');
   });
 
+  it('all readings have non-empty interpretations and valid raw values', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+
+    const profile = readBrowserOracle();
+
+    for (const reading of profile.readings) {
+      expect(reading.interpretation).toBeTruthy();
+      expect(typeof reading.raw).not.toBe(undefined);
+      expect(typeof reading.key).toBe('string');
+    }
+  });
+
 });
