@@ -1008,4 +1008,180 @@ describe('readBrowserOracle', () => {
     const alignmentReading = profile.readings.find(r => r.key === 'soul_alignment');
     expect(alignmentReading?.raw).toBe('light');
   });
+
+  it('detectMobile classifies iOS as mobile via fingerprint indicator', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) Mobile Safari/604.1',
+      language: 'en-US',
+      hardwareConcurrency: 4,
+      platform: 'iPhone',
+      onLine: true,
+      maxTouchPoints: 5,
+    });
+    vi.stubGlobal('window', { innerWidth: 375, innerHeight: 812, devicePixelRatio: 3, matchMedia: undefined });
+    vi.stubGlobal('screen', { width: 375, height: 812 });
+
+    const profile = readBrowserOracle();
+    // Fingerprint format field index 9 (0-based): mobileIndicator — produced by detectMobile(os)
+    const fingerprintFields = profile.fingerprint.split('|');
+    expect(fingerprintFields[9]).toBe('mobile');
+  });
+
+  it('prioritises iOS over Android when both keywords appear in UA', () => {
+    // detectOS checks iPhone/iPad/iPod before Windows/macOS/Android/Linux.
+    // When a UA contains both 'iPhone' and 'Android', iOS must win because it's checked first.
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148 Android',
+      language: 'en-US',
+      hardwareConcurrency: 4,
+      platform: 'iPhone',
+      onLine: true,
+      maxTouchPoints: 5,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+    expect(osReading?.raw).toBe('iOS');
+  });
+
+  it('classifies hour 16 as afternoon (boundary >=12, <17)', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    vi.setSystemTime(new Date('2024-01-01T16:59:00'));
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'cosmic_mood')?.raw).toBe('afternoon');
+  });
+
+  it('classifies hour 20 as evening (boundary >=17, <21)', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    vi.setSystemTime(new Date('2024-01-01T20:59:00'));
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'cosmic_mood')?.raw).toBe('evening');
+  });
+
+  it('detectMobile returns desktop indicator for non-mobile OS (Windows)', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'Windows',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const fingerprintFields = profile.fingerprint.split('|');
+    expect(fingerprintFields[9]).toBe('desktop');
+  });
+
+  it('tactile_sensibility returns "numb" when maxTouchPoints is zero', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const tactileReading = profile.readings.find(r => r.key === 'tactile_sensibility');
+    expect(tactileReading?.raw).toBe('numb');
+  });
+
+  it('validates complete fingerprint format with all ten pipe-delimited fields', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    vi.stubGlobal('screen', { width: 1920, height: 1080 });
+    const profile = readBrowserOracle();
+    const fields = profile.fingerprint.split('|');
+    expect(fields.length).toBe(10);
+    // Field index mapping (0-based):
+    //   [0] ua          [1] lang        [2] screenRes       [3] platform
+    //   [4] timezone    [5] networkSpeed  [6] colorScheme     [7] timeOfDay
+    //   [8] devicePixelRatio [9] mobileIndicator
+    expect(fields[0]).toBe('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36');
+    expect(fields[1]).toBe('en-US');
+    expect(fields[2]).toBe('1920x1080');
+    expect(fields[3]).toBe('MacIntel');
+    // timezone depends on mock (UTC from beforeEach)
+    expect(['UTC', 'America/New_York']).toContain(fields[4]);
+    expect(fields[5]).toBe('4g');
+    expect(['light', 'dark']).toContain(fields[6]);
+    expect(['deep_night', 'morning', 'afternoon', 'evening', 'night']).toContain(fields[7]);
+    expect(fields[8]).toMatch(/^\d+\.?\d*$/);
+    expect(fields[9]).toBe('desktop');
+  });
+
+  it('classifies hour 21 as night (boundary >=21)', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    vi.setSystemTime(new Date('2024-01-01T21:00:00'));
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'cosmic_mood')?.raw).toBe('night');
+  });
+
+  it('detects Edge via EdgiOS keyword', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148 EdgiOS/120.0',
+      language: 'en-US',
+      hardwareConcurrency: 4,
+      platform: 'iPhone',
+      onLine: true,
+      maxTouchPoints: 5,
+      connection: { effectiveType: '5g' },
+    });
+    vi.stubGlobal('screen', { width: 375, height: 812 });
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    expect(browserReading?.raw).toBe('Edge');
+    // iOS must be detected too; mobile indicator should reflect this
+    const fingerprintFields = profile.fingerprint.split('|');
+    expect(fingerprintFields[9]).toBe('mobile');
+  });
+
+  it('detects Edge via EdgiOS keyword (non-iPhone UA)', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/91.0.864.70 Mobile Safari/537.36 EdgiOS/120.0',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'Windows NT 10.0; Win64; x64',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    expect(browserReading?.raw).toBe('Edge');
+  });
+
 });
