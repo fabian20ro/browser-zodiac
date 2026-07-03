@@ -1262,4 +1262,30 @@ describe('readBrowserOracle', () => {
     expect(thriftinessReading?.raw).toBe('lavish');
   });
 
+  it('treats non-boolean truthy saveData values (e.g. "true", 1) as lavish because of strict === true check', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g', saveData: "true" },
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'cosmic_thriftiness')?.raw).toBe('lavish');
+
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g', saveData: 1 },
+    });
+    const profile2 = readBrowserOracle();
+    expect(profile2.readings.find(r => r.key === 'cosmic_thriftiness')?.raw).toBe('lavish');
+  });
+
 });
