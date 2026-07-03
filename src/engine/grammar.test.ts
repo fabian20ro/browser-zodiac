@@ -203,6 +203,10 @@ describe('createGrammarEngine', () => {
       expect(() => makeEngine({ word: ['   '] })).toThrow(/Empty rule entry/);
     });
 
+    it('throws on rule entries containing the grammar delimiter #', () => {
+      expect(() => makeEngine({ word: ['hello #world'] })).toThrow(/contains unbalanced '#'/);
+    });
+
     it('throws on invalid symbol name in grammar', () => {
       expect(() => makeEngine({ '123bad': ['hello'] })).toThrow(/Invalid grammar symbol/);
     });
