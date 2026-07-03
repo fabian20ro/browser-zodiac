@@ -556,6 +556,21 @@ describe('readBrowserOracle', () => {
     expect(tactileReading?.raw).toBe('sensitive');
   });
 
+  it('detects tactile_sensibility as numb when maxTouchPoints is zero', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const tactileReading = profile.readings.find(r => r.key === 'tactile_sensibility');
+    expect(tactileReading?.raw).toBe('numb');
+  });
+
   it('handles missing rtt in connection', () => {
     vi.stubGlobal('navigator', {
       userAgent: 'Mozilla/5.0',
