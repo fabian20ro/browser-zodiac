@@ -1247,4 +1247,19 @@ describe('readBrowserOracle', () => {
     expect(thriftinessReading?.raw).toBe('lavish');
   });
 
+  it('detects cosmic_thriftiness as lavish when connection exists but saveData is undefined', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const thriftinessReading = profile.readings.find(r => r.key === 'cosmic_thriftiness');
+    expect(thriftinessReading?.raw).toBe('lavish');
+  });
+
 });
