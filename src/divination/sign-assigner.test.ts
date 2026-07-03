@@ -128,6 +128,17 @@ describe('sign-assigner', () => {
      expect(sign1).not.toBe(sign2);
     });
 
+    it('treats dates as UTC — same calendar day in different timezones yields different signs', () => {
+     // '2024-06-15T00:00:00Z' is 2024-06-15 UTC.
+     // '2024-06-15T00:00:00+03:00' is 2024-06-14 in UTC, so the daily hash uses a different dateStr.
+     const fingerprint = 'utc-test';
+     const utcDate = new Date('2024-06-15T00:00:00Z');
+     const shiftedDate = new Date('2024-06-15T00:00:00+03:00');
+     expect(assignDailySign(fingerprint, utcDate)).not.toBe(
+       assignDailySign(fingerprint, shiftedDate)
+     );
+    });
+
     it('returns different signs for different dates with the same fingerprint', () => {
      const fingerprint = 'daily-test-fingerprint';
      const seenDays: string[] = [];
@@ -151,6 +162,17 @@ describe('sign-assigner', () => {
     it('returns a sign and its corresponding symbol', () => {
       const result = assignSignWithSymbol('test');
       expect(ZODIAC_SYMBOLS[result.sign]).toBe(result.symbol);
+    });
+
+    it('returns valid symbols for every zodiac sign', () => {
+      for (const sign of ZODIAC_SIGNS) {
+        expect(ZODIAC_SYMBOLS[sign]).toBeDefined();
+      }
+    });
+
+    it('does not map two signs to the same symbol', () => {
+      const symbols = new Set(Object.values(ZODIAC_SYMBOLS));
+      expect(symbols.size).toBe(ZODIAC_SIGNS.length);
     });
   });
 

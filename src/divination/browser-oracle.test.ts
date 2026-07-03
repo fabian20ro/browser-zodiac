@@ -556,6 +556,21 @@ describe('readBrowserOracle', () => {
     expect(tactileReading?.raw).toBe('sensitive');
   });
 
+  it('detects tactile_sensibility as numb when maxTouchPoints is zero', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const tactileReading = profile.readings.find(r => r.key === 'tactile_sensibility');
+    expect(tactileReading?.raw).toBe('numb');
+  });
+
   it('handles missing rtt in connection', () => {
     vi.stubGlobal('navigator', {
       userAgent: 'Mozilla/5.0',
@@ -771,7 +786,7 @@ describe('readBrowserOracle', () => {
       matchMedia: vi.fn().mockReturnValue({ matches: false }),
     });
     const profile = readBrowserOracle();
-    expect(profile.readings.length).toBe(21);
+    expect(profile.readings.length).toBe(22);
     const keys = profile.readings.map(r => r.key);
     expect(keys).toEqual(expect.arrayContaining([
       'spirit_browser', 'elemental_os', 'life_resolution', 'soul_window',
@@ -779,7 +794,7 @@ describe('readBrowserOracle', () => {
       'vibration_intensity', 'network_speed', 'cosmic_latency', 'cosmic_resonance',
       'cosmic_luck', 'cosmic_platform', 'social_connectivity', 'cosmic_timezone',
       'cosmic_noise', 'cosmic_focus', 'tactile_sensibility', 'pixel_density',
-      'cosmic_timezone_offset',
+      'cosmic_timezone_offset', 'cosmic_thriftiness',
     ]));
   });
 
@@ -1182,6 +1197,109 @@ describe('readBrowserOracle', () => {
     const profile = readBrowserOracle();
     const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
     expect(browserReading?.raw).toBe('Edge');
+  });
+
+  it('detects cosmic_thriftiness as thrifty when saveData is true', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) Mobile Safari/604.1',
+      language: 'en-US',
+      hardwareConcurrency: 4,
+      platform: 'iPhone',
+      onLine: true,
+      maxTouchPoints: 5,
+      connection: { effectiveType: '4g', saveData: true },
+    });
+    vi.stubGlobal('window', { innerWidth: 375, innerHeight: 812, devicePixelRatio: 3, matchMedia: undefined });
+    vi.stubGlobal('screen', { width: 375, height: 812 });
+
+    const profile = readBrowserOracle();
+    const thriftinessReading = profile.readings.find(r => r.key === 'cosmic_thriftiness');
+    expect(thriftinessReading?.raw).toBe('thrifty');
+  });
+
+  it('detects cosmic_thriftiness as lavish when saveData is false', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g', saveData: false },
+    });
+    const profile = readBrowserOracle();
+    const thriftinessReading = profile.readings.find(r => r.key === 'cosmic_thriftiness');
+    expect(thriftinessReading?.raw).toBe('lavish');
+  });
+
+  it('detects cosmic_thriftiness as lavish when connection is missing', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: undefined,
+    });
+    const profile = readBrowserOracle();
+    const thriftinessReading = profile.readings.find(r => r.key === 'cosmic_thriftiness');
+    expect(thriftinessReading?.raw).toBe('lavish');
+  });
+
+  it('detects cosmic_thriftiness as lavish when connection exists but saveData is undefined', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const thriftinessReading = profile.readings.find(r => r.key === 'cosmic_thriftiness');
+    expect(thriftinessReading?.raw).toBe('lavish');
+  });
+
+  it('treats non-boolean truthy saveData values (e.g. "true", 1) as lavish because of strict === true check', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g', saveData: "true" },
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'cosmic_thriftiness')?.raw).toBe('lavish');
+
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g', saveData: 1 },
+    });
+    const profile2 = readBrowserOracle();
+    expect(profile2.readings.find(r => r.key === 'cosmic_thriftiness')?.raw).toBe('lavish');
+  });
+
+  it('detects thrifty when saveData is true (strict equality)', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g', saveData: true },
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'cosmic_thriftiness')?.raw).toBe('thrifty');
   });
 
 });

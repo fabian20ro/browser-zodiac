@@ -17,6 +17,12 @@ function validateGrammar(grammar: Grammar): void {
         if (typeof entry !== 'string' || !entry.trim()) {
           throw new Error(`Empty rule entry in symbol '${symbol}' at index ${i}`);
         }
+        if (entry.includes('#')) {
+          const hashCount = (entry.match(/#/g) || []).length;
+          if (hashCount % 2 !== 0) {
+            throw new Error(`Rule entry in symbol '${symbol}' at index ${i} contains unbalanced '#': must not include the grammar delimiter`);
+          }
+        }
       }
     }
   }

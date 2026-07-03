@@ -58,6 +58,7 @@ export function readBrowserOracle(): DivinationProfile {
   const networkSpeed = navConn?.effectiveType || 'unknown';
   const devicePixelRatio = window?.devicePixelRatio || 1;
   const timezoneOffsetMinutes = navigator ? new Date().getTimezoneOffset() : null;
+  const thriftiness = (navigator as any)?.connection?.saveData === true ? 'thrifty' : 'lavish';
 
   const readings: DivinationReading[] = [
     {
@@ -164,6 +165,11 @@ export function readBrowserOracle(): DivinationProfile {
       key: 'cosmic_timezone_offset',
       raw: timezoneOffsetMinutes !== null ? String(timezoneOffsetMinutes) : 'unknown',
       interpretation: readingInterpretations['cosmic_timezone_offset'](timezoneOffsetMinutes !== null ? String(timezoneOffsetMinutes) : 'unknown'),
+    },
+    {
+      key: 'cosmic_thriftiness',
+      raw: thriftiness,
+      interpretation: readingInterpretations['cosmic_thriftiness'](thriftiness),
     },
   ];
 
