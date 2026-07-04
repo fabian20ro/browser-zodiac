@@ -1434,4 +1434,34 @@ describe('readBrowserOracle', () => {
     }
   });
 
+  it('detects cosmic_thriftiness as "thrifty" when saveData is true', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g', saveData: true },
+    });
+    const profile = readBrowserOracle();
+    const thriftReading = profile.readings.find(r => r.key === 'cosmic_thriftiness');
+    expect(thriftReading?.raw).toBe('thrifty');
+  });
+
+  it('detects cosmic_thriftiness as "lavish" when saveData is false', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g', saveData: false },
+    });
+    const profile = readBrowserOracle();
+    const thriftReading = profile.readings.find(r => r.key === 'cosmic_thriftiness');
+    expect(thriftReading?.raw).toBe('lavish');
+  });
+
 });
