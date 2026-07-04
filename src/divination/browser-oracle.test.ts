@@ -1531,6 +1531,67 @@ describe('readBrowserOracle', () => {
     const thriftReading = profile.readings.find(r => r.key === 'cosmic_thriftiness');
     expect(thriftReading?.raw).toBe('lavish');
   });
+
+  it('detects Edge on iOS via EdgiOS UA keyword', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148 EdgiOS/91.0',
+      language: 'en-US',
+      hardwareConcurrency: 4,
+      platform: 'iPhone',
+      onLine: true,
+      maxTouchPoints: 5,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+    expect(browserReading?.raw).toBe('Edge');
+    expect(osReading?.raw).toBe('iOS');
+    // iOS should be classified as mobile in the fingerprint
+    expect(profile.fingerprint).toContain('|mobile');
+  });
+
+  it('classifies hour 21 exactly as "night" (boundary >=21)', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    vi.setSystemTime(new Date('2024-01-01T21:00:00'));
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'cosmic_mood')?.raw).toBe('night');
+  });
+
+  it('verifies all reading keys are present in the output', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const expectedKeys = [
+      'spirit_browser', 'elemental_os', 'life_resolution', 'soul_window',
+      'cultural_destiny', 'soul_alignment', 'cosmic_mood', 'parallel_lives',
+      'vibration_intensity', 'network_speed', 'cosmic_latency', 'cosmic_resonance',
+      'cosmic_luck', 'cosmic_platform', 'social_connectivity', 'cosmic_timezone',
+      'cosmic_noise', 'cosmic_focus', 'tactile_sensibility', 'pixel_density',
+      'cosmic_timezone_offset', 'cosmic_thriftiness',
+    ];
+    for (const key of expectedKeys) {
+      const reading = profile.readings.find(r => r.key === key);
+      expect(reading).toBeDefined();
+      expect(typeof reading?.raw).toBe('string');
+      expect(reading?.interpretation).toBeTruthy();
+    }
+  });
 });
 
 describe('detectMobile', () => {
