@@ -204,5 +204,21 @@ describe('sign-assigner', () => {
         expect(ZODIAC_SIGNS).toContain(sign);
       }
     });
+
+    it('preserves positional correspondence with individual results', () => {
+      const fingerprints = ['alice', 'bob', 'carol'];
+      const batchResult = assignSigns(fingerprints);
+      for (let i = 0; i < fingerprints.length; i++) {
+        expect(batchResult[i]).toBe(assignSign(fingerprints[i]));
+      }
+    });
+
+    it('maps each fingerprint in a long list to its individual equivalent', () => {
+      const fingerprints = Array.from({ length: 20 }, (_, i) => `user-${i}`);
+      const batchResult = assignSigns(fingerprints);
+      for (let i = 0; i < fingerprints.length; i++) {
+        expect(batchResult[i]).toBe(assignSign(fingerprints[i]));
+      }
+    });
   });
 });
