@@ -495,6 +495,58 @@ describe('readBrowserOracle', () => {
     expect(focusReading?.raw).toBe('8');
   });
 
+  it('falls back to unknown when navigator.connection is absent', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'network_speed')?.raw).toBe('unknown');
+    expect(profile.readings.find(r => r.key === 'cosmic_latency')?.raw).toBe('unknown');
+  });
+
+  it('falls back to unknown when navigator.deviceMemory is absent', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'cosmic_focus')?.raw).toBe('unknown');
+  });
+
+  it('returns devicePixelRatio of 1 when absent from window', () => {
+    vi.stubGlobal('window', {
+      innerWidth: 1920,
+      innerHeight: 1080,
+      matchMedia: vi.fn().mockReturnValue({ matches: false }),
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'pixel_density')?.raw).toBe('1');
+  });
+
+  it('uses saveData to set cosmic_thriftiness', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g', saveData: true },
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'cosmic_thriftiness')?.raw).toBe('thrifty');
+  });
+
   it('handles detection of dark mode and evening time', () => {
     vi.stubGlobal('window', {
       innerWidth: 1920,
