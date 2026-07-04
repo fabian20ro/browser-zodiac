@@ -1298,6 +1298,27 @@ describe('readBrowserOracle', () => {
     expect(thriftinessReading?.raw).toBe('lavish');
   });
 
+  it('detectOS ignores navigator.platform — only user agent matters', () => {
+    // detectOS reads the UA string, NOT navigator.platform.
+    // Even if platform says "MacIntel", a UA with no OS keyword returns Unknown.
+    vi.stubGlobal('navigator', {
+      userAgent: 'PrivacyBrowser/1.0',
+      language: 'en-US',
+      hardwareConcurrency: 4,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+    expect(osReading?.raw).toBe('Unknown');
+
+    // Browser should also be Unknown — no keywords match.
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    expect(browserReading?.raw).toBe('Unknown');
+  });
+
   it('detects cosmic_thriftiness as lavish when connection is missing', () => {
     vi.stubGlobal('navigator', {
       userAgent: 'Mozilla/5.0',
