@@ -1592,6 +1592,51 @@ describe('readBrowserOracle', () => {
       expect(reading?.interpretation).toBeTruthy();
     }
   });
+
+  it('detects thrifty mode when saveData is true', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g', saveData: true },
+    });
+    const profile = readBrowserOracle();
+    const thriftReading = profile.readings.find(r => r.key === 'cosmic_thriftiness');
+    expect(thriftReading?.raw).toBe('thrifty');
+  });
+
+  it('defaults to lavish when saveData is absent or false', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const thriftReading = profile.readings.find(r => r.key === 'cosmic_thriftiness');
+    expect(thriftReading?.raw).toBe('lavish');
+  });
+
+  it('defaults to lavish when saveData is explicitly false', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g', saveData: false },
+    });
+    const profile = readBrowserOracle();
+    const thriftReading = profile.readings.find(r => r.key === 'cosmic_thriftiness');
+    expect(thriftReading?.raw).toBe('lavish');
+  });
 });
 
 describe('detectMobile', () => {
