@@ -41,6 +41,8 @@ function getTimeOfDay(hour: number): string {
   return 'night';
 }
 
+export { detectMobile };
+
 export function readBrowserOracle(): DivinationProfile {
   const ua = navigator?.userAgent || '';
   const browser = detectBrowser(ua);

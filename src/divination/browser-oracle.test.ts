@@ -1479,5 +1479,41 @@ describe('readBrowserOracle', () => {
     const thriftReading = profile.readings.find(r => r.key === 'cosmic_thriftiness');
     expect(thriftReading?.raw).toBe('lavish');
   });
+});
 
+describe('detectMobile', () => {
+  it('returns true for iOS', async () => {
+    const { detectMobile } = await import('./browser-oracle.ts');
+    expect(detectMobile('iOS')).toBe(true);
+  });
+
+  it('returns true for Android', async () => {
+    const { detectMobile } = await import('./browser-oracle.ts');
+    expect(detectMobile('Android')).toBe(true);
+  });
+
+  it('returns false for Windows', async () => {
+    const { detectMobile } = await import('./browser-oracle.ts');
+    expect(detectMobile('Windows')).toBe(false);
+  });
+
+  it('returns false for macOS', async () => {
+    const { detectMobile } = await import('./browser-oracle.ts');
+    expect(detectMobile('macOS')).toBe(false);
+  });
+
+  it('returns false for Linux', async () => {
+    const { detectMobile } = await import('./browser-oracle.ts');
+    expect(detectMobile('Linux')).toBe(false);
+  });
+
+  it('returns false for Unknown', async () => {
+    const { detectMobile } = await import('./browser-oracle.ts');
+    expect(detectMobile('Unknown')).toBe(false);
+  });
+
+  it('returns false for empty string', async () => {
+    const { detectMobile } = await import('./browser-oracle.ts');
+    expect(detectMobile('')).toBe(false);
+  });
 });
