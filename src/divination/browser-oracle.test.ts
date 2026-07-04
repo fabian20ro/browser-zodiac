@@ -282,6 +282,21 @@ describe('readBrowserOracle', () => {
     expect(browserReading?.raw).toBe('Safari');
   });
 
+  it('identifies Chrome on iOS via CriOS keyword', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148 CriOS/91.0.4441.82 Mobile Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'iPhone',
+      onLine: true,
+      maxTouchPoints: 5,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    expect(browserReading?.raw).toBe('Chrome');
+  });
+
   it('detects Brave browser', () => {
     vi.stubGlobal('navigator', {
       userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36 Brave/1.28',
