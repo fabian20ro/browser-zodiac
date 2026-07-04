@@ -511,6 +511,22 @@ describe('readBrowserOracle', () => {
     expect(moodReading?.raw).toBe('evening');
   });
 
+  it('detects iPad as iOS mobile device', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1',
+      language: 'en-US',
+      hardwareConcurrency: 4,
+      platform: 'iPad',
+      onLine: true,
+      maxTouchPoints: 5,
+      connection: { effectiveType: 'wifi' },
+    });
+    const profile = readBrowserOracle();
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+    expect(osReading?.raw).toBe('iOS');
+    expect(profile.fingerprint).toContain('|mobile');
+  });
+
   it('classifies hour 5 as deep_night (boundary <6)', () => {
     vi.stubGlobal('navigator', {
       userAgent: 'Mozilla/5.0',
