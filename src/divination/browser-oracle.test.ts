@@ -1389,6 +1389,31 @@ describe('readBrowserOracle', () => {
     expect(profile.readings.find(r => r.key === 'cosmic_thriftiness')?.raw).toBe('thrifty');
   });
 
+  it('detects network_speed for various connection types', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'network_speed')?.raw).toBe('4g');
+
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+    });
+    const profile2 = readBrowserOracle();
+    expect(profile2.readings.find(r => r.key === 'network_speed')?.raw).toBe('unknown');
+  });
+
   it('all readings have non-empty interpretations and valid raw values', () => {
     vi.stubGlobal('navigator', {
       userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
