@@ -203,6 +203,11 @@ describe('createGrammarEngine', () => {
       expect(() => makeEngine({ word: ['   '] })).toThrow(/Empty rule entry/);
     });
 
+    it('returns [?symbol] for an existing but empty rule array', () => {
+      const engine = makeEngine({ word: [] });
+      expect(engine.expand('#word#')).toBe('[?word]');
+    });
+
     it('throws on rule entries containing the grammar delimiter #', () => {
       expect(() => makeEngine({ word: ['hello #world'] })).toThrow(/contains unbalanced '#'/);
     });
