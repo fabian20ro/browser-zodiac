@@ -1672,6 +1672,38 @@ describe('readBrowserOracle', () => {
 });
 
 describe('detectMobile', () => {
+  it('captures non-English language in cultural_destiny raw value (ro-RO)', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'ro-RO',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const culturalReading = profile.readings.find(r => r.key === 'cultural_destiny');
+    expect(culturalReading?.raw).toBe('ro-RO');
+    expect(typeof culturalReading?.interpretation).toBe('string');
+    expect((culturalReading?.interpretation as string).length).toBeGreaterThan(0);
+  });
+
+  it('trims leading/trailing whitespace from navigator.language for cultural_destiny', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: '  en-US  ',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const culturalReading = profile.readings.find(r => r.key === 'cultural_destiny');
+    expect(culturalReading?.raw).toBe('en-US');
+  });
+
   it('returns true for iOS', async () => {
     const { detectMobile } = await import('./browser-oracle.ts');
     expect(detectMobile('iOS')).toBe(true);
