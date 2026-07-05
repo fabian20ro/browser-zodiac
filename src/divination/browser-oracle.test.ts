@@ -1044,6 +1044,28 @@ describe('readBrowserOracle', () => {
     expect(ssrOffsetReading?.raw).toBe('unknown');
   });
 
+  it('propagates cosmic_timezone_offset into fingerprint structure', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+    });
+    vi.stubGlobal('window', { innerWidth: 1920, innerHeight: 1080, devicePixelRatio: 1, matchMedia: vi.fn().mockReturnValue({ matches: false }) });
+    const profile = readBrowserOracle();
+    const offsetReading = profile.readings.find(r => r.key === 'cosmic_timezone_offset');
+    expect(offsetReading).toBeDefined();
+    // Fingerprint format: ${ua}|${lang}|${screenRes}|${platform}|${timezone}|${networkSpeed}|...
+    // Position 4 is the timezone name (e.g. "UTC"), distinct from cosmic_timezone_offset minutes value.
+    const fingerprintParts = profile.fingerprint.split('|');
+    expect(fingerprintParts[3]).toBe('MacIntel');        // position 3: platform
+    expect(fingerprintParts[5]).toBe('unknown');          // position 5: networkSpeed (no connection mock)
+    expect(typeof offsetReading?.raw).toBe('string');     // minutes-east-of-UTC as string
+    expect(offsetReading?.raw).not.toBe('unknown');       // navigator present → computed, not fallback
+  });
+
   it('every reading has an interpreted string and no undefined raw values (regression guard)', () => {
     const profile = readBrowserOracle();
     for (const reading of profile.readings) {
