@@ -155,6 +155,36 @@ describe('readBrowserOracle', () => {
     expect(connectivityReading?.raw).toBe('hermit');
   });
 
+  it('returns cosmic_resonance as discordant when offline', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: false,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const resonanceReading = profile.readings.find(r => r.key === 'cosmic_resonance');
+    expect(resonanceReading?.raw).toBe('discordant');
+  });
+
+  it('returns cosmic_luck as ominous when offline', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: false,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const luckReading = profile.readings.find(r => r.key === 'cosmic_luck');
+    expect(luckReading?.raw).toBe('ominous');
+  });
+
   it('includes cosmic_focus in readings', () => {
     const profile = readBrowserOracle();
     const focusReading = profile.readings.find(r => r.key === 'cosmic_focus');
