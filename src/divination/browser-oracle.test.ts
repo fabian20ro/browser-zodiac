@@ -539,6 +539,34 @@ describe('readBrowserOracle', () => {
     expect(profile.readings.find(r => r.key === 'cosmic_latency')?.raw).toBe('unknown');
   });
 
+  it.each(['3g', '4g', 'wifi'] as const)('propagates effectiveType "%s" into network_speed raw value', (type) => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: type },
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'network_speed')?.raw).toBe(type);
+  });
+
+  it('treats slow-2g as a valid network speed', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: 'slow-2g' },
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'network_speed')?.raw).toBe('slow-2g');
+  });
+
   it('falls back to unknown when navigator.deviceMemory is absent', () => {
     vi.stubGlobal('navigator', {
       userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
