@@ -139,6 +139,12 @@ describe('sign-assigner', () => {
      );
     });
 
+    it('throws when given an InvalidDate (e.g., new Date(NaN))', () => {
+     const fingerprint = 'invalid-date-test';
+     const invalidDate = new Date(NaN);
+     expect(() => assignDailySign(fingerprint, invalidDate)).toThrow();
+    });
+
     it('returns different signs for different dates with the same fingerprint', () => {
      const fingerprint = 'daily-test-fingerprint';
      const seenDays: string[] = [];
