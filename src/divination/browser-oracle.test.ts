@@ -721,6 +721,38 @@ describe('readBrowserOracle', () => {
     expect(vibrationIntensityReading?.raw).toBe('unknowable');
   });
 
+  it('emits actual core count as string when hardwareConcurrency > 0', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 16,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: {
+        effectiveType: '4g',
+      },
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'parallel_lives')?.raw).toBe('16');
+    expect(profile.readings.find(r => r.key === 'vibration_intensity')?.raw).toBe('16');
+  });
+
+  it('emits core count string "1" when hardwareConcurrency is exactly one', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 1,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'parallel_lives')?.raw).toBe('1');
+    expect(profile.readings.find(r => r.key === 'vibration_intensity')?.raw).toBe('1');
+  });
+
   it('calculates cosmic_noise from user agent length', () => {
     vi.stubGlobal('navigator', {
       userAgent: '12345',
