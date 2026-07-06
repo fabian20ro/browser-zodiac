@@ -6,6 +6,8 @@ function detectBrowser(ua: string): string {
   if (ua.includes('Firefox') || ua.includes('FxiOS')) return 'Firefox';
   if (ua.includes('Edg') || ua.includes('EdgiOS')) return 'Edge';
   if (ua.includes('OPR') || ua.includes('Opera') || ua.includes('OPiOS')) return 'Opera';
+  if (ua.includes('Brave')) return 'Brave';
+  if (ua.includes('Vivaldi')) return 'Vivaldi';
   if (ua.includes('Chrome') || ua.includes('CriOS')) return 'Chrome';
   if (ua.includes('Safari')) return 'Safari';
   return 'Unknown';
@@ -38,6 +40,8 @@ function getTimeOfDay(hour: number): string {
   if (hour < 21) return 'evening';
   return 'night';
 }
+
+export { detectMobile };
 
 export function readBrowserOracle(): DivinationProfile {
   const ua = navigator?.userAgent || '';

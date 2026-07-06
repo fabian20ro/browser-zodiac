@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { assignSign, assignDailySign, assignSignWithSymbol, assignSigns } from './sign-assigner.ts';
+import { assignSign, assignDailySign, assignSignWithSymbol, assignSigns, assignRandomSign } from './sign-assigner.ts';
 import { ZODIAC_SIGNS, ZODIAC_SYMBOLS } from '../horoscope/zodiac.ts';
 
 describe('sign-assigner', () => {
@@ -139,6 +139,12 @@ describe('sign-assigner', () => {
      );
     });
 
+    it('throws when given an InvalidDate (e.g., new Date(NaN))', () => {
+     const fingerprint = 'invalid-date-test';
+     const invalidDate = new Date(NaN);
+     expect(() => assignDailySign(fingerprint, invalidDate)).toThrow();
+    });
+
     it('returns different signs for different dates with the same fingerprint', () => {
      const fingerprint = 'daily-test-fingerprint';
      const seenDays: string[] = [];
@@ -203,6 +209,57 @@ describe('sign-assigner', () => {
       for (const sign of signs) {
         expect(ZODIAC_SIGNS).toContain(sign);
       }
+    });
+
+    it('preserves positional correspondence with individual results', () => {
+      const fingerprints = ['alice', 'bob', 'carol'];
+      const batchResult = assignSigns(fingerprints);
+      for (let i = 0; i < fingerprints.length; i++) {
+        expect(batchResult[i]).toBe(assignSign(fingerprints[i]));
+      }
+    });
+
+    it('maps each fingerprint in a long list to its individual equivalent', () => {
+      const fingerprints = Array.from({ length: 20 }, (_, i) => `user-${i}`);
+      const batchResult = assignSigns(fingerprints);
+      for (let i = 0; i < fingerprints.length; i++) {
+        expect(batchResult[i]).toBe(assignSign(fingerprints[i]));
+      }
+    });
+  });
+
+  describe('assignRandomSign', () => {
+    it('returns a valid zodiac sign', () => {
+      const sign = assignRandomSign();
+      expect(ZODIAC_SIGNS).toContain(sign);
+    });
+
+    it('produces different results across many calls (not constant)', () => {
+      const seen = new Set<string>();
+      for (let i = 0; i < 100; i++) {
+        seen.add(assignRandomSign());
+      }
+      expect(seen.size).toBeGreaterThan(2);
+    });
+
+    it('distributes roughly uniformly across all signs', () => {
+      const counts: Record<string, number> = {};
+      ZODIAC_SIGNS.forEach(s => counts[s] = 0);
+
+      for (let i = 0; i < 1200; i++) {
+        const sign = assignRandomSign();
+        counts[sign]++;
+      }
+
+      for (const sign of ZODIAC_SIGNS) {
+        expect(counts[sign]).toBeGreaterThan(40);
+        expect(counts[sign]).toBeLessThan(160);
+      }
+    });
+
+    it('does not require a fingerprint', () => {
+      const sign = assignRandomSign();
+      expect(ZODIAC_SIGNS).toContain(sign);
     });
   });
 });

@@ -48,6 +48,26 @@ describe('hashString', () => {
     const hash = hashString('');
     expect(hash).toBe(5381); // djb2 initial value, no iterations
   });
+
+  it('is sensitive to character order (abc ≠ cba)', () => {
+    expect(hashString('abc')).not.toBe(hashString('cba'));
+  });
+
+  it('distributes across the full range for diverse inputs', () => {
+    const hashes = new Set<string>();
+    for (let i = 0; i < 500; i++) {
+      hashes.add(String(hashString(`input-${i}`)));
+    }
+    // With 2^32 space and 500 inputs, near-collision-free is essentially guaranteed
+    expect(hashes.size).toBe(500);
+  });
+
+  it('handles long strings without overflow surprises', () => {
+    const long = 'a'.repeat(10000);
+    const hash = hashString(long);
+    expect(Number.isInteger(hash)).toBe(true);
+    expect(hash >>> 0).toBe(hash); // round-trip confirms unsigned 32-bit
+  });
 });
 
 describe('dailySeed', () => {

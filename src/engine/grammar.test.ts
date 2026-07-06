@@ -179,6 +179,22 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.trim-end#')).toBe('  hello');
     });
 
+    it('applies trim-all modifier', () => {
+      const engine = makeEngine({ word: ['  he llo  '] });
+      expect(engine.expand('#word.trim-all#')).toBe('hello');
+      expect(engine.expand('#word.trim-all.uppercase#')).toBe('HELLO');
+    });
+
+    it('applies glitch modifier standalone', () => {
+      const engine = makeEngine({ word: ['submarine'] });
+      expect(engine.expand('#word.glitch#')).toBe('s§bm§r§n§');
+    });
+
+    it('applies echo modifier standalone', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(engine.expand('#word.echo#')).toBe('hello hello');
+    });
+
     it('handles mixed quotes with unquote modifier', () => {
       const engine = makeEngine({ word: ['"hello\''] }, 42);
       expect(engine.expand('#word.unquote#')).toBe('hello');
@@ -201,6 +217,11 @@ describe('createGrammarEngine', () => {
     it('throws on empty rule entry in grammar', () => {
       expect(() => makeEngine({ word: ['', 'valid'] })).toThrow(/Empty rule entry/);
       expect(() => makeEngine({ word: ['   '] })).toThrow(/Empty rule entry/);
+    });
+
+    it('returns [?symbol] for an existing but empty rule array', () => {
+      const engine = makeEngine({ word: [] });
+      expect(engine.expand('#word#')).toBe('[?word]');
     });
 
     it('throws on rule entries containing the grammar delimiter #', () => {

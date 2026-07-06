@@ -1,4 +1,4 @@
-import { hashString } from '../engine/random';
+import { hashString, mulberry32 } from '../engine/random';
 import { ZODIAC_SIGNS, ZODIAC_SYMBOLS, type ZodiacSign } from '../horoscope/zodiac';
 
 export function assignSign(fingerprint: string): ZodiacSign {
@@ -32,4 +32,14 @@ export function assignSignWithSymbol(fingerprint: string): { sign: ZodiacSign; s
  */
 export function assignSigns(fingerprints: string[]): ZodiacSign[] {
   return fingerprints.map(assignSign);
+}
+
+/**
+ * Assigns a random zodiac sign using the seeded PRNG.
+ * Each invocation produces a fresh unpredictable result, but within a single call it is deterministic
+ * (same code path → same Mulberry32 state). Useful for "random reading" features and testing.
+ */
+export function assignRandomSign(): ZodiacSign {
+  const rng = mulberry32(Math.floor(Math.random() * 0x80000000));
+  return ZODIAC_SIGNS[rng() * ZODIAC_SIGNS.length | 0];
 }

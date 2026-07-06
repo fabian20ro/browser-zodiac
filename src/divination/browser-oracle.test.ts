@@ -155,6 +155,36 @@ describe('readBrowserOracle', () => {
     expect(connectivityReading?.raw).toBe('hermit');
   });
 
+  it('returns cosmic_resonance as discordant when offline', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: false,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const resonanceReading = profile.readings.find(r => r.key === 'cosmic_resonance');
+    expect(resonanceReading?.raw).toBe('discordant');
+  });
+
+  it('returns cosmic_luck as ominous when offline', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: false,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const luckReading = profile.readings.find(r => r.key === 'cosmic_luck');
+    expect(luckReading?.raw).toBe('ominous');
+  });
+
   it('includes cosmic_focus in readings', () => {
     const profile = readBrowserOracle();
     const focusReading = profile.readings.find(r => r.key === 'cosmic_focus');
@@ -280,6 +310,51 @@ describe('readBrowserOracle', () => {
     const profile = readBrowserOracle();
     const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
     expect(browserReading?.raw).toBe('Safari');
+  });
+
+  it('identifies Chrome on iOS via CriOS keyword', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148 CriOS/91.0.4441.82 Mobile Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'iPhone',
+      onLine: true,
+      maxTouchPoints: 5,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    expect(browserReading?.raw).toBe('Chrome');
+  });
+
+  it('detects Brave browser', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36 Brave/1.28',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    expect(browserReading?.raw).toBe('Brave');
+  });
+
+  it('detects Vivaldi browser', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Vivaldi/3.6',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'Windows',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    expect(browserReading?.raw).toBe('Vivaldi');
   });
 
   it('detects pixel density correctly', () => {
@@ -434,6 +509,34 @@ describe('readBrowserOracle', () => {
     expect(osReading?.raw).toBe('Unknown');
   });
 
+  it('maps tactile_sensibility to "numb" when maxTouchPoints is zero', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'tactile_sensibility')?.raw).toBe('numb');
+  });
+
+  it('maps tactile_sensibility to "sensitive" when maxTouchPoints is non-zero', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 Chrome Mobile Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'Android',
+      onLine: true,
+      maxTouchPoints: 5,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'tactile_sensibility')?.raw).toBe('sensitive');
+  });
+
   it('detects device memory correctly', () => {
     vi.stubGlobal('navigator', {
       userAgent: 'Mozilla/5.0',
@@ -450,6 +553,86 @@ describe('readBrowserOracle', () => {
     expect(focusReading?.raw).toBe('8');
   });
 
+  it('falls back to unknown when navigator.connection is absent', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'network_speed')?.raw).toBe('unknown');
+    expect(profile.readings.find(r => r.key === 'cosmic_latency')?.raw).toBe('unknown');
+  });
+
+  it.each(['3g', '4g', 'wifi'] as const)('propagates effectiveType "%s" into network_speed raw value', (type) => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: type },
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'network_speed')?.raw).toBe(type);
+  });
+
+  it('treats slow-2g as a valid network speed', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: 'slow-2g' },
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'network_speed')?.raw).toBe('slow-2g');
+  });
+
+  it('falls back to unknown when navigator.deviceMemory is absent', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'cosmic_focus')?.raw).toBe('unknown');
+  });
+
+  it('returns devicePixelRatio of 1 when absent from window', () => {
+    vi.stubGlobal('window', {
+      innerWidth: 1920,
+      innerHeight: 1080,
+      matchMedia: vi.fn().mockReturnValue({ matches: false }),
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'pixel_density')?.raw).toBe('1');
+  });
+
+  it('uses saveData to set cosmic_thriftiness', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g', saveData: true },
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'cosmic_thriftiness')?.raw).toBe('thrifty');
+  });
+
   it('handles detection of dark mode and evening time', () => {
     vi.stubGlobal('window', {
       innerWidth: 1920,
@@ -464,6 +647,22 @@ describe('readBrowserOracle', () => {
     const moodReading = profile.readings.find(r => r.key === 'cosmic_mood');
     expect(alignmentReading?.raw).toBe('dark');
     expect(moodReading?.raw).toBe('evening');
+  });
+
+  it('detects iPad as iOS mobile device', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1',
+      language: 'en-US',
+      hardwareConcurrency: 4,
+      platform: 'iPad',
+      onLine: true,
+      maxTouchPoints: 5,
+      connection: { effectiveType: 'wifi' },
+    });
+    const profile = readBrowserOracle();
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+    expect(osReading?.raw).toBe('iOS');
+    expect(profile.fingerprint).toContain('|mobile');
   });
 
   it('classifies hour 5 as deep_night (boundary <6)', () => {
@@ -608,6 +807,38 @@ describe('readBrowserOracle', () => {
     expect(vibrationIntensityReading?.raw).toBe('unknowable');
   });
 
+  it('emits actual core count as string when hardwareConcurrency > 0', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 16,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: {
+        effectiveType: '4g',
+      },
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'parallel_lives')?.raw).toBe('16');
+    expect(profile.readings.find(r => r.key === 'vibration_intensity')?.raw).toBe('16');
+  });
+
+  it('emits core count string "1" when hardwareConcurrency is exactly one', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 1,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'parallel_lives')?.raw).toBe('1');
+    expect(profile.readings.find(r => r.key === 'vibration_intensity')?.raw).toBe('1');
+  });
+
   it('calculates cosmic_noise from user agent length', () => {
     vi.stubGlobal('navigator', {
       userAgent: '12345',
@@ -661,6 +892,27 @@ describe('readBrowserOracle', () => {
     for (const reading of profile.readings) {
       expect(typeof reading.raw).toBe('string');
     }
+
+    // When navigator is undefined, onLine defaults to false via `?? false`,
+    // so disconnected-fallback interpretations must apply:
+    const resonanceReading = profile.readings.find(r => r.key === 'cosmic_resonance');
+    expect(resonanceReading?.raw).toBe('discordant');
+
+    const connectivityReading = profile.readings.find(r => r.key === 'social_connectivity');
+    expect(connectivityReading?.raw).toBe('hermit');
+
+    const luckReading = profile.readings.find(r => r.key === 'cosmic_luck');
+    expect(luckReading?.raw).toBe('ominous');
+
+    // Browser and OS should both fall back to Unknown on empty UA string.
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    expect(browserReading?.raw).toBe('Unknown');
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+    expect(osReading?.raw).toBe('Unknown');
+
+    // Zero cores means parallel/vibration readings fall back to "unknowable".
+    const parallelReading = profile.readings.find(r => r.key === 'parallel_lives');
+    expect(parallelReading?.raw).toBe('unknowable');
   });
 
   it('prioritises Edge over Chrome when both keywords appear in UA', () => {
@@ -818,6 +1070,28 @@ describe('readBrowserOracle', () => {
     const ssrProfile = readBrowserOracle();
     const ssrOffsetReading = ssrProfile.readings.find(r => r.key === 'cosmic_timezone_offset');
     expect(ssrOffsetReading?.raw).toBe('unknown');
+  });
+
+  it('propagates cosmic_timezone_offset into fingerprint structure', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+    });
+    vi.stubGlobal('window', { innerWidth: 1920, innerHeight: 1080, devicePixelRatio: 1, matchMedia: vi.fn().mockReturnValue({ matches: false }) });
+    const profile = readBrowserOracle();
+    const offsetReading = profile.readings.find(r => r.key === 'cosmic_timezone_offset');
+    expect(offsetReading).toBeDefined();
+    // Fingerprint format: ${ua}|${lang}|${screenRes}|${platform}|${timezone}|${networkSpeed}|...
+    // Position 4 is the timezone name (e.g. "UTC"), distinct from cosmic_timezone_offset minutes value.
+    const fingerprintParts = profile.fingerprint.split('|');
+    expect(fingerprintParts[3]).toBe('MacIntel');        // position 3: platform
+    expect(fingerprintParts[5]).toBe('unknown');          // position 5: networkSpeed (no connection mock)
+    expect(typeof offsetReading?.raw).toBe('string');     // minutes-east-of-UTC as string
+    expect(offsetReading?.raw).not.toBe('unknown');       // navigator present → computed, not fallback
   });
 
   it('every reading has an interpreted string and no undefined raw values (regression guard)', () => {
@@ -1232,6 +1506,27 @@ describe('readBrowserOracle', () => {
     expect(thriftinessReading?.raw).toBe('lavish');
   });
 
+  it('detectOS ignores navigator.platform — only user agent matters', () => {
+    // detectOS reads the UA string, NOT navigator.platform.
+    // Even if platform says "MacIntel", a UA with no OS keyword returns Unknown.
+    vi.stubGlobal('navigator', {
+      userAgent: 'PrivacyBrowser/1.0',
+      language: 'en-US',
+      hardwareConcurrency: 4,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+    expect(osReading?.raw).toBe('Unknown');
+
+    // Browser should also be Unknown — no keywords match.
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    expect(browserReading?.raw).toBe('Unknown');
+  });
+
   it('detects cosmic_thriftiness as lavish when connection is missing', () => {
     vi.stubGlobal('navigator', {
       userAgent: 'Mozilla/5.0',
@@ -1302,4 +1597,262 @@ describe('readBrowserOracle', () => {
     expect(profile.readings.find(r => r.key === 'cosmic_thriftiness')?.raw).toBe('thrifty');
   });
 
+  it('detects network_speed for various connection types', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'network_speed')?.raw).toBe('4g');
+
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+    });
+    const profile2 = readBrowserOracle();
+    expect(profile2.readings.find(r => r.key === 'network_speed')?.raw).toBe('unknown');
+  });
+
+  it('all readings have non-empty interpretations and valid raw values', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+
+    const profile = readBrowserOracle();
+
+    for (const reading of profile.readings) {
+      expect(reading.interpretation).toBeTruthy();
+      expect(typeof reading.raw).not.toBe(undefined);
+      expect(typeof reading.key).toBe('string');
+    }
+  });
+
+  it('detects cosmic_thriftiness as "thrifty" when saveData is true', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g', saveData: true },
+    });
+    const profile = readBrowserOracle();
+    const thriftReading = profile.readings.find(r => r.key === 'cosmic_thriftiness');
+    expect(thriftReading?.raw).toBe('thrifty');
+  });
+
+  it('detects cosmic_thriftiness as "lavish" when saveData is false', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g', saveData: false },
+    });
+    const profile = readBrowserOracle();
+    const thriftReading = profile.readings.find(r => r.key === 'cosmic_thriftiness');
+    expect(thriftReading?.raw).toBe('lavish');
+  });
+
+  it('detects Edge on iOS via EdgiOS UA keyword', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148 EdgiOS/91.0',
+      language: 'en-US',
+      hardwareConcurrency: 4,
+      platform: 'iPhone',
+      onLine: true,
+      maxTouchPoints: 5,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+    expect(browserReading?.raw).toBe('Edge');
+    expect(osReading?.raw).toBe('iOS');
+    // iOS should be classified as mobile in the fingerprint
+    expect(profile.fingerprint).toContain('|mobile');
+  });
+
+  it('classifies hour 21 exactly as "night" (boundary >=21)', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    vi.setSystemTime(new Date('2024-01-01T21:00:00'));
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'cosmic_mood')?.raw).toBe('night');
+  });
+
+  it('verifies all reading keys are present in the output', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const expectedKeys = [
+      'spirit_browser', 'elemental_os', 'life_resolution', 'soul_window',
+      'cultural_destiny', 'soul_alignment', 'cosmic_mood', 'parallel_lives',
+      'vibration_intensity', 'network_speed', 'cosmic_latency', 'cosmic_resonance',
+      'cosmic_luck', 'cosmic_platform', 'social_connectivity', 'cosmic_timezone',
+      'cosmic_noise', 'cosmic_focus', 'tactile_sensibility', 'pixel_density',
+      'cosmic_timezone_offset', 'cosmic_thriftiness',
+    ];
+    for (const key of expectedKeys) {
+      const reading = profile.readings.find(r => r.key === key);
+      expect(reading).toBeDefined();
+      expect(typeof reading?.raw).toBe('string');
+      expect(reading?.interpretation).toBeTruthy();
+    }
+  });
+
+  it('detects thrifty mode when saveData is true', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g', saveData: true },
+    });
+    const profile = readBrowserOracle();
+    const thriftReading = profile.readings.find(r => r.key === 'cosmic_thriftiness');
+    expect(thriftReading?.raw).toBe('thrifty');
+  });
+
+  it('defaults to lavish when saveData is absent or false', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const thriftReading = profile.readings.find(r => r.key === 'cosmic_thriftiness');
+    expect(thriftReading?.raw).toBe('lavish');
+  });
+
+  it('defaults to lavish when saveData is explicitly false', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g', saveData: false },
+    });
+    const profile = readBrowserOracle();
+    const thriftReading = profile.readings.find(r => r.key === 'cosmic_thriftiness');
+    expect(thriftReading?.raw).toBe('lavish');
+  });
+});
+
+describe('detectMobile', () => {
+  it('captures non-English language in cultural_destiny raw value (ro-RO)', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'ro-RO',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const culturalReading = profile.readings.find(r => r.key === 'cultural_destiny');
+    expect(culturalReading?.raw).toBe('ro-RO');
+    expect(typeof culturalReading?.interpretation).toBe('string');
+    expect((culturalReading?.interpretation as string).length).toBeGreaterThan(0);
+  });
+
+  it('trims leading/trailing whitespace from navigator.language for cultural_destiny', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: '  en-US  ',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const culturalReading = profile.readings.find(r => r.key === 'cultural_destiny');
+    expect(culturalReading?.raw).toBe('en-US');
+  });
+
+  it('returns true for iOS', async () => {
+    const { detectMobile } = await import('./browser-oracle.ts');
+    expect(detectMobile('iOS')).toBe(true);
+  });
+
+  it('returns true for Android', async () => {
+    const { detectMobile } = await import('./browser-oracle.ts');
+    expect(detectMobile('Android')).toBe(true);
+  });
+
+  it('returns false for Windows', async () => {
+    const { detectMobile } = await import('./browser-oracle.ts');
+    expect(detectMobile('Windows')).toBe(false);
+  });
+
+  it('returns false for macOS', async () => {
+    const { detectMobile } = await import('./browser-oracle.ts');
+    expect(detectMobile('macOS')).toBe(false);
+  });
+
+  it('returns false for Linux', async () => {
+    const { detectMobile } = await import('./browser-oracle.ts');
+    expect(detectMobile('Linux')).toBe(false);
+  });
+
+  it('returns false for Unknown', async () => {
+    const { detectMobile } = await import('./browser-oracle.ts');
+    expect(detectMobile('Unknown')).toBe(false);
+  });
+
+  it('returns false for empty string', async () => {
+    const { detectMobile } = await import('./browser-oracle.ts');
+    expect(detectMobile('')).toBe(false);
+  });
+
+  it('every reading key has a defined interpretation that returns non-empty string', () => {
+    const profile = readBrowserOracle();
+    for (const reading of profile.readings) {
+      expect(reading.interpretation).toBeDefined();
+      expect(typeof reading.interpretation).toBe('string');
+      expect(reading.interpretation.length).toBeGreaterThan(0);
+    }
+  });
 });
