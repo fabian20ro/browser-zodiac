@@ -1812,6 +1812,35 @@ describe('detectMobile', () => {
     expect(culturalReading?.raw).toBe('en-US');
   });
 
+  it('handles missing navigator.language for cultural_destiny (undefined)', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const culturalReading = profile.readings.find(r => r.key === 'cultural_destiny');
+    expect(culturalReading?.raw).toBe('');
+  });
+
+  it('handles empty navigator.language for cultural_destiny', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: '',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const culturalReading = profile.readings.find(r => r.key === 'cultural_destiny');
+    expect(culturalReading?.raw).toBe('');
+  });
+
   it('returns true for iOS', async () => {
     const { detectMobile } = await import('./browser-oracle.ts');
     expect(detectMobile('iOS')).toBe(true);
@@ -1854,5 +1883,24 @@ describe('detectMobile', () => {
       expect(typeof reading.interpretation).toBe('string');
       expect(reading.interpretation.length).toBeGreaterThan(0);
     }
+  });
+
+  it('detects Safari on macOS with a UA that contains no Chrome token', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Safari/605.1.15',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: 'wifi' },
+    });
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+
+    expect(browserReading?.raw).toBe('Safari');
+    expect(osReading?.raw).toBe('macOS');
+    expect(profile.fingerprint).toContain('|desktop');
   });
 });

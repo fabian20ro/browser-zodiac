@@ -139,6 +139,17 @@ describe('sign-assigner', () => {
      );
     });
 
+    it('treats equivalent UTC instants as the same day — different ISO offsets with same moment yield identical signs', () => {
+     // Both dates below encode 2024-06-15T05:00:00Z in absolute time.
+     // Different local representations must collapse to the same dateStr via toISOString().split('T')[0].
+     const fingerprint = 'equiv-instant-test';
+     const a = new Date('2024-06-15T08:00:00+03:00'); // UTC 05:00
+     const b = new Date('2024-06-14T23:00:00-06:00'); // UTC 05:00
+     expect(assignDailySign(fingerprint, a)).toBe(
+       assignDailySign(fingerprint, b)
+     );
+    });
+
     it('throws when given an InvalidDate (e.g., new Date(NaN))', () => {
      const fingerprint = 'invalid-date-test';
      const invalidDate = new Date(NaN);
@@ -167,6 +178,7 @@ describe('sign-assigner', () => {
   describe('assignSignWithSymbol', () => {
     it('returns a sign and its corresponding symbol', () => {
       const result = assignSignWithSymbol('test');
+      expect(ZODIAC_SIGNS).toContain(result.sign);
       expect(ZODIAC_SYMBOLS[result.sign]).toBe(result.symbol);
     });
 
