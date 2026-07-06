@@ -10,9 +10,17 @@ export function assignSign(fingerprint: string): ZodiacSign {
 
 /**
  * Assigns a sign based on fingerprint and a specific date to allow for time-varying results.
+ * Uses the local calendar day (not UTC), so two Date objects representing the same local
+ * date in different timezones produce the same result.
  */
 export function assignDailySign(fingerprint: string, date: Date): ZodiacSign {
-  const dateStr = date.toISOString().split('T')[0];
+  if (!Number.isFinite(date.getTime())) {
+    throw new TypeError('assignDailySign requires a valid Date');
+  }
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  const dateStr = `${y}-${m}-${d}`;
   const normalized = `${fingerprint}:${dateStr}`.toLowerCase();
   const hash = hashString(normalized);
   const index = hash % ZODIAC_SIGNS.length;
