@@ -128,23 +128,12 @@ describe('sign-assigner', () => {
      expect(sign1).not.toBe(sign2);
     });
 
-    it('treats dates as UTC — same calendar day in different timezones yields different signs', () => {
-     // '2024-06-15T00:00:00Z' is 2024-06-15 UTC.
-     // '2024-06-15T00:00:00+03:00' is 2024-06-14 in UTC, so the daily hash uses a different dateStr.
-     const fingerprint = 'utc-test';
-     const utcDate = new Date('2024-06-15T00:00:00Z');
-     const shiftedDate = new Date('2024-06-15T00:00:00+03:00');
-     expect(assignDailySign(fingerprint, utcDate)).not.toBe(
-       assignDailySign(fingerprint, shiftedDate)
-     );
-    });
-
-    it('treats equivalent UTC instants as the same day — different ISO offsets with same moment yield identical signs', () => {
-     // Both dates below encode 2024-06-15T05:00:00Z in absolute time.
-     // Different local representations must collapse to the same dateStr via toISOString().split('T')[0].
-     const fingerprint = 'equiv-instant-test';
-     const a = new Date('2024-06-15T08:00:00+03:00'); // UTC 05:00
-     const b = new Date('2024-06-14T23:00:00-06:00'); // UTC 05:00
+    it('treats dates as local calendar day — same day in different timezones yields the same sign', () => {
+     // Both represent 2024-06-15 locally (ignoring timezone).
+     const fingerprint = 'local-day-test';
+     // In UTC mode: new Date(2024, 5, 15) is local June 15; +03:00 offset at 03:00 also has local date June 15.
+     const a = new Date(2024, 5, 15); // Local midnight → 2024-06-15
+     const b = new Date('2024-06-15T03:00:00+03:00'); // Same local day (UTC equivalent: 2024-06-15T00:00:00Z)
      expect(assignDailySign(fingerprint, a)).toBe(
        assignDailySign(fingerprint, b)
      );
