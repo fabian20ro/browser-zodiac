@@ -1846,4 +1846,13 @@ describe('detectMobile', () => {
     const { detectMobile } = await import('./browser-oracle.ts');
     expect(detectMobile('')).toBe(false);
   });
+
+  it('every reading key has a defined interpretation that returns non-empty string', () => {
+    const profile = readBrowserOracle();
+    for (const reading of profile.readings) {
+      expect(reading.interpretation).toBeDefined();
+      expect(typeof reading.interpretation).toBe('string');
+      expect(reading.interpretation.length).toBeGreaterThan(0);
+    }
+  });
 });
