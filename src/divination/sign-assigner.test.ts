@@ -178,6 +178,7 @@ describe('sign-assigner', () => {
   describe('assignSignWithSymbol', () => {
     it('returns a sign and its corresponding symbol', () => {
       const result = assignSignWithSymbol('test');
+      expect(ZODIAC_SIGNS).toContain(result.sign);
       expect(ZODIAC_SYMBOLS[result.sign]).toBe(result.symbol);
     });
 
