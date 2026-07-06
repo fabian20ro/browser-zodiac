@@ -145,6 +145,18 @@ describe('sign-assigner', () => {
      expect(() => assignDailySign(fingerprint, invalidDate)).toThrow();
     });
 
+    it('accepts out-of-range calendar dates by normalizing to the real local date (e.g., Feb 29 in non-leap year → March 1)', () => {
+     const fingerprint = 'overflow-date-test';
+     // In a non-leap year, JS Date constructor auto-normalizes month overflow:
+     // new Date(2023, 1, 29) rolls forward to 2023-03-01 in local time.
+     const normalizedDate = new Date(2023, 1, 29);
+     expect(normalizedDate.getFullYear()).toBe(2023);
+     // Month is zero-indexed: 2 === March (index 2)
+     expect(normalizedDate.getMonth()).toBe(2);
+     const sign = assignDailySign(fingerprint, normalizedDate);
+     expect(ZODIAC_SIGNS).toContain(sign);
+    });
+
     it('returns different signs for different dates with the same fingerprint', () => {
      const fingerprint = 'daily-test-fingerprint';
      const seenDays: string[] = [];
