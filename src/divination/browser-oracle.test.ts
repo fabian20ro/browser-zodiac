@@ -1884,4 +1884,23 @@ describe('detectMobile', () => {
       expect(reading.interpretation.length).toBeGreaterThan(0);
     }
   });
+
+  it('detects Safari on macOS with a UA that contains no Chrome token', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Safari/605.1.15',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: 'wifi' },
+    });
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+
+    expect(browserReading?.raw).toBe('Safari');
+    expect(osReading?.raw).toBe('macOS');
+    expect(profile.fingerprint).toContain('|desktop');
+  });
 });
