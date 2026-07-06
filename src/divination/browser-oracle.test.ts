@@ -509,6 +509,34 @@ describe('readBrowserOracle', () => {
     expect(osReading?.raw).toBe('Unknown');
   });
 
+  it('maps tactile_sensibility to "numb" when maxTouchPoints is zero', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'tactile_sensibility')?.raw).toBe('numb');
+  });
+
+  it('maps tactile_sensibility to "sensitive" when maxTouchPoints is non-zero', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 Chrome Mobile Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'Android',
+      onLine: true,
+      maxTouchPoints: 5,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'tactile_sensibility')?.raw).toBe('sensitive');
+  });
+
   it('detects device memory correctly', () => {
     vi.stubGlobal('navigator', {
       userAgent: 'Mozilla/5.0',
