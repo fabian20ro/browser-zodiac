@@ -86,4 +86,21 @@ describe('scheduleMidnightGmt', () => {
     expect(consoleSpy).toHaveBeenCalledWith("Error in scheduler callback:", expect.any(Error));
     consoleSpy.mockRestore();
   });
+
+  it('reschedules after a callback throws', async () => {
+    let callCount = 0;
+    const throwingCallback = () => {
+      if (++callCount === 1) throw new Error('First run fails');
+    };
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+    scheduleMidnightGmt(throwingCallback);
+
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(callCount).toBe(1);
+
+    // Advance to the next midnight — scheduler must have recovered
+    vi.setSystemTime(new Date('2026-01-02T23:59:59.000Z'));
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(callCount).toBe(2);
+  });
 });
