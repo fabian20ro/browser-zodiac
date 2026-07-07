@@ -492,6 +492,96 @@ describe('readBrowserOracle', () => {
     expect(osReading?.raw).toBe('Linux');
   });
 
+  describe('detectBrowser ambiguous UAs', () => {
+    function makeChromeSafariUA(browserMarker: string) {
+      return `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/${browserMarker} Safari/537.36`;
+    }
+
+    it('returns Chrome over Safari when both keywords present', () => {
+      vi.stubGlobal('navigator', {
+        userAgent: makeChromeSafariUA('91'),
+        language: 'en-US',
+        hardwareConcurrency: 8,
+        platform: 'MacIntel',
+        onLine: true,
+        maxTouchPoints: 0,
+        connection: { effectiveType: '4g' },
+      });
+      const profile = readBrowserOracle();
+      expect(profile.readings.find(r => r.key === 'spirit_browser')?.raw).toBe('Chrome');
+    });
+
+    it('returns Edge over Chrome when Edg and Chrome keywords both present', () => {
+      vi.stubGlobal('navigator', {
+        userAgent: makeChromeSafariUA('Edg/91.0.864'),
+        language: 'en-US',
+        hardwareConcurrency: 8,
+        platform: 'Windows NT 10.0; Win64; x64',
+        onLine: true,
+        maxTouchPoints: 0,
+        connection: { effectiveType: '4g' },
+      });
+      const profile = readBrowserOracle();
+      expect(profile.readings.find(r => r.key === 'spirit_browser')?.raw).toBe('Edge');
+    });
+
+    it('returns Firefox over Safari when FxiOS and Safari keywords both present', () => {
+      vi.stubGlobal('navigator', {
+        userAgent: `Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/94.0 Mobile/15E148`,
+        language: 'en-US',
+        hardwareConcurrency: 4,
+        platform: 'iPhone',
+        onLine: true,
+        maxTouchPoints: 5,
+        connection: { effectiveType: '4g' },
+      });
+      const profile = readBrowserOracle();
+      expect(profile.readings.find(r => r.key === 'spirit_browser')?.raw).toBe('Firefox');
+    });
+
+    it('returns Vivaldi over CriOS when both keywords present', () => {
+      vi.stubGlobal('navigator', {
+        userAgent: `Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148 CriOS/91 Vivaldi/3.6`,
+        language: 'en-US',
+        hardwareConcurrency: 4,
+        platform: 'iPhone',
+        onLine: true,
+        maxTouchPoints: 5,
+        connection: { effectiveType: '4g' },
+      });
+      const profile = readBrowserOracle();
+      expect(profile.readings.find(r => r.key === 'spirit_browser')?.raw).toBe('Vivaldi');
+    });
+
+    it('returns Brave over Chrome when both keywords present', () => {
+      vi.stubGlobal('navigator', {
+        userAgent: makeChromeSafariUA('Brave/1.28'),
+        language: 'en-US',
+        hardwareConcurrency: 8,
+        platform: 'MacIntel',
+        onLine: true,
+        maxTouchPoints: 0,
+        connection: { effectiveType: '4g' },
+      });
+      const profile = readBrowserOracle();
+      expect(profile.readings.find(r => r.key === 'spirit_browser')?.raw).toBe('Brave');
+    });
+
+    it('returns Opera over Chrome when OPR and Chrome keywords both present', () => {
+      vi.stubGlobal('navigator', {
+        userAgent: `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91 OPR/55.0`,
+        language: 'en-US',
+        hardwareConcurrency: 8,
+        platform: 'Windows NT 10.0; Win64; x64',
+        onLine: true,
+        maxTouchPoints: 0,
+        connection: { effectiveType: '4g' },
+      });
+      const profile = readBrowserOracle();
+      expect(profile.readings.find(r => r.key === 'spirit_browser')?.raw).toBe('Opera');
+    });
+  });
+
   it('handles empty user agent', () => {
     vi.stubGlobal('navigator', {
       userAgent: '',
