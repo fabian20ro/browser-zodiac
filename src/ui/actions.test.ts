@@ -263,4 +263,19 @@ describe('createActionButton', () => {
     expect(btn.textContent).toBe('⧉');
     vi.useRealTimers();
   });
+
+  it('does not add feedback class when error icon is shown', async () => {
+    const btn = createActionButton({
+      icon: '⧉',
+      errorIcon: '✕',
+      ariaLabel: 'Copy',
+      onClick: () => Promise.reject(new Error('boom')),
+    });
+
+    btn.click();
+    await Promise.resolve();
+
+    expect(btn.textContent).toBe('✕');
+    expect(btn.classList.contains('action-btn--feedback')).toBe(false);
+  });
 });
