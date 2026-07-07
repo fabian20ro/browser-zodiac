@@ -33,7 +33,7 @@ function getColorScheme(): 'dark' | 'light' {
   return 'light';
 }
 
-function getTimeOfDay(hour: number): string {
+export function getTimeOfDay(hour: number): string {
   if (hour < 6) return 'deep_night';
   if (hour < 12) return 'morning';
   if (hour < 17) return 'afternoon';

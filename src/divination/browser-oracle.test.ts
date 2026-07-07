@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { readBrowserOracle, detectMobile } from './browser-oracle.ts';
+import { readBrowserOracle, detectMobile, getTimeOfDay } from './browser-oracle.ts';
 
 describe('detectMobile', () => {
   const mobileOSes = ['iOS', 'Android'];
@@ -2096,5 +2096,39 @@ describe('detectMobile', () => {
     const profile = readBrowserOracle();
     expect(profile.fingerprint).toContain('|5g|');
     expect(profile.fingerprint).toContain('|light|morning|3|desktop');
+  });
+
+  describe('getTimeOfDay boundary transitions', () => {
+    it('returns deep_night at hours 0-5', () => {
+      for (let h = 0; h < 6; h++) {
+        expect(getTimeOfDay(h)).toBe('deep_night');
+      }
+    });
+
+    it('returns morning at hour 6 and returns afternoon at hour 12', () => {
+      expect(getTimeOfDay(5)).toBe('deep_night');
+      expect(getTimeOfDay(6)).toBe('morning');
+      expect(getTimeOfDay(11)).toBe('morning');
+    });
+
+    it('returns afternoon at hours 12-16 and evening at hour 17', () => {
+      expect(getTimeOfDay(12)).toBe('afternoon');
+      expect(getTimeOfDay(16)).toBe('afternoon');
+      expect(getTimeOfDay(17)).toBe('evening');
+    });
+
+    it('returns evening at hours 17-20 and night at hour 21', () => {
+      expect(getTimeOfDay(20)).toBe('evening');
+      expect(getTimeOfDay(21)).toBe('night');
+      expect(getTimeOfDay(23)).toBe('night');
+    });
+
+    it('handles negative hours gracefully (returns deep_night)', () => {
+      expect(getTimeOfDay(-1)).toBe('deep_night');
+    });
+
+    it('handles hour 0 explicitly', () => {
+      expect(getTimeOfDay(0)).toBe('deep_night');
+    });
   });
 });
