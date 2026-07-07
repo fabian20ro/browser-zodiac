@@ -83,6 +83,28 @@ dragon`;
   });
 });
 
+describe('parseGrammarText', () => {
+  describe('edge cases', () => {
+    it('drops orphan lines before any section header', () => {
+      const content = `orphan line one
+another orphan
+
+=== creature ===
+unicorn`;
+      const result = parseGrammarText(content);
+      expect(result.sections.creature).toEqual(['unicorn']);
+      expect(Object.keys(result.sections).length).toBe(1);
+    });
+
+    it('handles an empty file gracefully', () => {
+      const content = '';
+      const result = parseGrammarText(content);
+      expect(result.sections).toEqual({});
+      expect(result.imports).toEqual([]);
+    });
+  });
+});
+
 describe('loadGrammar', () => {
   function mockFetch(files: Record<string, string>): FetchFn {
     return vi.fn((url: string) => {
