@@ -87,8 +87,8 @@ describe('createGrammarEngine', () => {
 
     it('allows adding custom modifiers', () => {
       const engine = makeEngine({ word: ['hello'] });
-      engine.addModifier('shrug', (s) => `${s} ¯\\_(ツ)_/¯`);
-      expect(engine.expand('#word.shrug#')).toBe('hello ¯\\_(ツ)_/¯');
+      engine.addModifier('shrug', (s) => `${s} ¯\\\\_(ツ)_/¯`);
+      expect(engine.expand('#word.shrug#')).toBe('hello ¯\\\\_(ツ)_/¯');
     });
 
     it('applies bang modifier', () => {
@@ -241,5 +241,33 @@ describe('createGrammarEngine', () => {
       const engine = makeEngine({ word: ['hello'] });
       expect(() => engine.expand('#123abc#')).toThrow(/empty or malformed/);
     });
+
+    // NEW TESTS - uncovered edge cases
+    it('throws on modifier containing special characters (@)', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(() => engine.expand('#word.hello@world#')).toThrow(/malformed name 'hello@world'/);
+    });
+
+    it('throws on modifier starting with a number', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(() => engine.expand('#word.123bad#')).toThrow(/malformed name '123bad'/);
+    });
+
+    it('does not throw when grammar symbol value is non-array (null)', () => {
+      const engine = makeEngine({ word: null as any });
+      expect(() => engine.expand('#word#')).not.toThrow();
+    });
+
+    it('does not throw when grammar symbol value is non-array (string)', () => {
+      const engine = makeEngine({ word: 'hello' as any });
+      expect(() => engine.expand('#word#')).not.toThrow();
+    });
+
+    it('validates valid symbol names with underscores and hyphens', () => {
+      const engine = makeEngine({ _leading_underscore: ['ok'], 'hyphen-ated': ['ok'] });
+      expect(engine.expand('#_leading_underscore#')).toBe('ok');
+      expect(engine.expand('#hyphen-ated#')).toBe('ok');
+    });
+
   });
 });
