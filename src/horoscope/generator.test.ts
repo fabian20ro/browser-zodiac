@@ -117,4 +117,23 @@ describe('generateHoroscope', () => {
     const h = generateHoroscope('aries', locale, minimalDivination, fixedDate);
     expect(h.text).toBe('Your browser is Chrome');
   });
+
+  it('divination readings overwrite colliding locale grammar symbols', () => {
+    const locale: LocalePack = {
+      ...minimalLocale,
+      grammar: {
+        ...minimalLocale.grammar,
+        warning: ['ignore danger'],
+      },
+    };
+    const divinationWithCollision: DivinationProfile = {
+      ...minimalDivination,
+      readings: [
+        { key: 'warning', raw: 'SHE PULLS THE KNIFE FIRST', interpretation: '' },
+      ],
+      fingerprint: 'collision-fp',
+    };
+    const h = generateHoroscope('aries', locale, divinationWithCollision, fixedDate);
+    expect(h.warning).toBe('SHE PULLS THE KNIFE FIRST');
+  });
 });
