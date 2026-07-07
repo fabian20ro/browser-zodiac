@@ -833,6 +833,51 @@ describe('readBrowserOracle', () => {
     expect(moodReading?.raw).toBe('night');
   });
 
+  it('classifies hour 16 as afternoon (boundary >=17)', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    vi.setSystemTime(new Date('2024-01-01T16:00:00'));
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'cosmic_mood')?.raw).toBe('afternoon');
+  });
+
+  it('classifies hour 21 as night (boundary >=21)', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    vi.setSystemTime(new Date('2024-01-01T21:00:00'));
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'cosmic_mood')?.raw).toBe('night');
+  });
+
+  it('classifies hour 20 as evening (boundary <21)', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    vi.setSystemTime(new Date('2024-01-01T20:00:00'));
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'cosmic_mood')?.raw).toBe('evening');
+  });
+
   it('detects iPad as iOS via detectOS', () => {
     vi.stubGlobal('navigator', {
       userAgent: 'Mozilla/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1',
