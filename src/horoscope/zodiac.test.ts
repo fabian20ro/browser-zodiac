@@ -19,6 +19,14 @@ describe('ZODIAC_SYMBOLS', () => {
       expect(ZODIAC_SYMBOLS[sign].length).toBeGreaterThan(0);
     }
   });
+
+  it('has no extra symbols beyond the 12 signs', () => {
+    const symbolKeys = new Set(Object.keys(ZODIAC_SYMBOLS));
+    for (const sign of ZODIAC_SIGNS) {
+      expect(symbolKeys.has(sign)).toBe(true);
+    }
+    expect(symbolKeys.size).toBe(12);
+  });
 });
 
 describe('randomSign', () => {
