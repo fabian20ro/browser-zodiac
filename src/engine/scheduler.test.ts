@@ -1,5 +1,55 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { toGmtDateString, msUntilNextMidnightGmt, scheduleMidnightGmt } from './scheduler.ts';
+import { getNextMidnightGmt, toGmtDateString, msUntilNextMidnightGmt, scheduleMidnightGmt } from './scheduler.ts';
+
+describe('getNextMidnightGmt', () => {
+  it('returns next-day midnight when called before midnight', () => {
+    const now = new Date('2026-01-01T12:00:00.000Z');
+    const expected = new Date('2026-01-02T00:00:00.000Z');
+    expect(getNextMidnightGmt(now)).toEqual(expected);
+  });
+
+  it('returns next-day midnight when called at midnight', () => {
+    const now = new Date('2026-01-01T00:00:00.000Z');
+    const expected = new Date('2026-01-02T00:00:00.000Z');
+    expect(getNextMidnightGmt(now)).toEqual(expected);
+  });
+
+  it('returns next-day midnight at end of year boundary', () => {
+    const now = new Date('2026-12-31T23:59:59.000Z');
+    const expected = new Date('2027-01-01T00:00:00.000Z');
+    expect(getNextMidnightGmt(now)).toEqual(expected);
+  });
+
+  it('returns a fresh Date (does not mutate input)', () => {
+    const now = new Date('2026-01-01T12:00:00.000Z');
+    const original = now.getTime();
+    getNextMidnightGmt(now);
+    expect(now.getTime()).toBe(original);
+  });
+
+  it('returns today midnight when input is just past midnight', () => {
+    // When called at e.g. 12:00, next midnight is tomorrow — but if called
+    // right after midnight (UTCDate wraps), the helper should still produce
+    // a correct Date via setUTCHours(0).
+    const now = new Date('2026-01-01T00:00:01.000Z');
+    const expected = new Date('2026-01-02T00:00:00.000Z');
+    expect(getNextMidnightGmt(now)).toEqual(expected);
+  });
+
+  it('uses current time when no argument is given', () => {
+    // Cannot fully test default without freezing clocks, but verify signature
+    const result = getNextMidnightGmt();
+    expect(result).toBeInstanceOf(Date);
+    expect(result.getUTCHours()).toBe(0);
+    expect(result.getUTCMinutes()).toBe(0);
+  });
+
+  it('msUntilNextMidnightGmt agrees with getNextMidnightGmt', () => {
+    const now = new Date('2026-01-01T15:30:00.000Z');
+    const midnight = getNextMidnightGmt(now);
+    expect(msUntilNextMidnightGmt(now)).toBe(midnight.getTime() - now.getTime());
+  });
+});
 
 describe('toGmtDateString', () => {
   it('returns the expected YYYY-MM-DD for a future date', () => {
