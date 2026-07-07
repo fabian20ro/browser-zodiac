@@ -1,6 +1,23 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { readBrowserOracle, detectMobile } from './browser-oracle.ts';
 
+describe('detectMobile', () => {
+  const mobileOSes = ['iOS', 'Android'];
+  const desktopOSes = ['Windows', 'macOS', 'Linux', 'Unknown'];
+
+  for (const os of mobileOSes) {
+    it(`returns true when OS is ${os}`, () => {
+      expect(detectMobile(os)).toBe(true);
+    });
+  }
+
+  for (const os of desktopOSes) {
+    it(`returns false when OS is ${os}`, () => {
+      expect(detectMobile(os)).toBe(false);
+    });
+  }
+});
+
 describe('readBrowserOracle', () => {
   const originalNavigator = global.navigator;
   const originalWindow = global.window;
