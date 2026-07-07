@@ -54,4 +54,27 @@ describe('scheduleMidnightGmt resilience', () => {
     expect(count).toBe(1);
     cancel1();
   });
+
+  it('should suppress the first callback when rescheduled before its first iteration completes', () => {
+    // Scenario: schedule fires, then immediately re-schedules while
+    // isLoopRunning=false and wasStartedDuringLoop=true. The source uses
+    // wasStartedDuringLoop to skip execution on the very first tick of a
+    // brand-new loop that replaced an existing one — this test ensures
+    // the replacement takes effect correctly: exactly 1 invocation total.
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+
+    const firstCancel = scheduleMidnightGmt(callback);
+
+    // Re-schedule immediately before the first callback fires.
+    // The second call cancels the first's pending timeout, gets a new loopId,
+    // and marks wasStartedDuringLoop=false (isLoopRunning is still false).
+    const secondCancel = scheduleMidnightGmt(callback);
+
+    vi.advanceTimersByTime(1000);
+
+    // Only the second schedule should have executed.
+    expect(count).toBe(1);
+
+    secondCancel();
+  });
 });

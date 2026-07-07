@@ -5,6 +5,14 @@ export function msUntilNextMidnightGmt(now: Date): number {
   return midnight.getTime() - now.getTime();
 }
 
+/** Returns the next GMT midnight as a new Date object. */
+export function getNextMidnightGmt(now: Date = new Date()): Date {
+  const midnight = new Date(now.getTime());
+  midnight.setUTCDate(midnight.getUTCDate() + 1);
+  midnight.setUTCHours(0, 0, 0, 0);
+  return midnight;
+}
+
 /** Returns the UTC date string "YYYY-MM-DD" for the given Date. */
 export function toGmtDateString(date: Date): string {
   return date.toISOString().slice(0, 10);
