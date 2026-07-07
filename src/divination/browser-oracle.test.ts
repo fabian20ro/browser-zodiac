@@ -2075,4 +2075,26 @@ describe('detectMobile', () => {
   it('returns desktop for Linux', () => {
     expect(detectMobile('Linux')).toBe(false);
   });
+
+  it('composes the fingerprint with varying network speed, pixel density and time-of-day', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '5g' },
+    });
+    vi.stubGlobal('window', {
+      innerWidth: 1920,
+      innerHeight: 1080,
+      devicePixelRatio: 3,
+      matchMedia: vi.fn().mockReturnValue({ matches: false }),
+    });
+    vi.setSystemTime(new Date('2024-01-01T10:00:00'));
+    const profile = readBrowserOracle();
+    expect(profile.fingerprint).toContain('|5g|');
+    expect(profile.fingerprint).toContain('|light|morning|3|desktop');
+  });
 });
