@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ZODIAC_SIGNS, ZODIAC_SYMBOLS, randomSign } from './zodiac.ts';
+import { ZODIAC_SIGNS, ZODIAC_SYMBOLS, randomSign, getSignDisplayName } from './zodiac.ts';
 import { mulberry32 } from '../engine/random.ts';
 
 describe('ZODIAC_SIGNS', () => {
@@ -61,5 +61,26 @@ describe('randomSign', () => {
       const result = randomSign('nonexistent' as any);
       expect(ZODIAC_SIGNS).toContain(result);
     }
+  });
+});
+
+describe('getSignDisplayName', () => {
+  it('returns a capitalized name for every sign', () => {
+    for (const sign of ZODIAC_SIGNS) {
+      const display = getSignDisplayName(sign);
+      expect(display).toBe(display[0].toUpperCase() + display.slice(1).toLowerCase());
+    }
+  });
+
+  it('returns consistent names across calls', () => {
+    const ariesDisplay = getSignDisplayName('aries');
+    expect(ariesDisplay).toBe('Aries');
+    expect(getSignDisplayName('leo')).toBe('Leo');
+    expect(getSignDisplayName('pisces')).toBe('Pisces');
+  });
+
+  it('has no duplicate display names', () => {
+    const names = ZODIAC_SIGNS.map((sign) => getSignDisplayName(sign));
+    expect(new Set(names).size).toBe(12);
   });
 });

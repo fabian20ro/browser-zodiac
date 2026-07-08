@@ -49,3 +49,22 @@ export const ZODIAC_SYMBOLS: Record<ZodiacSign, string> = {
   aquarius: '\u2652',
   pisces: '\u2653',
 };
+
+const SIGN_DISPLAY_NAMES: Record<ZodiacSign, string> = {
+  aries: 'Aries',
+  taurus: 'Taurus',
+  gemini: 'Gemini',
+  cancer: 'Cancer',
+  leo: 'Leo',
+  virgo: 'Virgo',
+  libra: 'Libra',
+  scorpio: 'Scorpio',
+  sagittarius: 'Sagittarius',
+  capricorn: 'Capricorn',
+  aquarius: 'Aquarius',
+  pisces: 'Pisces',
+};
+
+export function getSignDisplayName(sign: ZodiacSign): string {
+  return SIGN_DISPLAY_NAMES[sign];
+}
