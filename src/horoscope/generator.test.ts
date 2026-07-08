@@ -137,6 +137,13 @@ describe('generateHoroscope', () => {
     expect(h.text).toBe('Chrome visits the Loyal Dog');
   });
 
+  it('throws on unrecognized zodiac sign key instead of silent undefined injection', () => {
+    const unknownLocale: LocalePack = { ...minimalLocale }; // no signNames for 'bogus'
+    expect(() => generateHoroscope('bogus' as ZodiacSign, unknownLocale, minimalDivination, fixedDate)).toThrow(
+      'Unrecognized zodiac sign key',
+    );
+  });
+
   it('divination readings overwrite colliding locale grammar symbols', () => {
     const locale: LocalePack = {
       ...minimalLocale,
