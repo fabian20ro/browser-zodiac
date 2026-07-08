@@ -179,7 +179,7 @@ unicorn`,
 
     await expect(
       loadGrammar('en', 'http://test/data/', fetch, true),
-    ).rejects.toThrow('Failed to load @from missing.txt: 404');
+    ).rejects.toThrow('Failed to load http://test/data/en/missing.txt: 404');
   });
 
   it('throws when the main grammar file is missing', async () => {
@@ -210,5 +210,22 @@ beta entry`,
     const grammar = await loadGrammar('en', 'http://test/data/', fetch);
     expect(grammar.alpha).toContain('alpha entry');
     expect(grammar.beta).toContain('beta entry');
+  });
+
+  it('recursively resolves @from directives in imported files', async () => {
+    // Per docstring: imported files may contain their own @from directives;
+    // they are loaded and merged into the main grammar.
+    const fetch = mockFetch({
+      'http://test/data/en.txt': `@from pack.txt import *`,
+      'http://test/data/en/pack.txt': `=== creature ===
+unicorn
+@from extras.txt import *`,
+      'http://test/data/en/extras.txt': `=== food ===
+ghost sandwich`,
+    });
+
+    const grammar = await loadGrammar('en', 'http://test/data/', fetch);
+    expect(grammar.creature).toContain('unicorn');
+    expect(grammar.food).toContain('ghost sandwich');
   });
 });
