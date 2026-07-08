@@ -83,6 +83,22 @@ describe('detectLanguage', () => {
 
     expect(detectLanguage()).toBe('en');
   });
+
+  it('treats empty stored language as unset and falls back to browser language', () => {
+    window.localStorage.setItem('horror-scope-lang', '');
+
+    setNavigatorProperty('language', 'ro');
+
+    expect(detectLanguage()).toBe('ro');
+  });
+
+  it('falls back to English when localStorage entry is missing entirely', () => {
+    // beforeEach already removes the key; just verify fallback works.
+    setNavigatorProperty('language', 'de-DE');
+
+    expect(window.localStorage.getItem('horror-scope-lang')).toBeNull();
+    expect(detectLanguage()).toBe('en');
+  });
 });
 
 describe('getAvailableLocales', () => {

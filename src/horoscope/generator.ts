@@ -30,6 +30,9 @@ export function generateHoroscope(
   const rng = mulberry32(seed);
 
   const signName = locale.ui.signNames[sign];
+  if (!signName) {
+    throw new Error(`Unrecognized zodiac sign key: ${String(sign)}`);
+  }
 
   // Merge locale grammar with divination context symbols
   const contextGrammar: Grammar = {

@@ -118,6 +118,32 @@ describe('generateHoroscope', () => {
     expect(h.text).toBe('Your browser is Chrome');
   });
 
+  it('preserves multiple distinct divination readings in merged grammar', () => {
+    const locale: LocalePack = {
+      ...minimalLocale,
+      grammar: {
+        ...minimalLocale.grammar,
+        origin: ['#spirit_browser# visits #numen_fortuna#'],
+      },
+    };
+    const multiReadingDivination: DivinationProfile = {
+      readings: [
+        { key: 'spirit_browser', raw: 'Chrome', interpretation: '' },
+        { key: 'numen_fortuna', raw: 'the Loyal Dog', interpretation: '' },
+      ],
+      fingerprint: 'multi-fp',
+    };
+    const h = generateHoroscope('aries', locale, multiReadingDivination, fixedDate);
+    expect(h.text).toBe('Chrome visits the Loyal Dog');
+  });
+
+  it('throws on unrecognized zodiac sign key instead of silent undefined injection', () => {
+    const unknownLocale: LocalePack = { ...minimalLocale }; // no signNames for 'bogus'
+    expect(() => generateHoroscope('bogus' as ZodiacSign, unknownLocale, minimalDivination, fixedDate)).toThrow(
+      'Unrecognized zodiac sign key',
+    );
+  });
+
   it('divination readings overwrite colliding locale grammar symbols', () => {
     const locale: LocalePack = {
       ...minimalLocale,
