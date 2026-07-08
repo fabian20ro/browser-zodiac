@@ -102,6 +102,36 @@ unicorn`;
       expect(result.sections).toEqual({});
       expect(result.imports).toEqual([]);
     });
+
+    it('treats @from directives inside a section as imports, not entries', () => {
+      const content = `=== food ===
+toast
+@from creatures.txt import *
+dragon`;
+      const result = parseGrammarText(content);
+      expect(result.sections.food).toEqual(['toast', 'dragon']);
+      expect(result.imports).toContain('creatures.txt');
+    });
+
+    it('collects @from directives from multiple sections separately', () => {
+      const content = `@from a.txt import *
+=== food ===
+toast
+=== drink ===
+beer`;
+      const result = parseGrammarText(content);
+      expect(result.sections.food).toEqual(['toast']);
+      expect(result.sections.drink).toEqual(['beer']);
+      expect(result.imports).toEqual(['a.txt']);
+    });
+
+    it('handles a file with only @from directives', () => {
+      const content = `@from x.txt import *
+@from y.txt import *`;
+      const result = parseGrammarText(content);
+      expect(result.sections).toEqual({});
+      expect(result.imports).toEqual(['x.txt', 'y.txt']);
+    });
   });
 });
 
