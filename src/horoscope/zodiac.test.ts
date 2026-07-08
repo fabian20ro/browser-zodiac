@@ -55,4 +55,11 @@ describe('randomSign', () => {
     
     expect(res1).toBe(res2);
   });
+
+  it('returns a valid sign when given an unrecognized input', () => {
+    for (let i = 0; i < 50; i++) {
+      const result = randomSign('nonexistent' as any);
+      expect(ZODIAC_SIGNS).toContain(result);
+    }
+  });
 });
