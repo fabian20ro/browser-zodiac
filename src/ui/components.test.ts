@@ -6,6 +6,8 @@ import {
   createSignCard,
   createTopBar,
   createDivinationPanel,
+  createHeader,
+  createFooter,
 } from './components.ts';
 import type { UIStrings } from '../i18n/types.ts';
 import type { Horoscope } from '../horoscope/generator.ts';
@@ -175,5 +177,69 @@ describe('createDivinationPanel', () => {
     expect(toggle?.getAttribute('aria-controls')).toBe('divination-card__list');
     expect(list?.id).toBe('divination-card__list');
     expect((toggle as HTMLButtonElement).type).toBe('button');
+  });
+});
+
+describe('createHeader', () => {
+  it('returns a header element with the correct CSS class', () => {
+    const header = createHeader(minimalUi);
+    expect(header.tagName).toBe('HEADER');
+    expect(header.className).toBe('header');
+  });
+
+  it('renders title and subtitle from uiStrings', () => {
+    const header = createHeader(minimalUi);
+    const titleEl = header.querySelector('.header__title');
+    const subtitleEl = header.querySelector('.header__subtitle');
+    expect(titleEl?.textContent).toBe('T');
+    expect(subtitleEl?.textContent).toBe('S');
+  });
+
+  it('renders decorative stars', () => {
+    const header = createHeader(minimalUi);
+    const deco = header.querySelector('.header__stars');
+    expect(deco).not.toBeNull();
+    expect(deco!.textContent).toBe('\u2726 \u263D \u2727 \u2726');
+  });
+
+  it('has the expected child order: stars, title, subtitle', () => {
+    const header = createHeader(minimalUi);
+    expect(header.children.length).toBe(3);
+    expect(header.children[0].className).toBe('header__stars');
+    expect(header.children[1].tagName).toBe('H1');
+    expect(header.children[2].tagName).toBe('P');
+  });
+});
+
+describe('createFooter', () => {
+  it('returns a footer element with the correct CSS class', () => {
+    const footer = createFooter(minimalUi);
+    expect(footer.tagName).toBe('FOOTER');
+    expect(footer.className).toBe('footer');
+  });
+
+  it('renders generated-by and disclaimer text from uiStrings', () => {
+    const footer = createFooter(minimalUi);
+    const genEl = footer.querySelector('.footer__generated');
+    const discEl = footer.querySelector('.footer__disclaimer');
+    expect(genEl?.textContent).toBe('\u2727 G \u2727');
+    expect(discEl?.textContent).toBe('F');
+  });
+
+  it('renders a GitHub badge link with correct target attributes', () => {
+    const footer = createFooter(minimalUi);
+    const badgeLink = footer.querySelector('.footer__badge') as HTMLAnchorElement;
+    expect(badgeLink).not.toBeNull();
+    expect(badgeLink!.target).toBe('_blank');
+    expect(badgeLink!.rel).toContain('noopener');
+    expect(badgeLink!.href).toContain('fabian20ro/horror-scope');
+  });
+
+  it('has the expected child order: generated, disclaimer, badge', () => {
+    const footer = createFooter(minimalUi);
+    expect(footer.children.length).toBe(3);
+    expect(footer.children[0].className).toBe('footer__generated');
+    expect(footer.children[1].className).toBe('footer__disclaimer');
+    expect(footer.children[2].className).toBe('footer__badge');
   });
 });

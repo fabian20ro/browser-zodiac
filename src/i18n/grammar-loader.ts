@@ -82,34 +82,40 @@ export async function loadGrammar(
   const content = await response.text();
   const parsed = parseGrammarText(content);
 
-  // Start fetching all imported files in parallel
-  const importPromises = parsed.imports.map(async (importPath) => {
-    const importUrl = `${base}${localeId}/${importPath}`;
-    const res = await fetchFn(importUrl);
-    if (!res.ok) {
-      const errorMsg = `Failed to load @from ${importPath}: ${res.status}`;
-      if (strict) {
-        throw new Error(errorMsg);
-      }
-      console.warn(errorMsg);
-      return null;
-    }
-    const text = await res.text();
-    return parseGrammarText(text);
-  });
-  const importResults = await Promise.all(importPromises);
-
-  // Build the grammar: start with the main file's sections
+  // Initialize grammar from main file sections
   const grammar: Grammar = {};
   for (const [symbol, entries] of Object.entries(parsed.sections)) {
     if (!grammar[symbol]) grammar[symbol] = [];
     grammar[symbol].push(...entries);
   }
 
-  // Merge sections from all imported files
-  for (const result of importResults) {
-    if (!result) continue;
-    for (const [symbol, entries] of Object.entries(result.sections)) {
+  // Collect all imports recursively with deduplication to avoid cycles
+  const visitedUrls = new Set<string>();
+  const importQueue = [...parsed.imports.map((imp) => `${base}${localeId}/${imp}`)];
+
+  while (importQueue.length > 0) {
+    const url = importQueue.shift()!;
+    if (visitedUrls.has(url)) continue; // avoid infinite recursion on circular imports
+    visitedUrls.add(url);
+
+    const res = await fetchFn(url);
+    if (!res.ok) {
+      const errorMsg = `Failed to load ${url}: ${res.status}`;
+      if (strict) throw new Error(errorMsg);
+      console.warn(errorMsg);
+      continue;
+    }
+
+    const text = await res.text();
+    const parsedImport = parseGrammarText(text);
+
+    // Queue nested imports for later processing
+    for (const nestedImport of parsedImport.imports) {
+      importQueue.push(`${base}${localeId}/${nestedImport}`);
+    }
+
+    // Merge sections from this imported file into the grammar
+    for (const [symbol, entries] of Object.entries(parsedImport.sections)) {
       if (!grammar[symbol]) grammar[symbol] = [];
       grammar[symbol].push(...entries);
     }
