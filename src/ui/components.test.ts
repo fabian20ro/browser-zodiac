@@ -152,6 +152,30 @@ describe('createHoroscopeCard', () => {
     const text = card.querySelector('.horoscope-card__text');
     expect(text?.textContent).toBe('You will find a mysterious sock.');
   });
+
+  it('renders all four detail rows with correct labels and values', () => {
+    const card = createHoroscopeCard(minimalHoroscope, minimalUi);
+    const details = card.querySelector('.horoscope-card__details');
+    expect(details).not.toBeNull();
+    const rows = details!.querySelectorAll('.detail-row');
+    expect(rows.length).toBe(4);
+
+    // Row 0: lucky number
+    expect((rows[0].querySelector('.detail-row__label') as HTMLElement).textContent).toBe('L');
+    expect((rows[0].querySelector('.detail-row__value') as HTMLElement).textContent).toBe('42');
+
+    // Row 1: lucky color
+    expect((rows[1].querySelector('.detail-row__label') as HTMLElement).textContent).toBe('C');
+    expect((rows[1].querySelector('.detail-row__value') as HTMLElement).textContent).toBe('purple');
+
+    // Row 2: cosmic warning
+    expect((rows[2].querySelector('.detail-row__label') as HTMLElement).textContent).toBe('W');
+    expect((rows[2].querySelector('.detail-row__value') as HTMLElement).textContent).toBe('Beware of pigeons.');
+
+    // Row 3: compatibility
+    expect((rows[3].querySelector('.detail-row__label') as HTMLElement).textContent).toBe('Co');
+    expect((rows[3].querySelector('.detail-row__value') as HTMLElement).textContent).toBe('Leo');
+  });
 });
 
 describe('createTopBar', () => {
