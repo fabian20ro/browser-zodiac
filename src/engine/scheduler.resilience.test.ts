@@ -101,4 +101,31 @@ describe('scheduleMidnightGmt resilience', () => {
 
     cancel();
   });
+
+  it('should handle immediate synchronous cancellation without leaking', () => {
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+
+    const cancel = scheduleMidnightGmt(callback);
+
+    // Cancel synchronously right after scheduling, before any timer fires.
+    cancel();
+
+    vi.advanceTimersByTime(86400000);
+    expect(count).toBe(0);
+  });
+
+  it('should not double-fire when cancelled and re-scheduled in rapid succession', () => {
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+
+    const cancel = scheduleMidnightGmt(callback);
+    cancel();
+
+    // Re-schedule after cancellation.
+    const cancel2 = scheduleMidnightGmt(callback);
+
+    vi.advanceTimersByTime(86400000);
+    expect(count).toBe(1);
+
+    cancel2();
+  });
 });
