@@ -128,4 +128,27 @@ describe('scheduleMidnightGmt resilience', () => {
 
     cancel2();
   });
+
+  it('should suppress the first iteration when a new loop replaces an active one (wasStartedDuringLoop=true)', async () => {
+    // Scenario: a scheduler is running, then a new scheduleMidnightGmt call
+    // arrives while isLoopRunning=true. The source marks wasStartedDuringLoop=true
+    // and uses it to skip the very first execution of the replacement loop,
+    // only re-scheduling instead. This prevents a double-fire on rapid takeover.
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+
+    const cancel1 = scheduleMidnightGmt(callback);
+    await vi.advanceTimersByTimeAsync(1000);
+    // First loop fired once; isLoopRunning is now true.
+    expect(count).toBe(1);
+
+    // Cancel the first loop and immediately schedule a new one while it was active.
+    cancel1();
+    const cancel2 = scheduleMidnightGmt(callback);
+
+    await vi.advanceTimersByTimeAsync(86400000);
+    // Only the second scheduler should have executed (first iteration of replacement suppressed).
+    expect(count).toBe(2);
+
+    cancel2();
+  });
 });
