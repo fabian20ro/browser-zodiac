@@ -20,6 +20,20 @@ describe('getNextMidnightGmt', () => {
     expect(getNextMidnightGmt(now)).toEqual(expected);
   });
 
+  it('returns next-day midnight across non-leap Feb boundary', () => {
+    // In a non-leap year, Feb 28 + 1 day → Mar 1 (not Feb 29).
+    const now = new Date('2025-02-28T12:00:00.000Z');
+    const expected = new Date('2025-03-01T00:00:00.000Z');
+    expect(getNextMidnightGmt(now)).toEqual(expected);
+  });
+
+  it('returns next-day midnight across leap Feb boundary', () => {
+    // In a leap year, Feb 28 + 1 day → Feb 29 (next valid date).
+    const now = new Date('2024-02-28T12:00:00.000Z');
+    const expected = new Date('2024-02-29T00:00:00.000Z');
+    expect(getNextMidnightGmt(now)).toEqual(expected);
+  });
+
   it('returns a fresh Date (does not mutate input)', () => {
     const now = new Date('2026-01-01T12:00:00.000Z');
     const original = now.getTime();
