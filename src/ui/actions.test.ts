@@ -278,4 +278,27 @@ describe('createActionButton', () => {
     expect(btn.textContent).toBe('✕');
     expect(btn.classList.contains('action-btn--feedback')).toBe(false);
   });
+
+  it('shows error icon (not feedback) when both are set and action rejects', async () => {
+    vi.useFakeTimers();
+    const btn = createActionButton({
+      icon: '⧉',
+      feedbackIcon: '✓',
+      errorIcon: '✕',
+      ariaLabel: 'Copy',
+      onClick: () => Promise.reject(new Error('boom')),
+    });
+
+    btn.click();
+    await Promise.resolve();
+
+    expect(btn.textContent).toBe('✕');
+    expect(btn.classList.contains('action-btn--feedback')).toBe(false);
+
+    vi.advanceTimersByTime(1500);
+    expect(btn.textContent).toBe('⧉');
+    expect(btn.classList.contains('action-btn--feedback')).toBe(false);
+
+    vi.useRealTimers();
+  });
 });

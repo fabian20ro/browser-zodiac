@@ -51,9 +51,13 @@ export function detectLanguage(): string {
   return 'en';
 }
 
+const VALID_LOCALES = new Set(['en', 'ro']);
+
 export function persistLanguage(id: string): void {
+  const normalized = normalizeLocaleId(id);
+  if (!VALID_LOCALES.has(normalized)) return; // reject unknown locales silently
   try {
-    window.localStorage.setItem(STORAGE_KEY, normalizeLocaleId(id));
+    window.localStorage.setItem(STORAGE_KEY, normalized);
   } catch {
     // localStorage unavailable
   }
