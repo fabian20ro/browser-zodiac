@@ -26,6 +26,49 @@ describe('mulberry32', () => {
     const seq2 = Array.from({ length: 5 }, () => rng2());
     expect(seq1).not.toEqual(seq2);
   });
+
+  it('handles negative seeds (normalized via |0)', () => {
+    const rng = mulberry32(-1);
+    for (let i = 0; i < 50; i++) {
+      const val = rng();
+      expect(val).toBeGreaterThanOrEqual(0);
+      expect(val).toBeLessThan(1);
+    }
+  });
+
+  it('handles zero seed', () => {
+    const rng = mulberry32(0);
+    for (let i = 0; i < 50; i++) {
+      const val = rng();
+      expect(val).toBeGreaterThanOrEqual(0);
+      expect(val).toBeLessThan(1);
+    }
+  });
+
+  it('handles seeds larger than signed int max', () => {
+    const rng = mulberry32(2 ** 31 + 7);
+    for (let i = 0; i < 50; i++) {
+      const val = rng();
+      expect(val).toBeGreaterThanOrEqual(0);
+      expect(val).toBeLessThan(1);
+    }
+  });
+
+  it('negative seeds are deterministic', () => {
+    const rng1 = mulberry32(-42);
+    const rng2 = mulberry32(-42);
+    for (let i = 0; i < 50; i++) {
+      expect(rng1()).toBe(rng2());
+    }
+  });
+
+  it('zero and non-zero seeds produce different sequences', () => {
+    const rngA = mulberry32(0);
+    const rngB = mulberry32(1);
+    const seqA = Array.from({ length: 5 }, () => rngA());
+    const seqB = Array.from({ length: 5 }, () => rngB());
+    expect(seqA).not.toEqual(seqB);
+  });
 });
 
 describe('hashString', () => {
