@@ -125,4 +125,19 @@ describe('dailySeed', () => {
   it('differs by salt', () => {
     expect(dailySeed('2026-03-03', 'aries')).not.toBe(dailySeed('2026-03-03', 'taurus'));
   });
+
+  it('returns an unsigned 32-bit integer usable as mulberry32 seed', () => {
+    const seed = dailySeed('2026-07-09', 'aries');
+    expect(Number.isInteger(seed)).toBe(true);
+    expect(seed).toBeGreaterThanOrEqual(0);
+    expect(seed).toBeLessThanOrEqual(0xffffffff);
+    // round-trip confirms unsigned 32-bit representation is preserved
+    expect(seed >>> 0).toBe(seed);
+    // verify it can seed the PRNG without error
+    const rng = mulberry32(seed);
+    for (let i = 0; i < 10; i++) {
+      expect(rng()).toBeGreaterThanOrEqual(0);
+      expect(rng()).toBeLessThan(1);
+    }
+  });
 });

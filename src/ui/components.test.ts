@@ -202,6 +202,43 @@ describe('createDivinationPanel', () => {
     expect(list?.id).toBe('divination-card__list');
     expect((toggle as HTMLButtonElement).type).toBe('button');
   });
+
+  it('renders reading rows with localized labels and raw values', () => {
+    const ui: UIStrings = { ...minimalUi, divinationLabels: { moonsign: 'Moon Sign' } };
+    const panel = createDivinationPanel(
+      { readings: [{ key: 'moonsign', raw: 'Cancer' }, { key: 'unknown_key', raw: 'N/A' }], fingerprint: 'f' },
+      ui,
+    );
+    const list = panel.querySelector('.divination-card__list');
+    expect(list).not.toBeNull();
+    const rows = list!.querySelectorAll('.detail-row');
+    expect(rows.length).toBe(2);
+
+    expect((rows[0].querySelector('.detail-row__label') as HTMLElement).textContent).toBe('Moon Sign');
+    expect((rows[0].querySelector('.detail-row__value') as HTMLElement).textContent).toBe('Cancer');
+
+    // Unmapped key falls back to raw key string (not the localized label)
+    expect((rows[1].querySelector('.detail-row__label') as HTMLElement).textContent).toBe('unknown_key');
+    expect((rows[1].querySelector('.detail-row__value') as HTMLElement).textContent).toBe('N/A');
+  });
+
+  it('toggles aria-expanded and collapsed class when toggle is clicked', () => {
+    const panel = createDivinationPanel({ readings: [], fingerprint: 'f' }, minimalUi);
+    const toggle = panel.querySelector('.divination-card__toggle') as HTMLButtonElement;
+    const list = panel.querySelector('.divination-card__list')!;
+
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    expect(list.classList.contains('divination-card__list--collapsed')).toBe(true);
+
+    toggle.click();
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    expect(list.classList.contains('divination-card__list--collapsed')).toBe(false);
+    expect(toggle.textContent).toBe('\u25B2');
+
+    toggle.click(); // collapse again
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    expect(list.classList.contains('divination-card__list--collapsed')).toBe(true);
+  });
 });
 
 describe('createHeader', () => {

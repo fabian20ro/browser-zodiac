@@ -105,6 +105,20 @@ describe('detectLanguage', () => {
     expect(window.localStorage.getItem('horror-scope-lang')).toBeNull();
     expect(detectLanguage()).toBe('en');
   });
+
+  it('prefers saved language over navigator.language when both are valid', () => {
+    window.localStorage.setItem('horror-scope-lang', 'ro');
+    setNavigatorProperty('language', 'de-DE');
+
+    expect(detectLanguage()).toBe('ro');
+  });
+
+  it('ignores invalid stored language and falls back to navigator.language', () => {
+    window.localStorage.setItem('horror-scope-lang', 'zz');
+    setNavigatorProperty('language', 'ro');
+
+    expect(detectLanguage()).toBe('ro');
+  });
 });
 
 describe('getAvailableLocales', () => {
