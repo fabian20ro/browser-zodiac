@@ -167,4 +167,46 @@ describe('scheduleMidnightGmt', () => {
     await vi.advanceTimersByTimeAsync(86400000);
     expect(callCount).toBe(2);
   });
+
+  it('a new scheduler cancels the previous one', async () => {
+    const firstCallback = vi.fn();
+    const secondCallback = vi.fn();
+    // Set time at midnight so next midnight is exactly 24h away (86400000ms)
+    vi.setSystemTime(new Date('2026-01-01T00:00:00.000Z'));
+
+    scheduleMidnightGmt(firstCallback);
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(firstCallback).toHaveBeenCalledTimes(1);
+
+    // Start a new scheduler — should cancel any pending handle from the first
+    scheduleMidnightGmt(secondCallback);
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(firstCallback).toHaveBeenCalledTimes(1);
+    expect(secondCallback).toHaveBeenCalledTimes(1);
+  });
+
+  it('skips the first iteration when scheduled during an active loop', async () => {
+    let callCount = 0;
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+    scheduleMidnightGmt(() => {
+      callCount++;
+      // While executing the first callback, start a new scheduler — it should skip its first iteration
+      scheduleMidnightGmt(() => {
+        callCount++;
+      });
+    });
+
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(callCount).toBe(1); // only the outer callback fires; inner's first tick is skipped
+
+    // Advance to next midnight — inner scheduler's skip-tick fires (no-op), callCount stays at 1
+    vi.setSystemTime(new Date('2026-01-02T23:59:59.000Z'));
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(callCount).toBe(1); // inner scheduler skipped its first iteration as documented
+
+    // Advance to the following midnight — inner scheduler's actual callback fires
+    vi.setSystemTime(new Date('2026-01-03T23:59:59.000Z'));
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(callCount).toBe(2); // inner scheduler's iteration finally runs after the skip
+  });
 });
