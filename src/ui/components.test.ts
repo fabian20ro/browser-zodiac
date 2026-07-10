@@ -239,6 +239,12 @@ describe('createDivinationPanel', () => {
     expect(toggle.getAttribute('aria-expanded')).toBe('false');
     expect(list.classList.contains('divination-card__list--collapsed')).toBe(true);
   });
+
+  it('returns a section element with both card and divination-card classes', () => {
+    const panel = createDivinationPanel({ readings: [], fingerprint: 'f' }, minimalUi);
+    expect(panel.tagName).toBe('SECTION');
+    expect(panel.className).toBe('card divination-card');
+  });
 });
 
 describe('createHeader', () => {
