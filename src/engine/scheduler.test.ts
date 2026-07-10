@@ -58,6 +58,18 @@ describe('getNextMidnightGmt', () => {
     expect(result.getUTCMinutes()).toBe(0);
   });
 
+  it('returns a Date with zero minutes, seconds, and milliseconds', () => {
+    // Observable contract: the next GMT midnight must be an exact boundary — no
+    // sub-hour drift from implementation changes (e.g. using setUTCHours vs
+    // setUTCDate+setUTCHours).
+    const now = new Date('2026-06-15T14:37:22.123Z');
+    const midnight = getNextMidnightGmt(now);
+    expect(midnight.getUTCHours()).toBe(0);
+    expect(midnight.getUTCMinutes()).toBe(0);
+    expect(midnight.getUTCSeconds()).toBe(0);
+    expect(midnight.getUTCMilliseconds()).toBe(0);
+  });
+
   it('msUntilNextMidnightGmt agrees with getNextMidnightGmt', () => {
     const now = new Date('2026-01-01T15:30:00.000Z');
     const midnight = getNextMidnightGmt(now);
