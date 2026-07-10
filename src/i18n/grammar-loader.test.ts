@@ -182,6 +182,22 @@ unicorn`,
     ).rejects.toThrow('Failed to load http://test/data/en/missing.txt: 404');
   });
 
+  it('tolerates missing @from files in non-strict mode by warning and continuing', async () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const fetch = mockFetch({
+      'http://test/data/en.txt': `@from ghost.txt import *\n\n=== food ===\ntoast`,
+    });
+
+    const grammar = await loadGrammar('en', 'http://test/data/', fetch, false);
+    expect(grammar.food).toEqual(['toast']);
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+    expect(warnSpy).toHaveBeenCalledWith(
+      `Failed to load http://test/data/en/ghost.txt: 404`,
+    );
+
+    warnSpy.mockRestore();
+  });
+
   it('throws when the main grammar file is missing', async () => {
     const fetch = mockFetch({});
     await expect(

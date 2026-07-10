@@ -159,6 +159,12 @@ describe('persistLanguage', () => {
       expect(() => persistLanguage(testCase)).not.toThrow();
     }
   });
+
+  it('rejects unregistered locale ids without writing to localStorage', () => {
+    persistLanguage('zzz');
+
+    expect(window.localStorage.getItem('horror-scope-lang')).toBeNull();
+  });
 });
 
 // Note: loadAllGrammars tests removed - they require network/file access

@@ -37,6 +37,11 @@ function applyTheme(theme: 'dark' | 'light'): void {
 async function initApp(): Promise<void> {
   const container = document.getElementById('app')!;
 
+  // Prevent stacked error UIs on rapid retry clicks.
+  if (container.innerHTML.trim() !== '') {
+    container.innerHTML = '';
+  }
+
   try {
     await loadAllGrammars();
   } catch (error) {

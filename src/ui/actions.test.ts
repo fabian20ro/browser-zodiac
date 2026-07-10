@@ -232,6 +232,39 @@ describe('createActionButton', () => {
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
+  it('does not show feedback on second click while first is still pending', async () => {
+    vi.useFakeTimers();
+    let resolveFirst!: (value: boolean) => void;
+    const pending = new Promise<boolean>(resolve => { resolveFirst = resolve; });
+
+    const btn = createActionButton({
+      icon: '⧉',
+      feedbackIcon: '✓',
+      errorIcon: '✕',
+      ariaLabel: 'Copy',
+      onClick: () => pending,
+    });
+
+    btn.click();
+    await Promise.resolve();
+
+    resolveFirst!(true);
+    await Promise.resolve();
+    expect(btn.textContent).toBe('✓');
+    expect(btn.classList.contains('action-btn--feedback')).toBe(true);
+
+    vi.advanceTimersByTime(1501);
+    expect(btn.textContent).toBe('⧉');
+    expect(btn.classList.contains('action-btn--feedback')).toBe(false);
+
+    btn.click();
+    await Promise.resolve();
+    expect(btn.textContent).toBe('✓');
+    expect(btn.classList.contains('action-btn--feedback')).toBe(true);
+
+    vi.useRealTimers();
+  });
+
   it('does not show success feedback when the click action rejects', async () => {
     const btn = createActionButton({
       icon: '⧉',
