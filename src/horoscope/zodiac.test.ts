@@ -29,11 +29,14 @@ describe('ZODIAC_SYMBOLS', () => {
   });
 
   it('maps canonical signs to their Unicode symbols', () => {
-    expect(ZODIAC_SYMBOLS['aries']).toBe('\u2648');
-    expect(ZODIAC_SYMBOLS['taurus']).toBe('\u2649');
-    expect(ZODIAC_SYMBOLS['leo']).toBe('\u264C');
-    expect(ZODIAC_SYMBOLS['scorpio']).toBe('\u264F');
-    expect(ZODIAC_SYMBOLS['sagittarius']).toBe('\u2650');
+    const expected = {
+      aries: '\u2648', taurus: '\u2649', gemini: '\u264A', cancer: '\u264B',
+      leo: '\u264C', virgo: '\u264D', libra: '\u264E', scorpio: '\u264F',
+      sagittarius: '\u2650', capricorn: '\u2651', aquarius: '\u2652', pisces: '\u2653',
+    };
+    for (const sign of ZODIAC_SIGNS) {
+      expect(ZODIAC_SYMBOLS[sign], `${sign} symbol`).toBe(expected[sign]);
+    }
   });
 
   it('each symbol is a single character', () => {
