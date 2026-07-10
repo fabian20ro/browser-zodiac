@@ -244,4 +244,18 @@ ghost sandwich`,
     expect(grammar.creature).toContain('unicorn');
     expect(grammar.food).toContain('ghost sandwich');
   });
+
+  it('handles circular @from imports without infinite recursion', async () => {
+    // The visitedUrls deduplication must prevent infinite loops when files
+    // import each other cyclically.
+    const fetch = mockFetch({
+      'http://test/data/en.txt': `@from b.txt import *`,
+      'http://test/data/en/b.txt': `=== creature ===\nunicorn\n@from a.txt import *\n@from en.txt import *`,
+      'http://test/data/en/a.txt': `=== food ===\ntoast`,
+    });
+
+    const grammar = await loadGrammar('en', 'http://test/data/', fetch);
+    expect(grammar.creature).toContain('unicorn');
+    expect(grammar.food).toEqual(['toast']);
+  });
 });
