@@ -182,4 +182,96 @@ describe('generateHoroscope', () => {
       expect(h.luckyNumber).toBeLessThanOrEqual(99);
     },
   );
+
+  it('uses only the date portion (day-level) when deriving seeds', () => {
+    const hDay = generateHoroscope('aries', minimalLocale, minimalDivination, fixedDate);
+    const hMidnight = generateHoroscope('aries', minimalLocale, minimalDivination, new Date('2026-03-03T00:00:00Z'));
+    const hNoon = generateHoroscope('aries', minimalLocale, minimalDivination, new Date('2026-03-03T12:00:00Z'));
+    expect(hDay.luckyNumber).toBe(hMidnight.luckyNumber);
+    expect(hDay.luckyNumber).toBe(hNoon.luckyNumber);
+  });
+
+  it('uses sign as salt when consultation is 0, and "sign:N" otherwise', () => {
+    const hDefault = generateHoroscope('aries', minimalLocale, minimalDivination, fixedDate);
+    const hZero = generateHoroscope('aries', minimalLocale, minimalDivination, fixedDate, 0);
+    const hOne = generateHoroscope('aries', minimalLocale, minimalDivination, fixedDate, 1);
+    expect(hDefault.luckyNumber).toBe(hZero.luckyNumber);
+    // Sign-only salt vs "sign:1" must produce different output
+    expect(hDefault.luckyNumber).not.toBe(hOne.luckyNumber);
+  });
+
+  it('is deterministic across all fields (text, warning, color, compatibility) — not just luckyNumber', () => {
+    const h1 = generateHoroscope('leo', minimalLocale, minimalDivination, fixedDate);
+    const h2 = generateHoroscope('leo', minimalLocale, minimalDivination, fixedDate);
+    expect(h1.text).toBe(h2.text);
+    expect(h1.warning).toBe(h2.warning);
+    expect(h1.luckyColor).toBe(h2.luckyColor);
+    expect(h1.compatibility).toBe(h2.compatibility);
+  });
+
+  it('produces a date string in YYYY-MM-DD format', () => {
+    const h = generateHoroscope('aries', minimalLocale, minimalDivination, fixedDate);
+    expect(h.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(h.date).toBe('2026-03-03');
+  });
+
+  it('generates non-empty text from every grammar section (#origin#, #warning#, etc.)', () => {
+    const h = generateHoroscope('aries', minimalLocale, minimalDivination, fixedDate);
+    expect(h.text.length).toBeGreaterThan(10);
+    expect(h.warning.length).toBeGreaterThan(1);
+  });
+
+  it('deterministic across consultations (each consultation is stable)', () => {
+    const hA = generateHoroscope('gemini', minimalLocale, minimalDivination, fixedDate, 7);
+    const hB = generateHoroscope('gemini', minimalLocale, minimalDivination, fixedDate, 7);
+    expect(hA.text).toBe(hB.text);
+    expect(hA.luckyNumber).toBe(hB.luckyNumber);
+    expect(hA.warning).toBe(hB.warning);
+    expect(hA.luckyColor).toBe(hB.luckyColor);
+    expect(hA.compatibility).toBe(hB.compatibility);
+  });
+
+  it('divination readings overwrite colliding locale grammar symbols in every section', () => {
+    const locale: LocalePack = {
+      ...minimalLocale,
+      grammar: {
+        ...minimalLocale.grammar,
+        warning: ['ignore danger'],
+        compatibility: ['peaceful'],
+        luckyColor: ['red'],
+      },
+    };
+    const divinationWithCollisions: DivinationProfile = {
+      readings: [
+        { key: 'warning', raw: 'SHE PULLS THE KNIFE FIRST', interpretation: '' },
+        { key: 'compatibility', raw: 'SCORPIO', interpretation: '' },
+        { key: 'luckyColor', raw: 'BLACK', interpretation: '' },
+      ],
+      fingerprint: 'triple-collision-fp',
+    };
+    const h = generateHoroscope('aries', locale, divinationWithCollisions, fixedDate);
+    expect(h.warning).toBe('SHE PULLS THE KNIFE FIRST');
+    expect(h.compatibility).toBe('SCORPIO');
+    expect(h.luckyColor).toBe('BLACK');
+  });
+
+  it('throws on unrecognized zodiac sign key in every locale that lacks the symbol', () => {
+    const emptySignsLocale: LocalePack = { ...minimalLocale, ui: { ...minimalLocale.ui, signNames: {} } };
+    expect(() => generateHoroscope('bogus' as ZodiacSign, emptySignsLocale, minimalDivination, fixedDate)).toThrow(
+      'Unrecognized zodiac sign key',
+    );
+  });
+
+  it('produces distinct horoscopes for every pair of different signs', () => {
+    const signs = Object.keys(ZODIAC_SYMBOLS) as ZodiacSign[];
+    const all = signs.map((sign) => generateHoroscope(sign, minimalLocale, minimalDivination, fixedDate));
+
+    for (let i = 0; i < all.length - 1; i++) {
+      for (let j = i + 1; j < all.length; j++) {
+        expect(all[i].sign).not.toBe(all[j].sign);
+        // Each sign should produce a different lucky number — with high probability.
+        expect(all[i].luckyNumber).not.toBe(all[j].luckyNumber);
+      }
+    }
+  });
 });
