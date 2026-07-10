@@ -162,4 +162,24 @@ describe('generateHoroscope', () => {
     const h = generateHoroscope('aries', locale, divinationWithCollision, fixedDate);
     expect(h.warning).toBe('SHE PULLS THE KNIFE FIRST');
   });
+
+  it.each(Object.keys(ZODIAC_SYMBOLS) as ZodiacSign[])(
+    'every zodiac sign %s generates without error and produces all fields',
+    (sign) => {
+      const h = generateHoroscope(sign, minimalLocale, minimalDivination, fixedDate);
+      expect(h.sign).toBe(sign);
+      expect(h.signSymbol).toBeDefined();
+      expect(typeof h.text).toBe('string');
+      expect(h.text.length).toBeGreaterThan(0);
+      expect(typeof h.warning).toBe('string');
+      expect(h.warning.length).toBeGreaterThan(0);
+      expect(typeof h.luckyColor).toBe('string');
+      expect(h.luckyColor.length).toBeGreaterThan(0);
+      expect(typeof h.compatibility).toBe('string');
+      expect(h.compatibility.length).toBeGreaterThan(0);
+      expect(Number.isInteger(h.luckyNumber)).toBe(true);
+      expect(h.luckyNumber).toBeGreaterThanOrEqual(1);
+      expect(h.luckyNumber).toBeLessThanOrEqual(99);
+    },
+  );
 });
