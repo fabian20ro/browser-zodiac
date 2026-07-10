@@ -129,6 +129,26 @@ describe('scheduleMidnightGmt resilience', () => {
     cancel2();
   });
 
+  it('should suppress stale timers across a chain of three rapid replacements', () => {
+    // Scenario: schedule → cancel → schedule → cancel → schedule.
+    // Each cancel should clear its activeHandle, so no stale timer fires
+    // when the next iteration advances time by a full day.
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+
+    const cancel1 = scheduleMidnightGmt(callback);
+    cancel1();
+
+    const cancel2 = scheduleMidnightGmt(callback);
+    cancel2();
+
+    const cancel3 = scheduleMidnightGmt(callback);
+
+    vi.advanceTimersByTime(86400000);
+    expect(count).toBe(1);
+
+    cancel3();
+  });
+
   it('should suppress the first iteration when a new loop replaces an active one (wasStartedDuringLoop=true)', async () => {
     // Scenario: a scheduler is running, then a new scheduleMidnightGmt call
     // arrives while isLoopRunning=true. The source marks wasStartedDuringLoop=true
