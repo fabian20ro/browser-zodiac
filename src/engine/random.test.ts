@@ -45,6 +45,15 @@ describe('mulberry32', () => {
     }
   });
 
+  it('handles float seeds by truncating to int via |0', () => {
+    // Float seeds should behave identically after bitwise normalization
+    const rngInt = mulberry32(42);
+    const rngFloat = mulberry32(42.7);
+    for (let i = 0; i < 100; i++) {
+      expect(rngFloat()).toBe(rngInt());
+    }
+  });
+
   it('handles seeds larger than signed int max', () => {
     const rng = mulberry32(2 ** 31 + 7);
     for (let i = 0; i < 50; i++) {
