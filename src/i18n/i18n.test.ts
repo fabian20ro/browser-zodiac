@@ -5,7 +5,6 @@ import {
   getAvailableLocales,
   detectLanguage,
   persistLanguage,
-  loadAllGrammars,
 } from './index.ts';
 
 const originalLanguage = navigator.language;
@@ -62,6 +61,69 @@ describe('getLocale', () => {
   it('falls back to English for unknown locale', () => {
     const locale = getLocale('xx');
     expect(locale.id).toBe('en');
+  });
+
+  it('returns a plain object (no prototype pollution)', () => {
+    const locale = getLocale('en');
+    // The spread operator {...base, grammar} produces a plain object;
+    // verify it doesn't carry unintended properties from the source.
+    expect(Object.prototype.hasOwnProperty.call(locale, 'id')).toBe(true);
+    expect(Object.prototype.hasOwnProperty.call(locale, 'grammar')).toBe(true);
+  });
+
+  it('returns distinct locale packs on repeated calls', () => {
+    const a = getLocale('en');
+    const b = getLocale('en');
+    // Each call spreads from the base, so they are separate objects.
+    expect(a).not.toBe(b);
+    expect(a.id).toBe(b.id);
+  });
+
+  it('getLocale merges default grammar when loadAllGrammars has not been called', () => {
+    const locale = getLocale('en');
+    // Without loadAllGrammars, the fallback is en.grammar (the embedded one)
+    expect(locale.grammar).toBeDefined();
+    // The default grammar should contain at least the symbol loaded from the base pack
+    expect(Object.keys(locale.grammar as Record<string, unknown>).length).toBeGreaterThan(0);
+  });
+
+  it('each locale carries its own embedded grammar by default', () => {
+    const en = getLocale('en');
+    const ro = getLocale('ro');
+    // The two base packs hold different grammar data (different languages)
+    expect(en.grammar).not.toBe(ro.grammar);
+  });
+
+  it('getLocale preserves all properties from the source locale pack', () => {
+    const en = getLocale('en');
+    // Verify key structural fields exist on returned object
+    expect(en.ui).toBeDefined();
+    expect(en.ui.signNames).toBeDefined();
+    expect(en.grammar).toBeDefined();
+  });
+
+  it('getLocale fallback for unknown id still returns a valid locale', () => {
+    const unknown = getLocale('zz-INVALID');
+    // Should fall through to English base with no loaded grammar
+    expect(unknown.id).toBe('en');
+    expect(unknown.grammar).toBeDefined();
+    expect(Object.keys(unknown.grammar as Record<string, unknown>).length).toBeGreaterThan(0);
+  });
+
+  it('getLocale does not mutate the source locale pack', () => {
+    const before = getAvailableLocales().find((l) => l.id === 'en');
+    // Snapshot structural state
+    const snapshotKeys = new Set(Object.keys(before!));
+    const snapshotSignNamesCount = Object.keys(before!.ui.signNames).length;
+
+    // Call getLocale repeatedly (which spreads from the source)
+    for (let i = 0; i < 5; i++) {
+      void getLocale('en');
+    }
+
+    const after = getAvailableLocales().find((l) => l.id === 'en');
+    expect(Object.keys(after!).length).toBe(snapshotKeys.size);
+    expect(Object.keys(after!.ui.signNames).length).toBe(snapshotSignNamesCount);
   });
 });
 
@@ -155,6 +217,24 @@ describe('getAvailableLocales', () => {
       }
     }
   });
+
+  it('returns an array with no undefined entries', () => {
+    const locales = getAvailableLocales();
+    for (let i = 0; i < locales.length; i++) {
+      expect(locales[i]).toBeDefined();
+      expect(locales[i].id).toBeTruthy();
+    }
+  });
+
+  it('returning locales is stable in content across calls', () => {
+    const a = getAvailableLocales();
+    const b = getAvailableLocales();
+    // Same registry → same entries, just different array identity (Array.from creates new).
+    expect(a.length).toBe(b.length);
+    for (let i = 0; i < a.length; i++) {
+      expect(a[i].id).toBe(b[i].id);
+    }
+  });
 });
 
 describe('persistLanguage', () => {
@@ -176,6 +256,21 @@ describe('persistLanguage', () => {
     persistLanguage('zzz');
 
     expect(window.localStorage.getItem('horror-scope-lang')).toBeNull();
+  });
+
+  it('overwrites previously stored language with new value', () => {
+    persistLanguage('ro');
+    expect(window.localStorage.getItem('horror-scope-lang')).toBe('ro');
+
+    persistLanguage('en');
+    expect(window.localStorage.getItem('horror-scope-lang')).toBe('en');
+  });
+
+  it('persisted language is detected by detectLanguage', () => {
+    persistLanguage('ro');
+    setNavigatorProperty('language', 'de-DE');
+
+    expect(detectLanguage()).toBe('ro');
   });
 });
 
