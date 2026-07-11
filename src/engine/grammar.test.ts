@@ -253,14 +253,14 @@ describe('createGrammarEngine', () => {
       expect(() => engine.expand('#word.123bad#')).toThrow(/malformed name '123bad'/);
     });
 
-    it('does not throw when grammar symbol value is non-array (null)', () => {
+    it('returns [?symbol] when grammar symbol value is non-array (null)', () => {
       const engine = makeEngine({ word: null as any });
-      expect(() => engine.expand('#word#')).not.toThrow();
+      expect(engine.expand('#word#')).toBe('[?word]');
     });
 
-    it('does not throw when grammar symbol value is non-array (string)', () => {
+    it('returns [?symbol] when grammar symbol value is a string', () => {
       const engine = makeEngine({ word: 'hello' as any });
-      expect(() => engine.expand('#word#')).not.toThrow();
+      expect(engine.expand('#word#')).toBe('[?word]');
     });
 
     it('validates valid symbol names with underscores and hyphens', () => {
