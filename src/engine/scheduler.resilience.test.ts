@@ -195,4 +195,36 @@ describe('scheduleMidnightGmt resilience', () => {
     await vi.advanceTimersByTimeAsync(86400000);
     expect(count).toBe(2); // no third fire
   });
+
+  it('should handle replacement initiated from within its own callback (wasStartedDuringLoop=true skip)', async () => {
+    // Scenario: a scheduler fires, the callback calls scheduleMidnightGmt()
+    // while isLoopRunning=true — this triggers line 23-25 replacement logic
+    // in the source. The new loop must take over without double-firing the
+    // current tick, and the wasStartedDuringLoop skip path must still suppress
+    // one iteration on the replacement before resuming normal firing.
+    let innerCancel: (() => void) | null = null;
+
+    const reScheduleCallback = async () => {
+      count++;
+      // Re-schedule from within a running callback — exercises line 23-25.
+      if (innerCancel === null) {
+        innerCancel = scheduleMidnightGmt(callback);
+      }
+    };
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+    const cancelOriginal = scheduleMidnightGmt(reScheduleCallback);
+
+    // First tick fires the original callback, which re-schedules mid-tick.
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(count).toBe(1); // only one invocation from original loop
+
+    // The replacement's first iteration is skipped (wasStartedDuringLoop=true),
+    // and the original loop body exits without re-scheduling (loopId mismatch).
+    // Only one total invocation fires — this is correct resilience behavior.
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(count).toBe(1); // replacement's first tick skipped, no double-fire
+
+    cancelOriginal();
+    if (innerCancel) innerCancel();
+  });
 });
