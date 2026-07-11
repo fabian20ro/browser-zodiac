@@ -118,6 +118,18 @@ describe('generateHoroscope', () => {
     expect(h.text).toBe('Your browser is Chrome');
   });
 
+  it('signName injected as grammar symbol flows into expanded text', () => {
+    const locale: LocalePack = {
+      ...minimalLocale,
+      grammar: {
+        ...minimalLocale.grammar,
+        origin: ['#signName#, the stars align today'],
+      },
+    };
+    const h = generateHoroscope('aries', locale, minimalDivination, fixedDate);
+    expect(h.text).toBe('Aries, the stars align today');
+  });
+
   it('preserves multiple distinct divination readings in merged grammar', () => {
     const locale: LocalePack = {
       ...minimalLocale,
@@ -273,5 +285,36 @@ describe('generateHoroscope', () => {
         expect(all[i].luckyNumber).not.toBe(all[j].luckyNumber);
       }
     }
+  });
+
+  it('generates valid output when divination has no readings', () => {
+    const emptyDivination: DivinationProfile = {
+      readings: [],
+      fingerprint: 'empty-fp',
+    };
+    const h = generateHoroscope('aries', minimalLocale, emptyDivination, fixedDate);
+    expect(h.sign).toBe('aries');
+    expect(typeof h.text).toBe('string');
+    expect(h.text.length).toBeGreaterThan(0);
+    expect(typeof h.warning).toBe('string');
+    expect(h.warning.length).toBeGreaterThan(0);
+    expect(Number.isInteger(h.luckyNumber)).toBe(true);
+  });
+
+  it('passes plain literal text through unchanged when no symbols are referenced', () => {
+    const locale: LocalePack = {
+      ...minimalLocale,
+      grammar: {
+        origin: ['the stars are silent'],
+        warning: ['quiet night'],
+        luckyColor: ['dark'],
+        compatibility: ['alone'],
+      },
+    };
+    const h = generateHoroscope('taurus', locale, minimalDivination, fixedDate);
+    expect(h.text).toBe('the stars are silent');
+    expect(h.warning).toBe('quiet night');
+    expect(h.luckyColor).toBe('dark');
+    expect(h.compatibility).toBe('alone');
   });
 });

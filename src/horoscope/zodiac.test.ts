@@ -82,6 +82,14 @@ describe('randomSign', () => {
 });
 
 describe('getSignDisplayName', () => {
+  it('every sign has a symbol AND a display name', () => {
+    for (const sign of ZODIAC_SIGNS) {
+      expect(ZODIAC_SYMBOLS[sign], `${sign} symbol`).toBeDefined();
+      const displayName = getSignDisplayName(sign);
+      expect(displayName, `${sign} display name`).toBeTruthy();
+    }
+  });
+
   it('returns a capitalized name for every sign', () => {
     for (const sign of ZODIAC_SIGNS) {
       const display = getSignDisplayName(sign);
@@ -94,6 +102,17 @@ describe('getSignDisplayName', () => {
     expect(ariesDisplay).toBe('Aries');
     expect(getSignDisplayName('leo')).toBe('Leo');
     expect(getSignDisplayName('pisces')).toBe('Pisces');
+  });
+
+  it('maps every sign to its canonical display name', () => {
+    const expected: Record<string, string> = {
+      aries: 'Aries', taurus: 'Taurus', gemini: 'Gemini', cancer: 'Cancer',
+      leo: 'Leo', virgo: 'Virgo', libra: 'Libra', scorpio: 'Scorpio',
+      sagittarius: 'Sagittarius', capricorn: 'Capricorn', aquarius: 'Aquarius', pisces: 'Pisces',
+    };
+    for (const sign of ZODIAC_SIGNS) {
+      expect(getSignDisplayName(sign), `${sign} display name`).toBe(expected[sign]);
+    }
   });
 
   it('has no duplicate display names', () => {

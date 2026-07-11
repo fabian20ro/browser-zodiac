@@ -179,7 +179,7 @@ describe('createHoroscopeCard', () => {
 });
 
 describe('createTopBar', () => {
-  it('uses localized aria labels for language and theme toggles', () => {
+  it('shows sun icon and switches-to-dark label when starting in dark mode', () => {
     const bar = createTopBar(locales, 'en', minimalUi, () => {}, true, () => {});
     const buttons = bar.querySelectorAll('button');
     const languageButton = buttons[0] as HTMLButtonElement;
@@ -205,6 +205,15 @@ describe('createTopBar', () => {
     const buttons = bar.querySelectorAll('button');
     (buttons[0] as HTMLButtonElement).click();
     expect(onLangChange).toHaveBeenCalledWith('ro');
+  });
+
+  it('shows moon icon and switches-to-dark label when starting in light mode', () => {
+    const bar = createTopBar(locales, 'en', minimalUi, () => {}, false, () => {});
+    const buttons = bar.querySelectorAll('button') as NodeListOf<HTMLButtonElement>;
+    const themeButton = buttons[1];
+
+    expect(themeButton.textContent).toBe('\u{1F319}');
+    expect(themeButton.getAttribute('aria-label')).toBe('Switch to dark theme');
   });
 });
 

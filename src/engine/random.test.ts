@@ -176,4 +176,12 @@ describe('dailySeed', () => {
     expect(Number.isInteger(seed)).toBe(true);
     expect(seed >>> 0).toBe(seed);
   });
+
+  it('handles both arguments empty', () => {
+    const seed = dailySeed('', '');
+    expect(Number.isInteger(seed)).toBe(true);
+    expect(seed >>> 0).toBe(seed);
+    // deterministic: same call returns same seed
+    expect(dailySeed('', '')).toBe(seed);
+  });
 });

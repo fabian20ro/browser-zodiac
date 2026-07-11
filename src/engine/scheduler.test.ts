@@ -245,4 +245,37 @@ describe('scheduleMidnightGmt', () => {
     await vi.advanceTimersByTimeAsync(2);
     expect(callback).toHaveBeenCalledTimes(1);
   });
+
+  it('awaits an async callback before rescheduling the next tick', async () => {
+    // Observable contract: if the callback returns a Promise, the scheduler must
+    // wait for resolution before scheduling the next midnight — otherwise long-running
+    // tasks can overlap or miss their next window.
+    let resolveTask!: () => void;
+    const task = new Promise<void>(r => { resolveTask = r; });
+
+    const callback = vi.fn(async () => {
+      await task;
+    });
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+    scheduleMidnightGmt(callback);
+
+    // Fire first tick — callback starts executing and awaits the unresolved promise
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(callback).toHaveBeenCalledTimes(1);
+
+    // Advance time past midnight a full day later — second call should NOT fire yet,
+    // because the scheduler is still waiting for the async callback to resolve.
+    vi.setSystemTime(new Date('2026-01-02T23:59:59.000Z'));
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(callback).toHaveBeenCalledTimes(1); // still just 1 — task unresolved
+
+    // Now resolve the pending task — scheduler should reschedule and fire again at next midnight
+    resolveTask();
+    await vi.advanceTimersByTimeAsync(1);
+
+    // Advance to the following midnight (scheduler already past this one)
+    vi.setSystemTime(new Date('2026-01-03T23:59:59.000Z'));
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(callback).toHaveBeenCalledTimes(3); // initial + immediate reschedule after await resolves + next midnight tick
+  });
 });
