@@ -190,6 +190,22 @@ describe('createTopBar', () => {
     expect(languageButton.type).toBe('button');
     expect(themeButton.type).toBe('button');
   });
+
+  it('calls onThemeToggle when the theme button is clicked', () => {
+    const onThemeToggle = vi.fn();
+    const bar = createTopBar(locales, 'en', minimalUi, () => {}, true, onThemeToggle);
+    const buttons = bar.querySelectorAll('button');
+    (buttons[1] as HTMLButtonElement).click();
+    expect(onThemeToggle).toHaveBeenCalledTimes(1);
+  });
+
+  it('calls onLanguageChange with the other locale id when the language button is clicked', () => {
+    const onLangChange = vi.fn();
+    const bar = createTopBar(locales, 'en', minimalUi, onLangChange, true, () => {});
+    const buttons = bar.querySelectorAll('button');
+    (buttons[0] as HTMLButtonElement).click();
+    expect(onLangChange).toHaveBeenCalledWith('ro');
+  });
 });
 
 describe('createDivinationPanel', () => {
