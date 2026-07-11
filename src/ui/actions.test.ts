@@ -233,6 +233,21 @@ describe('createActionButton', () => {
     expect(btn.classList.contains('action-btn--feedback')).toBe(false);
   });
 
+  it('leaves button unchanged when async result is non-boolean and no feedbackIcon', async () => {
+    const btn = createActionButton({
+      icon: '⧉',
+      errorIcon: '✕',
+      ariaLabel: 'Copy',
+      onClick: () => Promise.resolve('done'),
+    });
+
+    btn.click();
+    await Promise.resolve();
+
+    expect(btn.textContent).toBe('⧉');
+    expect(btn.classList.contains('action-btn--feedback')).toBe(false);
+  });
+
   it('prevents concurrent executions of onClick', async () => {
     const onClick = vi.fn().mockImplementation(async () => {
       await new Promise(resolve => setTimeout(resolve, 50));
