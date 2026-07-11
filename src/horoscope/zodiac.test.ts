@@ -82,6 +82,14 @@ describe('randomSign', () => {
 });
 
 describe('getSignDisplayName', () => {
+  it('every sign has a symbol AND a display name', () => {
+    for (const sign of ZODIAC_SIGNS) {
+      expect(ZODIAC_SYMBOLS[sign], `${sign} symbol`).toBeDefined();
+      const displayName = getSignDisplayName(sign);
+      expect(displayName, `${sign} display name`).toBeTruthy();
+    }
+  });
+
   it('returns a capitalized name for every sign', () => {
     for (const sign of ZODIAC_SIGNS) {
       const display = getSignDisplayName(sign);
