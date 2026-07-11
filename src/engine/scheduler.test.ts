@@ -221,4 +221,28 @@ describe('scheduleMidnightGmt', () => {
     await vi.advanceTimersByTimeAsync(86400000);
     expect(callCount).toBe(2); // inner scheduler's iteration finally runs after the skip
   });
+
+  it('fires after ~24h when scheduled exactly at midnight', async () => {
+    const callback = vi.fn();
+    // At exact midnight, getNextMidnightGmt returns next-day midnight (86400000ms away).
+    vi.setSystemTime(new Date('2026-01-01T00:00:00.000Z'));
+    scheduleMidnightGmt(callback);
+
+    await vi.advanceTimersByTimeAsync(86399999);
+    expect(callback).not.toHaveBeenCalled();
+
+    await vi.advanceTimersByTimeAsync(1);
+    expect(callback).toHaveBeenCalledTimes(1);
+  });
+
+  it('fires within 1ms when delay would otherwise be sub-millisecond', async () => {
+    // At 23:59:59.999Z, getNextMidnightGmt returns ~86400000ms away (next day).
+    // This test verifies the Math.max(..., 1) floor path isn't triggered by normal midnight scheduling.
+    const callback = vi.fn();
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.999Z'));
+    scheduleMidnightGmt(callback);
+
+    await vi.advanceTimersByTimeAsync(2);
+    expect(callback).toHaveBeenCalledTimes(1);
+  });
 });

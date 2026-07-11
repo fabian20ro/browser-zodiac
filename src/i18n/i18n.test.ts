@@ -119,6 +119,18 @@ describe('detectLanguage', () => {
 
     expect(detectLanguage()).toBe('ro');
   });
+
+  it('falls back to English when navigator.language is null', () => {
+    setNavigatorProperty('language', null as unknown as string);
+
+    expect(detectLanguage()).toBe('en');
+  });
+
+  it('falls back to English when navigator.language is an empty string', () => {
+    setNavigatorProperty('language', '');
+
+    expect(detectLanguage()).toBe('en');
+  });
 });
 
 describe('getAvailableLocales', () => {

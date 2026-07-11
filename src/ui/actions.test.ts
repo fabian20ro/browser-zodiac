@@ -197,6 +197,27 @@ describe('createActionButton', () => {
     expect(btn.classList.contains('action-btn--feedback')).toBe(false);
   });
 
+  it('shows error icon when async click returns false and errorIcon is set', async () => {
+    vi.useFakeTimers();
+    const btn = createActionButton({
+      icon: '⧉',
+      feedbackIcon: '✓',
+      errorIcon: '✕',
+      ariaLabel: 'Copy',
+      onClick: () => Promise.resolve(false),
+    });
+
+    btn.click();
+    await Promise.resolve();
+
+    expect(btn.textContent).toBe('✕');
+    expect(btn.classList.contains('action-btn--feedback')).toBe(false);
+
+    vi.advanceTimersByTime(1500);
+    expect(btn.textContent).toBe('⧉');
+    vi.useRealTimers();
+  });
+
   it('does not show feedback when async click rejects and errorIcon is not set', async () => {
     const btn = createActionButton({
       icon: '⧉',

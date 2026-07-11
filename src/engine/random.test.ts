@@ -149,4 +149,31 @@ describe('dailySeed', () => {
       expect(rng()).toBeLessThan(1);
     }
   });
+
+  it('handles empty date string', () => {
+    const seed = dailySeed('', 'aries');
+    expect(Number.isInteger(seed)).toBe(true);
+    expect(seed >>> 0).toBe(seed);
+    // deterministic: same call returns same seed
+    expect(dailySeed('', 'aries')).toBe(seed);
+  });
+
+  it('handles empty salt', () => {
+    const seed = dailySeed('2026-03-03', '');
+    expect(Number.isInteger(seed)).toBe(true);
+    expect(seed >>> 0).toBe(seed);
+  });
+
+  it('treats different special characters as distinct', () => {
+    // The separator ':' is part of the hash; inputs with @, #, $ must differ
+    const seedA = dailySeed('2026-03-03@test', 'aries');
+    const seedB = dailySeed('2026-03-03#test', 'aries');
+    expect(seedA).not.toBe(seedB);
+  });
+
+  it('handles unicode in date string', () => {
+    const seed = dailySeed('2026—03—03', 'aries'); // em-dash variant
+    expect(Number.isInteger(seed)).toBe(true);
+    expect(seed >>> 0).toBe(seed);
+  });
 });

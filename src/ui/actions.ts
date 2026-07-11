@@ -30,7 +30,15 @@ export function createActionButton(options: ActionButtonOptions): HTMLButtonElem
 
     try {
       const result = await options.onClick();
-      if (options.feedbackIcon && result !== false) {
+      if (typeof result === 'boolean' && !result) {
+        if (options.errorIcon) {
+          btn.textContent = options.errorIcon;
+          revertTimer = setTimeout(() => {
+            btn.textContent = options.icon;
+            revertTimer = null;
+          }, 1500);
+        }
+      } else if (options.feedbackIcon) {
         btn.textContent = options.feedbackIcon;
         btn.classList.add('action-btn--feedback');
         revertTimer = setTimeout(() => {
