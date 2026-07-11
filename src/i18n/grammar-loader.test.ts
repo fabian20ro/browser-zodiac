@@ -245,6 +245,21 @@ ghost sandwich`,
     expect(grammar.food).toContain('ghost sandwich');
   });
 
+  it('passes through an import-only intermediary file in the chain', async () => {
+    // An imported file that contains only @from directives (no sections)
+    // must not break the recursive chain — downstream files' sections still
+    // get merged into the grammar.
+    const fetch = mockFetch({
+      'http://test/data/en.txt': `@from bridge.txt import *`,
+      'http://test/data/en/bridge.txt': `@from payload.txt import *`,
+      'http://test/data/en/payload.txt': `=== creature ===\nunicorn\n=== food ===\ntoast`,
+    });
+
+    const grammar = await loadGrammar('en', 'http://test/data/', fetch);
+    expect(grammar.creature).toEqual(['unicorn']);
+    expect(grammar.food).toEqual(['toast']);
+  });
+
   it('handles circular @from imports without infinite recursion', async () => {
     // The visitedUrls deduplication must prevent infinite loops when files
     // import each other cyclically.
