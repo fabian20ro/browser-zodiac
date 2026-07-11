@@ -118,6 +118,18 @@ describe('generateHoroscope', () => {
     expect(h.text).toBe('Your browser is Chrome');
   });
 
+  it('signName injected as grammar symbol flows into expanded text', () => {
+    const locale: LocalePack = {
+      ...minimalLocale,
+      grammar: {
+        ...minimalLocale.grammar,
+        origin: ['#signName#, the stars align today'],
+      },
+    };
+    const h = generateHoroscope('aries', locale, minimalDivination, fixedDate);
+    expect(h.text).toBe('Aries, the stars align today');
+  });
+
   it('preserves multiple distinct divination readings in merged grammar', () => {
     const locale: LocalePack = {
       ...minimalLocale,
