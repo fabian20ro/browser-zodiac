@@ -171,4 +171,28 @@ describe('scheduleMidnightGmt resilience', () => {
 
     cancel2();
   });
+
+  it('should fire on second tick after wasStartedDuringLoop skips the first', async () => {
+    // Source line 48-51: when replacement arrives while isLoopRunning=true,
+    // iteration===1 with wasStartedDuringLoop=true triggers scheduleNext()
+    // without invoking callback. The next advance must fire normally and
+    // cancel still works after the second execution.
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+
+    const cancel1 = scheduleMidnightGmt(callback);
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(count).toBe(1); // first loop fired once, isLoopRunning=true now
+
+    cancel1();
+    const cancel2 = scheduleMidnightGmt(callback);
+
+    // First tick of replacement: wasStartedDuringLoop=true → skipped.
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(count).toBe(2); // second tick fires normally
+
+    // Cancel after the second fire should be a no-op (already cleared).
+    cancel2();
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(count).toBe(2); // no third fire
+  });
 });
