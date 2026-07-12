@@ -25,6 +25,7 @@ export function render(
 ): void {
   container.innerHTML = '';
   container.className = 'app';
+  container.setAttribute('aria-live', 'polite');
 
   const wrapper = document.createElement('div');
   wrapper.className = 'app__wrapper';
