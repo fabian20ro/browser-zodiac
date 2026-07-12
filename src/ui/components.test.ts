@@ -191,6 +191,12 @@ describe('createTopBar', () => {
     expect(themeButton.type).toBe('button');
   });
 
+  it('renders the other locale flag on the language button', () => {
+    const bar = createTopBar(locales, 'en', minimalUi, () => {}, true, () => {});
+    const languageButton = bar.querySelector('.top-bar__btn') as HTMLElement;
+    expect(languageButton.textContent).toBe('\u{1F1F7}\u{1F1F4}'); // Romanian flag 🇷🇴 for en→ro switch
+  });
+
   it('calls onThemeToggle when the theme button is clicked', () => {
     const onThemeToggle = vi.fn();
     const bar = createTopBar(locales, 'en', minimalUi, () => {}, true, onThemeToggle);
