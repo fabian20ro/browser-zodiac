@@ -191,10 +191,17 @@ describe('createTopBar', () => {
     expect(themeButton.type).toBe('button');
   });
 
-  it('renders the other locale flag on the language button', () => {
+  it('shows both flags (current → target) on the language button', () => {
     const bar = createTopBar(locales, 'en', minimalUi, () => {}, true, () => {});
     const languageButton = bar.querySelector('.top-bar__btn') as HTMLElement;
-    expect(languageButton.textContent).toBe('\u{1F1F7}\u{1F1F4}'); // Romanian flag 🇷🇴 for en→ro switch
+    expect(languageButton.textContent).toBe('\u{1F1EC}\u{1F1E7} → \u{1F1F7}\u{1F1F4}'); // 🇬🇧 → 🇷🇴
+  });
+
+  it('falls back to otherLocale.name when current locale has no flag entry', () => {
+    const bar = createTopBar(locales, 'xx', minimalUi, () => {}, true, () => {});
+    const languageButton = bar.querySelector('.top-bar__btn') as HTMLElement;
+    // xx not in LANG_FLAGS → empty string (falsy) → only other flag shown (no arrow separator)
+    expect(languageButton.textContent).toBe('\u{1F1EC}\u{1F1E7}'); // 🇬🇧 (otherLocale is 'en' since it's first non-'xx')
   });
 
   it('calls onThemeToggle when the theme button is clicked', () => {
