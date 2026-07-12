@@ -96,6 +96,15 @@ Mâine va ploua`;
       'Mâine va ploua',
     ]);
   });
+
+  it('skips indented comments (// after whitespace)', () => {
+    // parseEntriesFile uses trimStart() for comment detection — lines whose
+    // leading content begins with // must be skipped regardless of indentation.
+    const content = `unicorn
+  // indented comment
+dragon`;
+    expect(parseEntriesFile(content)).toEqual(['unicorn', 'dragon']);
+  });
 });
 
 describe('parseGrammarText', () => {
