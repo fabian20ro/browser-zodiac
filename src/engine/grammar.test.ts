@@ -200,6 +200,16 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.unquote#')).toBe('hello');
     });
 
+    it('applies lowercase modifier standalone', () => {
+      const engine = makeEngine({ word: ['HELLO WORLD'] });
+      expect(engine.expand('#word.lowercase#')).toBe('hello world');
+    });
+
+    it('applies shout modifier', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      expect(engine.expand('#word.shout#')).toBe('HELLO!');
+    });
+
     it('handles complex nested expansions with multiple modifiers', () => {
       const engine = makeEngine({
         a: ['#b.uppercase#'],
