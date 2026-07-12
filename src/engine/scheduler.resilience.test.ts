@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { scheduleMidnightGmt } from './scheduler.ts';
+import { msUntilNextMidnightGmt, scheduleMidnightGmt } from './scheduler.ts';
 
 describe('scheduleMidnightGmt resilience', () => {
   let count = 0;
@@ -223,6 +223,42 @@ describe('scheduleMidnightGmt resilience', () => {
     // Only one total invocation fires — this is correct resilience behavior.
     await vi.advanceTimersByTimeAsync(86400000);
     expect(count).toBe(1); // replacement's first tick skipped, no double-fire
+
+    cancelOriginal();
+    if (innerCancel) innerCancel();
+  });
+
+  it('should suppress execution when callback completes after being superseded by a new scheduler', async () => {
+    // Exercises the loopId staleness guard at line 45 in scheduleNext().
+    // When a new scheduler replaces an active one while its callback is mid-execution,
+    // the original's pending await resolves but must be suppressed because loopId !== activeLoopId.
+    // Additionally, wasStartedDuringLoop=true on the replacement suppresses its first iteration
+    // (line 48-50), so only the outerCallback fires: count stays at 1 after two days of advance.
+    vi.setSystemTime(new Date('2026-01-01T00:00:00.000Z'));
+
+    let innerCancel: (() => void) | null = null;
+    const outerCallback = async () => {
+      count++;
+      // Trigger replacement from within the running callback.
+      if (innerCancel === null) {
+        innerCancel = scheduleMidnightGmt(callback);
+      }
+    };
+
+    const cancelOriginal = scheduleMidnightGmt(outerCallback);
+
+    // First tick fires the outer callback, which re-schedules internally → loopId=2 takes over.
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(count).toBe(1); // outer fired once
+
+    // The original's loop (loopId=1) is superseded by the inner (loopId=2).
+    // Advance another day — the replacement's first tick is suppressed via wasStartedDuringLoop=true.
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(count).toBe(1); // replacement's first iteration skipped
+
+    // Third advance: now fires normally on the replacement loop.
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(count).toBe(2); // second tick fires normally
 
     cancelOriginal();
     if (innerCancel) innerCancel();
