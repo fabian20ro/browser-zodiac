@@ -44,6 +44,16 @@ describe('ZODIAC_SYMBOLS', () => {
       expect(ZODIAC_SYMBOLS[sign].length).toBe(1);
     }
   });
+
+  it('every zodiac sign has both a symbol and a display name', () => {
+    const allSignKeys = new Set(Object.keys(ZODIAC_SYMBOLS));
+    for (const sign of ZODIAC_SIGNS) {
+      expect(ZODIAC_SYMBOLS[sign], `${sign} missing symbol`).toBeTruthy();
+      expect(getSignDisplayName(sign), `${sign} missing display name`).toBeTruthy();
+      allSignKeys.delete(sign);
+    }
+    expect(allSignKeys.size, 'extra symbols beyond 12 signs').toBe(0);
+  });
 });
 
 describe('randomSign', () => {

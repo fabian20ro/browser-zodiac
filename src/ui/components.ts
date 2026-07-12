@@ -30,9 +30,11 @@ export function createTopBar(
 ): HTMLElement {
   const bar = el('div', 'top-bar');
 
-  // Language toggle button (shows flag of OTHER language to switch to)
+  // Language toggle button (shows both flags: current → target)
   const otherLocale = locales.find((l) => l.id !== currentLangId) ?? locales[0];
-  const langBtn = el('button', 'top-bar__btn', LANG_FLAGS[otherLocale.id] ?? otherLocale.name);
+  const currentFlag = LANG_FLAGS[currentLangId] ?? '';
+  const otherFlag = LANG_FLAGS[otherLocale.id] ?? otherLocale.name;
+  const langBtn = el('button', 'top-bar__btn', currentFlag ? `${currentFlag} → ${otherFlag}` : otherFlag);
   langBtn.type = 'button';
   langBtn.setAttribute(
     'aria-label',
@@ -97,7 +99,7 @@ export function createHoroscopeCard(
   });
 
   const aiBtn = createActionButton({
-    icon: '\u2192',
+    icon: '→',
     ariaLabel: ui.interpretWithAI,
     onClick: () => {
       const url = buildGoogleAIUrl(ui.aiInterpretQuery + horoscope.text);
@@ -177,7 +179,7 @@ export function createDivinationPanel(
 
 export function createFooter(ui: UIStrings): HTMLElement {
   const footer = el('footer', 'footer');
-  const gen = el('p', 'footer__generated', `\u2727 ${ui.generatedBy} \u2727`);
+  const gen = el('p', 'footer__generated', `✧ ${ui.generatedBy} ✧`);
   const disc = el('p', 'footer__disclaimer', ui.footer);
 
   const badgeLink = document.createElement('a');

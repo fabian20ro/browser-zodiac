@@ -193,6 +193,19 @@ describe('detectLanguage', () => {
 
     expect(detectLanguage()).toBe('en');
   });
+
+  it('normalizes uppercase two-letter browser language tags', () => {
+    setNavigatorProperty('language', 'EN');
+
+    expect(detectLanguage()).toBe('en');
+  });
+
+  it('handles three-or-more character uppercase browser language via truncation', () => {
+    // e.g. some legacy locale tags like 'ENG' — slice(0,2) yields 'en' which is registered
+    setNavigatorProperty('language', 'ENG');
+
+    expect(detectLanguage()).toBe('en');
+  });
 });
 
 describe('getAvailableLocales', () => {

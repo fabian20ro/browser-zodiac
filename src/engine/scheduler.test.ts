@@ -139,6 +139,20 @@ describe('scheduleMidnightGmt', () => {
     expect(callback).not.toHaveBeenCalled();
   });
 
+  it('cancels a pending scheduler before its first tick', () => {
+    const callback = vi.fn();
+    // Set time BEFORE calling the function
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+    const cancel = scheduleMidnightGmt(callback);
+
+    // Cancel immediately — before any timer has fired
+    cancel();
+
+    // Advance to past the scheduled midnight — callback must NOT fire
+    vi.advanceTimersByTime(1000);
+    expect(callback).not.toHaveBeenCalled();
+  });
+
   it('schedules the next run after the first one', async () => {
     const callback = vi.fn();
     vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));

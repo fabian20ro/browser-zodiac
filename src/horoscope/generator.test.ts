@@ -317,4 +317,20 @@ describe('generateHoroscope', () => {
     expect(h.luckyColor).toBe('dark');
     expect(h.compatibility).toBe('alone');
   });
+
+  it('changes in locale grammar produce different horoscope text', () => {
+    const base = generateHoroscope('aries', minimalLocale, minimalDivination, fixedDate);
+    const altered: LocalePack = {
+      ...minimalLocale,
+      grammar: {
+        ...minimalLocale.grammar,
+        origin: ['The fates whisper differently today'],
+      },
+    };
+    const modified = generateHoroscope('aries', altered, minimalDivination, fixedDate);
+    expect(modified.text).not.toBe(base.text);
+    // sign, date and structure remain the same — only text changes.
+    expect(modified.sign).toBe(base.sign);
+    expect(modified.date).toBe(base.date);
+  });
 });
