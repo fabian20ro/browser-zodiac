@@ -206,6 +206,13 @@ describe('detectLanguage', () => {
 
     expect(detectLanguage()).toBe('en');
   });
+
+  it('handles single-character browser language tag via fallback (below slice threshold)', () => {
+    // navigator.language = 'e' → normalizeLocaleId gives 'e' → slice(0,2) yields 'e' which is not registered
+    setNavigatorProperty('language', 'e');
+
+    expect(detectLanguage()).toBe('en');
+  });
 });
 
 describe('getAvailableLocales', () => {
