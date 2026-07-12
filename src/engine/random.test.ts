@@ -184,4 +184,13 @@ describe('dailySeed', () => {
     // deterministic: same call returns same seed
     expect(dailySeed('', '')).toBe(seed);
   });
+
+  it('produces distinct seeds for consecutive dates', () => {
+    // Regression guard: advancing the date must always yield a different seed,
+    // otherwise daily horoscopes would silently repeat.
+    const seeds = Array.from({ length: 365 }, (_, i) =>
+      dailySeed(`2026-01-${String(i + 1).padStart(2, '0')}`, 'aries'),
+    );
+    expect(new Set(seeds).size).toBe(seeds.length);
+  });
 });
