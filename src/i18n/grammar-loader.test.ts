@@ -81,6 +81,21 @@ phoenix`;
 dragon`;
     expect(parseEntriesFile(content)).toEqual(['unicorn', 'dragon']);
   });
+
+  it('preserves Unicode entries (zodiac symbols + Romanian diacritics)', () => {
+    // Horoscope data uses zodiac symbols and Romanian text with diacritics;
+    // these must roundtrip through the parser without corruption.
+    const content = `♈ Aries
+♋ Cancer
+⚠️  Prigoană
+Mâine va ploua`;
+    expect(parseEntriesFile(content)).toEqual([
+      '♈ Aries',
+      '♋ Cancer',
+      '⚠️  Prigoană',
+      'Mâine va ploua',
+    ]);
+  });
 });
 
 describe('parseGrammarText', () => {
