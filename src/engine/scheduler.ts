@@ -1,7 +1,6 @@
 /** Returns the number of milliseconds from `now` until the next GMT midnight. */
 export function msUntilNextMidnightGmt(now: Date): number {
-  const midnight = new Date(now);
-  midnight.setUTCHours(24, 0, 0, 0);
+  const midnight = getNextMidnightGmt(now);
   return midnight.getTime() - now.getTime();
 }
 
