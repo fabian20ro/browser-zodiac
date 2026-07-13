@@ -292,4 +292,18 @@ describe('scheduleMidnightGmt', () => {
     await vi.advanceTimersByTimeAsync(86400000);
     expect(callback).toHaveBeenCalledTimes(3); // initial + immediate reschedule after await resolves + next midnight tick
   });
+
+  it('is safe to cancel after the callback has already fired', async () => {
+    // Observable contract: callers must not need to track whether a loop has completed
+    // before calling its cancel function — double cancellation (after fire) must not throw.
+    const callback = vi.fn();
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+    const cancel = scheduleMidnightGmt(callback);
+
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(callback).toHaveBeenCalledTimes(1);
+
+    // Cancel after the loop has fired — must not throw.
+    expect(() => cancel()).not.toThrow();
+  });
 });
