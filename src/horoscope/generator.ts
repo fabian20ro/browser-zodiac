@@ -34,16 +34,12 @@ export function generateHoroscope(
     throw new Error(`Unrecognized zodiac sign key: ${String(sign)}`);
   }
 
-  // Merge locale grammar with divination context symbols
+  // Merge locale grammar with divination context symbols; readings overwrite colliding keys.
   const contextGrammar: Grammar = {
     ...locale.grammar,
     signName: [signName],
+    ...Object.fromEntries(divination.readings.map((r) => [r.key, [r.raw]])),
   };
-
-  // Inject divination readings as grammar symbols
-  for (const reading of divination.readings) {
-    contextGrammar[reading.key] = [reading.raw];
-  }
 
   const engine = createGrammarEngine(contextGrammar, rng);
 

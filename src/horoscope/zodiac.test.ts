@@ -89,6 +89,14 @@ describe('randomSign', () => {
       expect(ZODIAC_SIGNS).toContain(result);
     }
   });
+
+  it('given a specific current sign, returns only other signs', () => {
+    const seed = 42;
+    const rng = mulberry32(seed);
+    const result = randomSign('libra', rng);
+    expect(result).not.toBe('libra');
+    expect(ZODIAC_SIGNS).toContain(result);
+  });
 });
 
 describe('getSignDisplayName', () => {
