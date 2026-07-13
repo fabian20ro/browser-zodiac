@@ -333,4 +333,59 @@ describe('generateHoroscope', () => {
     expect(modified.sign).toBe(base.sign);
     expect(modified.date).toBe(base.date);
   });
+
+  it('untested DivinationReadingKey values flow through grammar injection', () => {
+    const locale: LocalePack = {
+      ...minimalLocale,
+      grammar: {
+        ...minimalLocale.grammar,
+        warning: ['#cosmic_noise#'],
+      },
+    };
+    const divinationWithCosmicNoise: DivinationProfile = {
+      readings: [
+        { key: 'cosmic_noise', raw: 'THE STARS SCREAM', interpretation: 'auditory phenomenon' },
+      ],
+      fingerprint: 'noise-fp',
+    };
+    const h = generateHoroscope('aries', locale, divinationWithCosmicNoise, fixedDate);
+    expect(h.warning).toBe('THE STARS SCREAM');
+  });
+
+  it('numeric-looking DivinationReadingKey values do not break expansion', () => {
+    const locale: LocalePack = {
+      ...minimalLocale,
+      grammar: {
+        ...minimalLocale.grammar,
+        origin: ['#pixel_density#'],
+      },
+    };
+    const divinationWithPixelDensity: DivinationProfile = {
+      readings: [
+        { key: 'pixel_density', raw: '4K', interpretation: '' },
+      ],
+      fingerprint: 'pixel-fp',
+    };
+    const h = generateHoroscope('aries', locale, divinationWithPixelDensity, fixedDate);
+    expect(h.text).toBe('4K');
+  });
+
+  it('divination readings are deterministic — same key/raw produce same expansion across calls', () => {
+    const locale: LocalePack = {
+      ...minimalLocale,
+      grammar: {
+        ...minimalLocale.grammar,
+        compatibility: ['#cosmic_latency#'],
+      },
+    };
+    const divinationWithLatency: DivinationProfile = {
+      readings: [
+        { key: 'cosmic_latency', raw: 'SIGNAL STRONG', interpretation: '' },
+      ],
+      fingerprint: 'latency-fp',
+    };
+    const h1 = generateHoroscope('taurus', locale, divinationWithLatency, fixedDate);
+    const h2 = generateHoroscope('taurus', locale, divinationWithLatency, fixedDate);
+    expect(h1.compatibility).toBe(h2.compatibility);
+  });
 });

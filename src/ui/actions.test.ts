@@ -248,6 +248,27 @@ describe('createActionButton', () => {
     expect(btn.classList.contains('action-btn--feedback')).toBe(false);
   });
 
+  it('shows feedback icon when async result is falsy non-boolean and feedbackIcon is set', async () => {
+    vi.useFakeTimers();
+    const btn = createActionButton({
+      icon: '⧉',
+      feedbackIcon: '✓',
+      ariaLabel: 'Copy',
+      onClick: () => Promise.resolve(null),
+    });
+
+    btn.click();
+    await Promise.resolve();
+
+    expect(btn.textContent).toBe('✓');
+    expect(btn.classList.contains('action-btn--feedback')).toBe(true);
+
+    vi.advanceTimersByTime(1500);
+    expect(btn.textContent).toBe('⧉');
+    expect(btn.classList.contains('action-btn--feedback')).toBe(false);
+    vi.useRealTimers();
+  });
+
   it('shows feedback when async result is non-boolean truthy and feedbackIcon is set', async () => {
     vi.useFakeTimers();
     const btn = createActionButton({
