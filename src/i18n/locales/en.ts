@@ -1,4 +1,16 @@
 import type { LocalePack } from '../types.ts';
+import { ZODIAC_SIGNS, getSignDisplayName } from '../../horoscope/zodiac.ts';
+
+// Runtime invariant: every ZodiacSign must have a corresponding UI string.
+// Catches locale drift when new signs are added without updating the pack.
+for (const sign of ZODIAC_SIGNS) {
+  const displayName = getSignDisplayName(sign);
+  if (!displayName || typeof displayName !== 'string' || displayName.trim().length === 0) {
+    throw new Error(
+      `Locale invariant failed: no display name for ZodiacSign '${sign}'`,
+    );
+  }
+}
 
 export const en: LocalePack = {
   id: 'en',
