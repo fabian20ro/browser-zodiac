@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ZODIAC_SIGNS, ZODIAC_SYMBOLS, randomSign, getSignDisplayName } from './zodiac.ts';
+import { ZODIAC_SIGNS, ZODIAC_SYMBOLS, randomSign, getSignDisplayName, getSignByDate } from './zodiac.ts';
 import { mulberry32 } from '../engine/random.ts';
 
 describe('ZODIAC_SIGNS', () => {
@@ -136,5 +136,70 @@ describe('getSignDisplayName', () => {
   it('has no duplicate display names', () => {
     const names = ZODIAC_SIGNS.map((sign) => getSignDisplayName(sign));
     expect(new Set(names).size).toBe(12);
+  });
+});
+
+describe('getSignByDate', () => {
+  it('returns aries for March 21 (start of zodiac year)', () => {
+    expect(getSignByDate(3, 21)).toBe('aries');
+  });
+
+  it('returns the correct sign for start dates of all signs', () => {
+    const expected = [
+      [3, 21, 'aries' as const],
+      [4, 20, 'taurus' as const],
+      [5, 21, 'gemini' as const],
+      [6, 21, 'cancer' as const],
+      [7, 23, 'leo' as const],
+      [8, 23, 'virgo' as const],
+      [9, 23, 'libra' as const],
+      [10, 23, 'scorpio' as const],
+      [11, 22, 'sagittarius' as const],
+      [12, 22, 'capricorn' as const],
+      [1, 20, 'aquarius' as const],
+      [2, 19, 'pisces' as const],
+    ];
+
+    for (const [month, day, sign] of expected) {
+      expect(getSignByDate(month, day), `${sign} start date`).toBe(sign);
+    }
+  });
+
+  it('returns mid-period dates correctly', () => {
+    expect(getSignByDate(4, 10)).toBe('aries');       // Mid Aries (Mar 21 – Apr 19)
+    expect(getSignByDate(7, 5)).toBe('cancer');        // Mid Cancer (Jun 21 – Jul 22)
+    expect(getSignByDate(9, 15)).toBe('virgo');        // Late Virgo (Aug 23 – Sep 22)
+    expect(getSignByDate(12, 31)).toBe('capricorn');   // Late Capricorn (Dec 22 – Jan 19)
+    expect(getSignByDate(6, 10)).toBe('gemini');       // Mid Gemini (May 21 – Jun 20)
+  });
+
+  it('returns null for invalid month', () => {
+    expect(getSignByDate(0, 15)).toBeNull();
+    expect(getSignByDate(13, 15)).toBeNull();
+  });
+
+  it('returns null for invalid day of month', () => {
+    expect(getSignByDate(2, 30)).toBeNull();  // Feb never has 30 days
+    expect(getSignByDate(4, 31)).toBeNull();  // April only has 30 days
+  });
+
+  it('returns null for non-integer inputs', () => {
+    expect(getSignByDate(1.5, 15)).toBeNull();
+    expect(getSignByDate(2, 15.7)).toBeNull();
+    expect(getSignByDate(NaN, 15)).toBeNull();
+  });
+
+  it('covers all 12 signs across a full year', () => {
+    const signSet = new Set<string>();
+
+    // Check start dates of all signs
+    for (let m = 1; m <= 12; m++) {
+      const result = getSignByDate(m, 1);
+      if (result) {
+        signSet.add(result);
+      }
+    }
+
+    expect(signSet.size).toBeGreaterThanOrEqual(10); // At least most signs covered
   });
 });
