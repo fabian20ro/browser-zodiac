@@ -35,4 +35,19 @@ export const DEFAULT_MODIFIERS: ModifierEntry[] = [
   { name: 'case-flip',    fn: (s) => Array.from(s).map((c) => c === c.toUpperCase() ? c.toLowerCase() : c.toUpperCase()).join(''), },
 ];
 
+/** Runtime contract assertion — titlecase must produce canonical output */
+const TITLECASE_CONTRACT = DEFAULT_MODIFIERS.find(
+  (m) => m.name === 'titlecase'
+);
+if (TITLECASE_CONTRACT) {
+  const sample = 'hello world';
+  const expected = 'Hello World';
+  if (TITLECASE_CONTRACT.fn(sample) !== expected) {
+    throw new Error(
+      `titlecase contract violated: ${JSON.stringify(sample)} → ` +
+        `${JSON.stringify(TITLECASE_CONTRACT.fn(sample))} (expected ${JSON.stringify(expected)})`
+    );
+  }
+}
+
 export type SeededRandom = () => number; // Returns a float between 0 and 1

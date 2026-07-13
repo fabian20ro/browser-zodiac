@@ -82,12 +82,18 @@ export async function loadGrammar(
   const content = await response.text();
   const parsed = parseGrammarText(content);
 
-  // Initialize grammar from main file sections
   const grammar: Grammar = {};
-  for (const [symbol, entries] of Object.entries(parsed.sections)) {
-    if (!grammar[symbol]) grammar[symbol] = [];
-    grammar[symbol].push(...entries);
+
+  // Helper: merge parsed sections into a grammar accumulator.
+  function _mergeSections(grammar: Grammar, entriesBySymbol: Record<string, string[]>): void {
+    for (const [symbol, entries] of Object.entries(entriesBySymbol)) {
+      if (!grammar[symbol]) grammar[symbol] = [];
+      grammar[symbol].push(...entries);
+    }
   }
+
+  // Initialize grammar from main file sections
+  _mergeSections(grammar, parsed.sections);
 
   // Collect all imports recursively with deduplication to avoid cycles
   const visitedUrls = new Set<string>();
@@ -115,10 +121,7 @@ export async function loadGrammar(
     }
 
     // Merge sections from this imported file into the grammar
-    for (const [symbol, entries] of Object.entries(parsedImport.sections)) {
-      if (!grammar[symbol]) grammar[symbol] = [];
-      grammar[symbol].push(...entries);
-    }
+    _mergeSections(grammar, parsedImport.sections);
   }
 
   return grammar;
