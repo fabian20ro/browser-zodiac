@@ -10,6 +10,10 @@ const registry = new Map<string, LocalePack>();
 registry.set('en', en);
 registry.set('ro', ro);
 
+function getValidLocaleIds(): string[] {
+  return Array.from(registry.keys());
+}
+
 function normalizeLocaleId(id: string): string {
   return id.trim().toLowerCase();
 }
@@ -51,11 +55,9 @@ export function detectLanguage(): string {
   return 'en';
 }
 
-const VALID_LOCALES = new Set(['en', 'ro']);
-
 export function persistLanguage(id: string): void {
   const normalized = normalizeLocaleId(id);
-  if (!VALID_LOCALES.has(normalized)) return; // reject unknown locales silently
+  if (!getValidLocaleIds().includes(normalized)) return; // reject unknown locales silently
   try {
     window.localStorage.setItem(STORAGE_KEY, normalized);
   } catch {
