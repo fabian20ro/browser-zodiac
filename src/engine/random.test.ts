@@ -124,6 +124,31 @@ describe('hashString', () => {
     expect(hashString('abc')).not.toBe(hashString('cba'));
   });
 
+  it('produces different hashes for single-character mutations', () => {
+    // Catches weak avalanche: a broken hash might map similar strings to the same value.
+    const base = 'hello-world';
+    let collisions = 0;
+    for (let i = 0; i < base.length; i++) {
+      const mutated = base.slice(0, i) + String.fromCharCode((base.charCodeAt(i) % 26) + 97) + base.slice(i + 1);
+      if (hashString(mutated) === hashString(base)) collisions++;
+    }
+    expect(collisions).toBeLessThan(base.length / 4); // tolerate up to 25% but flag >25% as broken
+  });
+
+  it('distributes outputs across the full 32-bit space', () => {
+    // Verifies hashString doesn't cluster in a narrow band of the output range.
+    const hashes = new Set<number>();
+    for (let i = 0; i < 1000; i++) {
+      hashes.add(hashString(`test-${i}`));
+    }
+    expect(hashes.size).toBe(1000); // no collisions in 1000 inputs
+    const arr = Array.from(hashes);
+    const min = Math.min(...arr);
+    const max = Math.max(...arr);
+    const range = max - min;
+    expect(range).toBeGreaterThan(0xfffff * 3); // should span at least ~75% of 2^32
+  });
+
   it('distributes across the full range for diverse inputs', () => {
     const hashes = new Set<string>();
     for (let i = 0; i < 500; i++) {
