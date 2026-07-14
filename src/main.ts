@@ -15,7 +15,7 @@ import './style.css';
 
 const THEME_KEY = 'horror-scope-theme';
 
-function detectTheme(): 'dark' | 'light' {
+export function detectTheme(): 'dark' | 'light' {
   try {
     const saved = localStorage.getItem(THEME_KEY);
     if (saved === 'dark' || saved === 'light') return saved;

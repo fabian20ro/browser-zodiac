@@ -20,7 +20,11 @@ export function hashString(str: string): number {
   return hash >>> 0;
 }
 
-/** Create a daily seed from date string + extra salt */
-export function dailySeed(dateStr: string, salt: string): number {
-  return hashString(dateStr + ':' + salt);
+/** Create a daily seed from date string + optional time-part + salt.
+ * When `timePart` is provided (e.g., "09:30"), seeds differ by hour,
+ * so the same sign consulted at different times on the same day
+ * can produce distinct horoscopes. */
+export function dailySeed(dateStr: string, salt: string, timePart?: string): number {
+  const withTime = timePart !== undefined ? dateStr + ':' + timePart : dateStr;
+  return hashString(withTime + ':' + salt);
 }
