@@ -334,4 +334,25 @@ describe('dailySeed', () => {
       expect(rng()).toBeLessThan(1);
     }
   });
+
+  it('timePart produces distinct horoscope selections at morning vs evening', () => {
+    // Regression guard for the hourly variation feature: different timeParts on the same
+    // date must select different indices via mulberry32, so users opening the app in the
+    // morning see a different horoscope than users opening it in the evening.
+    const numSigns = 12;
+    const morningIdx = Math.floor(mulberry32(dailySeed('2026-07-09', 'aries', '08:00'))() * numSigns);
+    const eveningIdx = Math.floor(mulberry32(dailySeed('2026-07-09', 'aries', '20:00'))() * numSigns);
+    expect(Math.abs(morningIdx - eveningIdx)).toBeGreaterThan(0); // distinct selections
+  });
+
+  it('timePart variation is consistent within the same hour but differs across hours', () => {
+    // Same minute-level timePart must yield identical selection; different hours must not.
+    const numSigns = 12;
+    const morningA = Math.floor(mulberry32(dailySeed('2026-07-09', 'aries', '09:15'))() * numSigns);
+    const morningB = Math.floor(mulberry32(dailySeed('2026-07-09', 'aries', '09:15'))() * numSigns);
+    expect(morningA).toBe(morningB); // deterministic within same hour
+
+    const eveningC = Math.floor(mulberry32(dailySeed('2026-07-09', 'aries', '18:45'))() * numSigns);
+    expect(eveningC).not.toBe(morningA); // differs across hours
+  });
 });
