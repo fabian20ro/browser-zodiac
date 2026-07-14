@@ -17,6 +17,28 @@ export function createActionButton(options: ActionButtonOptions): HTMLButtonElem
   let revertTimer: ReturnType<typeof setTimeout> | null = null;
   let isRunning = false;
 
+  function showFeedback(icon: string): void {
+    btn.textContent = icon;
+    btn.classList.add('action-btn--feedback');
+    revertTimer = setTimeout(() => {
+      btn.textContent = options.icon;
+      btn.classList.remove('action-btn--feedback');
+      revertTimer = null;
+    }, 1500);
+  }
+
+  function showAndRevert(icon: string): void {
+    if (icon === options.feedbackIcon) {
+      showFeedback(icon);
+    } else if (options.errorIcon) {
+      btn.textContent = icon;
+      revertTimer = setTimeout(() => {
+        btn.textContent = options.icon;
+        revertTimer = null;
+      }, 1500);
+    }
+  }
+
   btn.addEventListener('click', async () => {
     if (isRunning) return;
     isRunning = true;
@@ -31,30 +53,12 @@ export function createActionButton(options: ActionButtonOptions): HTMLButtonElem
     try {
       const result = await options.onClick();
       if (typeof result === 'boolean' && !result) {
-        if (options.errorIcon) {
-          btn.textContent = options.errorIcon;
-          revertTimer = setTimeout(() => {
-            btn.textContent = options.icon;
-            revertTimer = null;
-          }, 1500);
-        }
+        showAndRevert(options.errorIcon ?? options.icon);
       } else if (options.feedbackIcon) {
-        btn.textContent = options.feedbackIcon;
-        btn.classList.add('action-btn--feedback');
-        revertTimer = setTimeout(() => {
-          btn.textContent = options.icon;
-          btn.classList.remove('action-btn--feedback');
-          revertTimer = null;
-        }, 1500);
+        showFeedback(options.feedbackIcon);
       }
     } catch {
-      if (options.errorIcon) {
-        btn.textContent = options.errorIcon;
-        revertTimer = setTimeout(() => {
-          btn.textContent = options.icon;
-          revertTimer = null;
-        }, 1500);
-      }
+      showAndRevert(options.errorIcon ?? options.icon);
     } finally {
       isRunning = false;
     }
