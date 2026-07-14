@@ -78,6 +78,25 @@ describe('mulberry32', () => {
     const seqB = Array.from({ length: 5 }, () => rngB());
     expect(seqA).not.toEqual(seqB);
   });
+
+  it('distributes roughly uniformly across [0, 1) over many samples', () => {
+    // Detects subtle PRNG algorithmic bugs (e.g. wrong shift direction)
+    // that bounds + determinism tests alone would miss.
+    const rng = mulberry32(7);
+    const n = 10_000;
+    const buckets = 10;
+    const counts = Array(buckets).fill(0);
+    for (let i = 0; i < n; i++) {
+      const v = rng();
+      const idx = Math.min(Math.floor(v * buckets), buckets - 1);
+      counts[idx]++;
+    }
+    const expected = n / buckets; // 1000
+    const maxDeviation = Math.ceil(2 * Math.sqrt(expected)); // ±2σ for binomial approx
+    for (const c of counts) {
+      expect(Math.abs(c - expected)).toBeLessThanOrEqual(maxDeviation);
+    }
+  });
 });
 
 describe('hashString', () => {
