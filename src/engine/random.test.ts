@@ -252,4 +252,33 @@ describe('dailySeed', () => {
       expect(rng()).toBeLessThan(1);
     }
   });
+
+  it('produces collision-free seeds across all 8760 hours in a year', () => {
+    // Regression guard: if any two hourly seeds collide, the user sees repeated
+    // horoscopes within the same day. The hash must spread seeds across the full
+    // 2^32 space well enough that this never happens.
+    const seen = new Set<number>();
+    for (let year = 2026; year <= 2027; year++) {
+      for (let month = 1; month <= 12; month++) {
+        const daysInMonth = new Date(year, month, 0).getDate();
+        for (let day = 1; day <= daysInMonth; day++) {
+          for (let h = 0; h < 24; h++) {
+            const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const seed = dailySeed(dateStr, 'aries', `${String(h).padStart(2, '0')}:00`);
+            expect(seen.has(seed)).toBe(false);
+            seen.add(seed);
+          }
+        }
+      }
+    }
+  });
+
+  it('non-standard timePart formats produce distinct seeds from standard format', () => {
+    // Documents observable behavior: djb2 treats string differences as seed differences.
+    // These edge-case formats must not collapse into the same seed as "09:15".
+    const base = dailySeed('2026-07-09', 'taurus', '09:15');
+    expect(dailySeed('2026-07-09', 'taurus', '9:15')).not.toBe(base);  // no zero-pad
+    expect(dailySeed('2026-07-09', 'taurus', '09:5')).not.toBe(base); // single-digit minute
+    expect(dailySeed('2026-07-09', 'taurus', '14:30')).not.toBe(base); // different time
+  });
 });
