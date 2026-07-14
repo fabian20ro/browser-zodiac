@@ -281,4 +281,32 @@ describe('dailySeed', () => {
     expect(dailySeed('2026-07-09', 'taurus', '09:5')).not.toBe(base); // single-digit minute
     expect(dailySeed('2026-07-09', 'taurus', '14:30')).not.toBe(base); // different time
   });
+
+  it('dateStr containing colons produces distinct seeds from dash-separated dates', () => {
+    // Edge case: if dateStr itself contains ':', the concatenation with ':' separator
+    // creates a longer/more complex string. djb2 must spread this into a different hash,
+    // otherwise malformed dates could accidentally collide with valid ones.
+    const colonDate = dailySeed('2026:03:03', 'aries');
+    const dashDate = dailySeed('2026-03-03', 'aries');
+    expect(colonDate).not.toBe(dashDate);
+  });
+
+  it('timePart containing colons (HH:MM:SS) produces a distinct seed from HH:MM', () => {
+    // Documents observable behavior when caller passes more precise timePart.
+    const hhmm = dailySeed('2026-07-09', 'aries', '14:30');
+    const hhmms = dailySeed('2026-07-09', 'aries', '14:30:45');
+    expect(hhmms).not.toBe(hhmm);
+  });
+
+  it('multiple colons in dateStr still produces valid unsigned 32-bit integer seed', () => {
+    const seed = dailySeed('2026::03::03', 'aries');
+    expect(Number.isInteger(seed)).toBe(true);
+    expect(seed >>> 0).toBe(seed);
+    // verify it can feed mulberry32 without error
+    const rng = mulberry32(seed);
+    for (let i = 0; i < 5; i++) {
+      expect(rng()).toBeGreaterThanOrEqual(0);
+      expect(rng()).toBeLessThan(1);
+    }
+  });
 });
