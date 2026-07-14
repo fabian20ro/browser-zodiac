@@ -15,6 +15,13 @@ function el<K extends keyof HTMLElementTagNameMap>(
   return e;
 }
 
+function appendDetailRow(parent: HTMLElement, label: string, value: string): void {
+  const row = el('div', 'detail-row');
+  row.appendChild(el('span', 'detail-row__label', label));
+  row.appendChild(el('span', 'detail-row__value', value));
+  parent.appendChild(row);
+}
+
 const LANG_FLAGS: Record<string, string> = {
   en: '\u{1F1EC}\u{1F1E7}',
   ro: '\u{1F1F7}\u{1F1F4}',
@@ -121,10 +128,7 @@ export function createHoroscopeCard(
   ];
 
   for (const [label, value] of items) {
-    const row = el('div', 'detail-row');
-    row.appendChild(el('span', 'detail-row__label', label));
-    row.appendChild(el('span', 'detail-row__value', value));
-    details.appendChild(row);
+    appendDetailRow(details, label, value);
   }
 
   card.append(headingRow, text, details);
@@ -161,10 +165,7 @@ export function createDivinationPanel(
 
   for (const reading of divination.readings) {
     const label = ui.divinationLabels[reading.key] ?? reading.key;
-    const row = el('div', 'detail-row');
-    row.appendChild(el('span', 'detail-row__label', label));
-    row.appendChild(el('span', 'detail-row__value', reading.raw));
-    list.appendChild(row);
+    appendDetailRow(list, label, reading.raw);
   }
 
   toggle.addEventListener('click', () => {
