@@ -335,6 +335,20 @@ describe('dailySeed', () => {
     }
   });
 
+  it('null timePart stringifies to "0" producing a valid but unexpected seed', () => {
+    // JS quirk: null !== undefined, so dailySeed passes `null` into concatenation
+    // as the string "0". Must produce a deterministic distinct seed from no-timePart.
+    const withNull = dailySeed('2026-03-03', 'aries', null);
+    const withoutTime = dailySeed('2026-03-03', 'aries');
+    expect(withNull).not.toBe(withoutTime);
+    // verify it can feed mulberry32 — no crash on null-derived seed
+    const rng = mulberry32(withNull);
+    for (let i = 0; i < 5; i++) {
+      expect(rng()).toBeGreaterThanOrEqual(0);
+      expect(rng()).toBeLessThan(1);
+    }
+  });
+
   it('timePart produces distinct horoscope selections at morning vs evening', () => {
     // Regression guard for the hourly variation feature: different timeParts on the same
     // date must select different indices via mulberry32, so users opening the app in the
