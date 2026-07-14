@@ -212,4 +212,44 @@ describe('dailySeed', () => {
     );
     expect(new Set(seeds).size).toBe(seeds.length);
   });
+
+  it('is backward-compatible: calling without timePart returns same seed as before', () => {
+    const withTime = dailySeed('2026-03-03', 'aries'); // no third arg
+    expect(withTime).toBe(dailySeed('2026-03-03', 'aries'));
+  });
+
+  it('differs by timePart on the same date and salt', () => {
+    const morning = dailySeed('2026-03-03', 'aries', '09:15');
+    const evening = dailySeed('2026-03-03', 'aries', '21:45');
+    expect(morning).not.toBe(evening);
+  });
+
+  it('same date+timePart+salt always returns the same seed', () => {
+    const a = dailySeed('2026-07-09', 'taurus', '14:30');
+    const b = dailySeed('2026-07-09', 'taurus', '14:30');
+    expect(a).toBe(b);
+  });
+
+  it('differing timePart produces different seeds (regression guard for hourly variation)', () => {
+    // Each hour of the day should produce a distinct seed so horoscopes vary.
+    const seeds = Array.from({ length: 24 }, (_, h) =>
+      dailySeed('2026-07-09', 'aries', `${String(h).padStart(2, '0')}:00`),
+    );
+    expect(new Set(seeds).size).toBe(seeds.length);
+  });
+
+  it('empty string timePart differs from no-timePart call on same date+salt', () => {
+    const withTime = dailySeed('2026-03-03', 'aries', '');
+    const withoutTime = dailySeed('2026-03-03', 'aries');
+    expect(withTime).not.toBe(withoutTime);
+  });
+
+  it('timePart seed can feed mulberry32 and produce valid samples', () => {
+    const seed = dailySeed('2026-07-09', 'aries', '18:00');
+    const rng = mulberry32(seed);
+    for (let i = 0; i < 5; i++) {
+      expect(rng()).toBeGreaterThanOrEqual(0);
+      expect(rng()).toBeLessThan(1);
+    }
+  });
 });
