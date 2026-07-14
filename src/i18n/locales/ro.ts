@@ -61,6 +61,6 @@ export const ro: LocalePack = {
     compatibility: ['#comp#'],
     chaos: ['haos', 'vidul', 'umbre'],
     color: ['Roșu', 'Albastru', 'Aurit', 'Argintiu', 'Violet'],
-    comp: ['Excelent', 'Bun', 'Medioc', 'Slab'],
+    comp: ['Excelent', 'Bun', 'Mediu', 'Slab'],
   },
 };
