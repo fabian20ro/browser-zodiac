@@ -24,7 +24,18 @@ export function hashString(str: string): number {
  * When `timePart` is provided (e.g., "09:30"), seeds differ by hour,
  * so the same sign consulted at different times on the same day
  * can produce distinct horoscopes. */
+/** Normalize a time-part to zero-padded HH:MM. Handles "9" → "09", "14:3" → "14:03".
+ * Rejects seconds precision — treats 'HH:MM:SS' as 'HH:MM'. */
+function normalizeTimePart(timePart: string): string {
+  if (!timePart) return '';
+  const parts = timePart.split(':');
+  const h = Number(parts[0]) || 0;
+  const m = Number(parts[1]) || 0;
+  return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+}
+
 export function dailySeed(dateStr: string, salt: string, timePart?: string): number {
-  const withTime = timePart !== undefined ? dateStr + ':' + timePart : dateStr;
+  const normalized = timePart !== undefined ? normalizeTimePart(timePart) : undefined;
+  const withTime = normalized !== undefined ? dateStr + ':' + normalized : dateStr;
   return hashString(withTime + ':' + salt);
 }
