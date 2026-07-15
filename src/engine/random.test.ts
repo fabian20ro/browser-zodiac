@@ -298,29 +298,36 @@ describe('dailySeed', () => {
     }
   });
 
-  it('non-standard timePart formats produce distinct seeds from standard format', () => {
-    // Documents observable behavior: djb2 treats string differences as seed differences.
-    // These edge-case formats must not collapse into the same seed as "09:15".
+  it('zero-pads non-standard timePart formats to produce identical seeds', () => {
+    // normalizeTimePart ensures "9:15" === "09:15" — same semantic hour.
     const base = dailySeed('2026-07-09', 'taurus', '09:15');
-    expect(dailySeed('2026-07-09', 'taurus', '9:15')).not.toBe(base);  // no zero-pad
-    expect(dailySeed('2026-07-09', 'taurus', '09:5')).not.toBe(base); // single-digit minute
-    expect(dailySeed('2026-07-09', 'taurus', '14:30')).not.toBe(base); // different time
+    expect(dailySeed('2026-07-09', 'taurus', '9:15')).toBe(base);  // zero-pad fix
+    expect(dailySeed('2026-07-09', 'taurus', '09:5')).toBe(
+      dailySeed('2026-07-09', 'taurus', '09:05')  // normalize single-digit minute
+    );
+    expect(dailySeed('2026-07-09', 'taurus', '14:3')).toBe(
+      dailySeed('2026-07-09', 'taurus', '14:03')  // normalize single-digit minute → "14:03"
+    );
+  });
+
+  it('different semantic times still produce distinct seeds', () => {
+    expect(dailySeed('2026-07-09', 'taurus', '14:30')).not.toBe(
+      dailySeed('2026-07-09', 'taurus', '08:00')
+    );
+  });
+
+  it('seconds-precision timePart normalizes to HH:MM (same seed)', () => {
+    // normalizeTimePart strips seconds — "14:30:45" → "14:30".
+    expect(dailySeed('2026-07-09', 'aries', '14:30:45')).toBe(
+      dailySeed('2026-07-09', 'aries', '14:30')
+    );
   });
 
   it('dateStr containing colons produces distinct seeds from dash-separated dates', () => {
     // Edge case: if dateStr itself contains ':', the concatenation with ':' separator
-    // creates a longer/more complex string. djb2 must spread this into a different hash,
-    // otherwise malformed dates could accidentally collide with valid ones.
     const colonDate = dailySeed('2026:03:03', 'aries');
     const dashDate = dailySeed('2026-03-03', 'aries');
     expect(colonDate).not.toBe(dashDate);
-  });
-
-  it('timePart containing colons (HH:MM:SS) produces a distinct seed from HH:MM', () => {
-    // Documents observable behavior when caller passes more precise timePart.
-    const hhmm = dailySeed('2026-07-09', 'aries', '14:30');
-    const hhmms = dailySeed('2026-07-09', 'aries', '14:30:45');
-    expect(hhmms).not.toBe(hhmm);
   });
 
   it('multiple colons in dateStr still produces valid unsigned 32-bit integer seed', () => {
@@ -335,13 +342,12 @@ describe('dailySeed', () => {
     }
   });
 
-  it('null timePart stringifies to "0" producing a valid but unexpected seed', () => {
-    // JS quirk: null !== undefined, so dailySeed passes `null` into concatenation
-    // as the string "0". Must produce a deterministic distinct seed from no-timePart.
-    const withNull = dailySeed('2026-03-03', 'aries', null);
+  it('null timePart is guarded and produces a valid distinct seed', () => {
+    // normalizeTimePart guards against null — returns '' which differs from no-timePart.
+    const withNull = dailySeed('2026-03-03', 'aries', null as any);
     const withoutTime = dailySeed('2026-03-03', 'aries');
     expect(withNull).not.toBe(withoutTime);
-    // verify it can feed mulberry32 — no crash on null-derived seed
+    // verify it can feed mulberry32 — no crash on null-guarded seed
     const rng = mulberry32(withNull);
     for (let i = 0; i < 5; i++) {
       expect(rng()).toBeGreaterThanOrEqual(0);
