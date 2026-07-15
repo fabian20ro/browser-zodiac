@@ -43,20 +43,14 @@ export function generateHoroscope(
 
   const engine = createGrammarEngine(contextGrammar, rng);
 
-  const text = engine.expand('#origin#');
-  const warning = engine.expand('#warning#');
-  const luckyColor = engine.expand('#luckyColor#');
-  const compatibility = engine.expand('#compatibility#');
-  const luckyNumber = Math.floor(rng() * 99) + 1;
-
   return {
     sign,
     signSymbol: ZODIAC_SYMBOLS[sign],
-    text,
-    luckyNumber,
-    luckyColor,
-    warning,
-    compatibility,
+    text: engine.expand('#origin#'),
+    warning: engine.expand('#warning#'),
+    luckyColor: engine.expand('#luckyColor#'),
+    compatibility: engine.expand('#compatibility#'),
+    luckyNumber: Math.floor(rng() * 99) + 1,
     date: dateStr,
   };
 }
