@@ -26,7 +26,7 @@ export function hashString(str: string): number {
  * can produce distinct horoscopes. */
 /** Normalize a time-part to zero-padded HH:MM. Handles "9" → "09", "14:3" → "14:03".
  * Rejects seconds precision — treats 'HH:MM:SS' as 'HH:MM'. */
-function normalizeTimePart(timePart: string): string {
+function normalizeTimePart(timePart: string | undefined): string {
   if (!timePart) return '';
   const parts = timePart.split(':');
   const h = Number(parts[0]) || 0;
@@ -35,7 +35,7 @@ function normalizeTimePart(timePart: string): string {
 }
 
 export function dailySeed(dateStr: string, salt: string, timePart?: string): number {
-  const normalized = timePart !== undefined ? normalizeTimePart(timePart) : undefined;
-  const withTime = normalized !== undefined ? dateStr + ':' + normalized : dateStr;
+  const normalized = normalizeTimePart(timePart);
+  const withTime = normalized ? dateStr + ':' + normalized : dateStr;
   return hashString(withTime + ':' + salt);
 }
