@@ -332,7 +332,7 @@ body::before {
   border-radius: 6px;
   color: var(--text-muted);
   cursor: pointer;
-  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+  transition: var(--action-btn-transition, color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease);
 }
 
 .action-btn:hover {
