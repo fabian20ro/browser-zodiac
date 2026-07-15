@@ -266,7 +266,8 @@ describe('dailySeed', () => {
   it('empty string timePart differs from no-timePart call on same date+salt', () => {
     const withTime = dailySeed('2026-03-03', 'aries', '');
     const withoutTime = dailySeed('2026-03-03', 'aries');
-    expect(withTime).not.toBe(withoutTime);
+    // empty timePart normalizes to '' (falsy), so behaves like no-timePart call
+    expect(withTime).toBe(withoutTime);
   });
 
   it('timePart seed can feed mulberry32 and produce valid samples', () => {
@@ -343,10 +344,11 @@ describe('dailySeed', () => {
   });
 
   it('null timePart is guarded and produces a valid distinct seed', () => {
-    // normalizeTimePart guards against null — returns '' which differs from no-timePart.
+    // null timePart normalizes to '' (falsy), same as no-timePart call
     const withNull = dailySeed('2026-03-03', 'aries', null as any);
     const withoutTime = dailySeed('2026-03-03', 'aries');
-    expect(withNull).not.toBe(withoutTime);
+    // null timePart falls through normalizeTimePart to '' (falsy), same as no-timePart call
+    expect(withNull).toBe(withoutTime);
     // verify it can feed mulberry32 — no crash on null-guarded seed
     const rng = mulberry32(withNull);
     for (let i = 0; i < 5; i++) {

@@ -55,11 +55,9 @@ export function scheduleMidnightGmt(callback: () => void): () => void {
       } catch (e) {
         console.error("Error in scheduler callback:", e);
       }
+      isLoopRunning = false;
       if (loopId === activeLoopId) {
-        isLoopRunning = false;
         scheduleNext();
-      } else {
-        isLoopRunning = false;
       }
     }, delay);
   }

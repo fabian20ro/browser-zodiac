@@ -23,6 +23,8 @@ export function render(
   isDark: boolean,
   onThemeToggle: () => void,
 ): void {
+  if (!container || container.nodeType !== Node.ELEMENT_NODE) return;
+
   container.innerHTML = '';
   container.className = 'app';
   container.setAttribute('aria-live', 'polite');
