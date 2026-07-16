@@ -40,13 +40,21 @@ const TITLECASE_CONTRACT = DEFAULT_MODIFIERS.find(
   (m) => m.name === 'titlecase'
 );
 if (TITLECASE_CONTRACT) {
-  const sample = 'hello world';
-  const expected = 'Hello World';
-  if (TITLECASE_CONTRACT.fn(sample) !== expected) {
-    throw new Error(
-      `titlecase contract violated: ${JSON.stringify(sample)} → ` +
-        `${JSON.stringify(TITLECASE_CONTRACT.fn(sample))} (expected ${JSON.stringify(expected)})`
-    );
+  const samples: Record<string, string> = {
+    'hello world': 'Hello World',
+    'the quick brown fox': 'The Quick Brown Fox',
+    'already Titlecased': 'Already Titlecased',
+    'multiple   spaces': 'Multiple Spaces',
+    '  leading-trailing ': 'Leading Trailing',
+  };
+  for (const [input, expected] of Object.entries(samples)) {
+    const actual = TITLECASE_CONTRACT.fn(input);
+    if (actual !== expected) {
+      throw new Error(
+        `titlecase contract violated: ${JSON.stringify(input)} → ` +
+          `${JSON.stringify(actual)} (expected ${JSON.stringify(expected)})`
+      );
+    }
   }
 }
 
