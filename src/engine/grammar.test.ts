@@ -48,6 +48,13 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#item#')).toBe('a');
     });
 
+    it('deterministically returns first item when all weights are zero (N≥3)', () => {
+      const engine = makeEngine({ item: ['a~~0', 'b~~0', 'c~~0', 'd~~0'] });
+      for (let i = 0; i < 100; i++) {
+        expect(engine.expand('#item#')).toBe('a');
+      }
+    });
+
     it('applies unquote modifier', () => {
       const engine = makeEngine({ word: ['"hello"'] }, 42);
       expect(engine.expand('#word.unquote#')).toBe('hello');
