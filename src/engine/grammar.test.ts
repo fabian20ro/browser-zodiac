@@ -299,5 +299,18 @@ describe('createGrammarEngine', () => {
       expect(() => makeEngine({ word: ['#'] })).toThrow(/contains unbalanced '#'/);
     });
 
+    it('handles user-supplied templates with unmatched delimiters gracefully', () => {
+      const engine = makeEngine({ greeting: ['hi'] });
+      // Matched portion expands; unmatched literal text passes through
+      expect(engine.expand('#greeting#unmatched')).toBe('hiunmatched');
+      expect(engine.expand('prefix#greeting#')).toBe('prefixhi');
+    });
+
+    it('handles user-supplied templates with trailing single delimiter', () => {
+      const engine = makeEngine({ word: ['test'] });
+      // Single trailing # is literal; matched expansion still works
+      expect(engine.expand('#word#text#more')).toBe('testtext#more');
+    });
+
   });
 });
