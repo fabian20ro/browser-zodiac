@@ -229,6 +229,43 @@ unicorn`,
     ).rejects.toThrow('Failed to load grammar');
   });
 
+  it('throws with full URL when the main grammar file fails in strict mode', async () => {
+    const fetch = mockFetch({});
+    await expect(
+      loadGrammar('en', 'http://test/data/', fetch, true),
+    ).rejects.toThrow('Failed to load grammar: http://test/data/en.txt (404)');
+  });
+
+  it('deduplicates fetch calls when multiple @from point to the same file', async () => {
+    const fetchCalls: string[] = [];
+    const fetch = vi.fn(async (url: string) => {
+      fetchCalls.push(url);
+      return Promise.resolve({
+        ok: true,
+        text: () =>
+          Promise.resolve(
+            `=== creature ===\nunicorn`,
+          ),
+      } as Response);
+    }) as FetchFn;
+
+    await loadGrammar('en', 'http://test/data/', fetch);
+    const uniqueUrls = [...new Set(fetchCalls)];
+    expect(uniqueUrls).toEqual(fetchCalls);
+  });
+
+  it('throws on non-200 @from response in strict mode with URL', async () => {
+    const fetch = mockFetch({
+      'http://test/data/en.txt': `@from bad.txt import *`,
+    });
+
+    await expect(
+      loadGrammar('en', 'http://test/data/', fetch, true),
+    ).rejects.toThrow(
+      'Failed to load http://test/data/en/bad.txt: 404',
+    );
+  });
+
   it('loads multiple @from files in parallel', async () => {
     const fetch = vi.fn((url: string) => {
       const files: Record<string, string> = {
