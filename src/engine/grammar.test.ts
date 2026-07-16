@@ -48,6 +48,13 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#item#')).toBe('a');
     });
 
+    it('deterministically returns first item when all weights are zero (N≥3)', () => {
+      const engine = makeEngine({ item: ['a~~0', 'b~~0', 'c~~0', 'd~~0'] });
+      for (let i = 0; i < 100; i++) {
+        expect(engine.expand('#item#')).toBe('a');
+      }
+    });
+
     it('applies unquote modifier', () => {
       const engine = makeEngine({ word: ['"hello"'] }, 42);
       expect(engine.expand('#word.unquote#')).toBe('hello');
@@ -290,6 +297,31 @@ describe('createGrammarEngine', () => {
 
     it('throws on a rule entry containing exactly one delimiter #', () => {
       expect(() => makeEngine({ word: ['#'] })).toThrow(/contains unbalanced '#'/);
+    });
+
+    it('handles user-supplied templates with unmatched delimiters gracefully', () => {
+      const engine = makeEngine({ greeting: ['hi'] });
+      // Matched portion expands; unmatched literal text passes through
+      expect(engine.expand('#greeting#unmatched')).toBe('hiunmatched');
+      expect(engine.expand('prefix#greeting#')).toBe('prefixhi');
+    });
+
+    it('handles user-supplied templates with trailing single delimiter', () => {
+      const engine = makeEngine({ word: ['test'] });
+      // Single trailing # is literal; matched expansion still works
+      expect(engine.expand('#word#text#more')).toBe('testtext#more');
+    });
+
+    it('applies strip-hashes modifier to remove all # characters', () => {
+      const engine = makeEngine({ word: ['a##b'] });
+      // '##' is allowed as balanced literal; strip-hashes removes both '#' chars
+      expect(engine.expand('#word.strip-hashes#')).toBe('ab');
+    });
+
+    it('strips hashes in chained modifiers', () => {
+      const engine = makeEngine({ word: ['a##b'] });
+      // strip-hashes first, then uppercase — demonstrates chaining works after stripping
+      expect(engine.expand('#word.strip-hashes.uppercase#')).toBe('AB');
     });
 
   });

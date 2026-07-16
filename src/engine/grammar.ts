@@ -126,6 +126,7 @@ export function createGrammarEngine(grammar: Grammar, rng: SeededRandom, options
   addModifier('celebrate', (s) => `🎉 ${s} 🎉`);
   addModifier('glitch', (s) => s.replace(/[aeiou]/gi, '§'));
   addModifier('case-flip', (s) => s.split('').map(c => c === c.toUpperCase() ? c.toLowerCase() : c.toUpperCase()).join(''));
+  addModifier('strip-hashes', (s) => s.replace(/#/g, ''));
 
   return { expand, addModifier };
 }
