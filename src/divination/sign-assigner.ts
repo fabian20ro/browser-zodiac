@@ -1,6 +1,19 @@
 import { hashString, mulberry32 } from '../engine/random';
 import { ZODIAC_SIGNS, ZODIAC_SYMBOLS, type ZodiacSign } from '../horoscope/zodiac';
 
+export type AstroElement = 'fire' | 'earth' | 'air' | 'water';
+
+const ELEMENT_BY_SIGN: Record<ZodiacSign, AstroElement> = {
+  aries: 'fire', taurus: 'earth', gemini: 'air', cancer: 'water',
+  leo: 'fire', virgo: 'earth', libra: 'air', scorpio: 'water',
+  sagittarius: 'fire', capricorn: 'earth', aquarius: 'air', pisces: 'water',
+};
+
+/** Returns the astrological element (fire/earth/air/water) for a zodiac sign. */
+export function getSignElement(sign: ZodiacSign): AstroElement {
+  return ELEMENT_BY_SIGN[sign];
+}
+
 export function assignSign(fingerprint: string): ZodiacSign {
   const normalized = fingerprint.normalize().toLowerCase();
   const hash = hashString(normalized);

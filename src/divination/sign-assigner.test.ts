@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { assignSign, assignDailySign, assignSignWithSymbol, assignSigns, assignRandomSign } from './sign-assigner.ts';
+import { assignSign, assignDailySign, assignSignWithSymbol, assignSigns, assignRandomSign, getSignElement } from './sign-assigner.ts';
 import { ZODIAC_SIGNS, ZODIAC_SYMBOLS } from '../horoscope/zodiac.ts';
 
 describe('sign-assigner', () => {
@@ -251,6 +251,32 @@ describe('sign-assigner', () => {
       for (let i = 0; i < fingerprints.length; i++) {
         expect(batchResult[i]).toBe(assignSign(fingerprints[i]));
       }
+    });
+  });
+
+  describe('getSignElement', () => {
+    it('returns fire for aries, leo, sagittarius', () => {
+      expect(getSignElement('aries')).toBe('fire');
+      expect(getSignElement('leo')).toBe('fire');
+      expect(getSignElement('sagittarius')).toBe('fire');
+    });
+
+    it('returns earth for taurus, virgo, capricorn', () => {
+      expect(getSignElement('taurus')).toBe('earth');
+      expect(getSignElement('virgo')).toBe('earth');
+      expect(getSignElement('capricorn')).toBe('earth');
+    });
+
+    it('returns air for gemini, libra, aquarius', () => {
+      expect(getSignElement('gemini')).toBe('air');
+      expect(getSignElement('libra')).toBe('air');
+      expect(getSignElement('aquarius')).toBe('air');
+    });
+
+    it('returns water for cancer, scorpio, pisces', () => {
+      expect(getSignElement('cancer')).toBe('water');
+      expect(getSignElement('scorpio')).toBe('water');
+      expect(getSignElement('pisces')).toBe('water');
     });
   });
 
