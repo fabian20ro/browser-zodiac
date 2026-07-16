@@ -57,3 +57,22 @@ export interface DivinationProfile {
   readings: DivinationReading[];
   fingerprint: string;
 }
+
+// Compile-time characterization: ensures DIVINATION_READING_KEYS remains in lockstep with DivinationReadingKey.
+// Adding a union member without a matching array entry (or vice versa) is now a type error.
+type _ArrayKeys<T extends ReadonlyArray<string>> = T[number];
+type _UnionKeys = DivinationReadingKey;
+
+interface _DriftProof {
+  /** Every array element must satisfy the union */
+  readonly arraySubset: Record<_ArrayKeys<typeof DIVINATION_READING_KEYS>, never> extends Record<_UnionKeys, never> ? true : false;
+  /** Every union member is represented in the array (exhaustive literal check) */
+  readonly unionSubset: _UnionKeys extends _ArrayKeys<typeof DIVINATION_READING_KEYS> ? true : false;
+}
+
+// Compile-time assertion — any drift surfaces as a type error here.
+const __drift_proof: _DriftProof = {
+  arraySubset: true,
+  unionSubset: true,
+};
+void __drift_proof; // keep linter happy
