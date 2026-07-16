@@ -279,5 +279,18 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#hyphen-ated#')).toBe('ok');
     });
 
+    it('passes even-but-malformed # delimiters through literal', () => {
+      const engine = makeEngine({ word: ['text ## more'] });
+      expect(engine.expand('#word#')).toBe('text ## more');
+    });
+
+    it('throws on an empty string symbol name in grammar', () => {
+      expect(() => makeEngine({ '': ['hello'] })).toThrow(/Invalid grammar symbol/);
+    });
+
+    it('throws on a rule entry containing exactly one delimiter #', () => {
+      expect(() => makeEngine({ word: ['#'] })).toThrow(/contains unbalanced '#'/);
+    });
+
   });
 });

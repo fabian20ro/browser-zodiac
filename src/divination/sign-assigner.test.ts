@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { assignSign, assignDailySign, assignSignWithSymbol, assignSigns, assignRandomSign } from './sign-assigner.ts';
+import { assignSign, assignDailySign, assignSignWithSymbol, assignSigns, assignRandomSign, getSignElement } from './sign-assigner.ts';
 import { ZODIAC_SIGNS, ZODIAC_SYMBOLS } from '../horoscope/zodiac.ts';
 
 describe('sign-assigner', () => {
@@ -85,6 +85,19 @@ describe('sign-assigner', () => {
       ];
       const results = new Set(variants.map(assignSign));
       expect(results.size).toBe(1);
+    });
+
+    it('maps fingerprints to signs via hashString % 12 on the normalized form', () => {
+      for (const fp of ['hello', 'world', '', '🌟', 'test', 'abc\\0def']) {
+        const normalized = fp.normalize().toLowerCase();
+        // Inline djb2 so we don't leak internal hash into the test surface.
+        let h = 5381;
+        for (let i = 0; i < normalized.length; i++) {
+          h = (h * 33 + normalized.charCodeAt(i)) | 0;
+        }
+        const expectedIndex = ((h >>> 0) % ZODIAC_SIGNS.length);
+        expect(assignSign(fp)).toBe(ZODIAC_SIGNS[expectedIndex]);
+      }
     });
     });
 
@@ -238,6 +251,32 @@ describe('sign-assigner', () => {
       for (let i = 0; i < fingerprints.length; i++) {
         expect(batchResult[i]).toBe(assignSign(fingerprints[i]));
       }
+    });
+  });
+
+  describe('getSignElement', () => {
+    it('returns fire for aries, leo, sagittarius', () => {
+      expect(getSignElement('aries')).toBe('fire');
+      expect(getSignElement('leo')).toBe('fire');
+      expect(getSignElement('sagittarius')).toBe('fire');
+    });
+
+    it('returns earth for taurus, virgo, capricorn', () => {
+      expect(getSignElement('taurus')).toBe('earth');
+      expect(getSignElement('virgo')).toBe('earth');
+      expect(getSignElement('capricorn')).toBe('earth');
+    });
+
+    it('returns air for gemini, libra, aquarius', () => {
+      expect(getSignElement('gemini')).toBe('air');
+      expect(getSignElement('libra')).toBe('air');
+      expect(getSignElement('aquarius')).toBe('air');
+    });
+
+    it('returns water for cancer, scorpio, pisces', () => {
+      expect(getSignElement('cancer')).toBe('water');
+      expect(getSignElement('scorpio')).toBe('water');
+      expect(getSignElement('pisces')).toBe('water');
     });
   });
 
