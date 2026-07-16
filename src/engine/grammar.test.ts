@@ -279,5 +279,10 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#hyphen-ated#')).toBe('ok');
     });
 
+    it('passes even-but-malformed # delimiters through literal', () => {
+      const engine = makeEngine({ word: ['text ## more'] });
+      expect(engine.expand('#word#')).toBe('text ## more');
+    });
+
   });
 });
