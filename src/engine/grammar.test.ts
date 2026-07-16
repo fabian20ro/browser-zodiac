@@ -312,5 +312,17 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word#text#more')).toBe('testtext#more');
     });
 
+    it('applies strip-hashes modifier to remove all # characters', () => {
+      const engine = makeEngine({ word: ['a##b'] });
+      // '##' is allowed as balanced literal; strip-hashes removes both '#' chars
+      expect(engine.expand('#word.strip-hashes#')).toBe('ab');
+    });
+
+    it('strips hashes in chained modifiers', () => {
+      const engine = makeEngine({ word: ['a##b'] });
+      // strip-hashes first, then uppercase — demonstrates chaining works after stripping
+      expect(engine.expand('#word.strip-hashes.uppercase#')).toBe('AB');
+    });
+
   });
 });
