@@ -105,6 +105,13 @@ Mâine va ploua`;
 dragon`;
     expect(parseEntriesFile(content)).toEqual(['unicorn', 'dragon']);
   });
+
+  it('handles CRLF line endings without corrupting entries', () => {
+    // Grammar files authored on Windows use \r\n; trimEnd must strip the \r so
+    // that entries roundtrip cleanly through parseEntriesFile.
+    const content = 'unicorn\r\ndragon\r\nphoenix';
+    expect(parseEntriesFile(content)).toEqual(['unicorn', 'dragon', 'phoenix']);
+  });
 });
 
 describe('parseGrammarText', () => {
