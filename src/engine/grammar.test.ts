@@ -324,5 +324,12 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.strip-hashes.uppercase#')).toBe('AB');
     });
 
+    it('returns first entry when all weights are invalid (strip to 0)', () => {
+      const engine = makeEngine({ item: ['a~~abc', 'b~~xyz'] });
+      for (let i = 0; i < 50; i++) {
+        expect(engine.expand('#item#')).toBe('a');
+      }
+    });
+
   });
 });
