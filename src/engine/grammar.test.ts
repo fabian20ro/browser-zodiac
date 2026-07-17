@@ -331,5 +331,23 @@ describe('createGrammarEngine', () => {
       }
     });
 
+    it('chains strip-hashes with scrub — order matters', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      // expandOnce leaves 'hello' as literal (no # patterns).
+      // strip-hashes removes '#' → 'hello'. scrub strips vowels → 'hll'.
+      expect(engine.expand('#word.strip-hashes.scrub#')).toBe('hll');
+    });
+
+    it('handles consecutive expansions in one template', () => {
+      const engine = makeEngine({ a: ['X'], b: ['Y'] });
+      // Three adjacent symbols — regex must not consume across the # delimiter boundary.
+      expect(engine.expand('#a# #b# #a#')).toBe('X Y X');
+    });
+
+    it('returns [?symbol] when symbol value is an object (non-array)', () => {
+      const engine = makeEngine({ word: { foo: 'bar' } as any });
+      expect(engine.expand('#word#')).toBe('[?word]');
+    });
+
   });
 });
