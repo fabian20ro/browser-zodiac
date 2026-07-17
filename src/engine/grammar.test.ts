@@ -338,6 +338,16 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.strip-hashes.scrub#')).toBe('hll');
     });
 
+    it('applies creepify modifier with ghost prefix', () => {
+      const engine = makeEngine({ word: ['spooky'] });
+      expect(engine.expand('#word.creepify#')).toBe('\u{1F480} spooky');
+    });
+
+    it('chains creepify with uppercase', () => {
+      const engine = makeEngine({ word: ['haunt'] });
+      expect(engine.expand('#word.creepify.uppercase#')).toBe('\u{1F480} HAUNT');
+    });
+
     it('handles consecutive expansions in one template', () => {
       const engine = makeEngine({ a: ['X'], b: ['Y'] });
       // Three adjacent symbols — regex must not consume across the # delimiter boundary.
