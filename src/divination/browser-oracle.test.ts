@@ -288,6 +288,21 @@ describe('readBrowserOracle', () => {
     expect(osReading?.raw).toBe('iOS');
   });
 
+  it('detects iPad as iOS via the dedicated branch', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148',
+      language: 'en-US',
+      hardwareConcurrency: 2,
+      platform: 'iPad',
+      onLine: true,
+      maxTouchPoints: 5,
+      connection: { effectiveType: 'wifi' },
+    });
+    const profile = readBrowserOracle();
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+    expect(osReading?.raw).toBe('iOS');
+  });
+
   it('detects Firefox on iOS via FxiOS', () => {
     vi.stubGlobal('navigator', {
       userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/94.0 Mobile/15E148',
