@@ -189,6 +189,16 @@ describe('createTopBar', () => {
     expect(themeButton.getAttribute('aria-label')).toBe('Switch to light theme');
     expect(languageButton.type).toBe('button');
     expect(themeButton.type).toBe('button');
+    expect(themeButton.textContent).toBe('\u2600\uFE0F'); // ☀️ for dark mode starting point
+  });
+
+  it('shows moon icon and switches-to-dark label when starting in light mode', () => {
+    const bar = createTopBar(locales, 'en', minimalUi, () => {}, false, () => {});
+    const buttons = bar.querySelectorAll('button') as NodeListOf<HTMLButtonElement>;
+    const themeButton = buttons[1];
+
+    expect(themeButton.textContent).toBe('\u{1F319}'); // 🌙 for light mode starting point
+    expect(themeButton.getAttribute('aria-label')).toBe('Switch to dark theme');
   });
 
   it('shows both flags (current → target) on the language button', () => {
