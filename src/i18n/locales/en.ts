@@ -87,3 +87,13 @@ export const en: LocalePack = {
     comp: ['Excellent', 'Good', 'Average', 'Poor'],
   },
 };
+
+// Runtime invariant: every divination label must be a non-empty string.
+for (const key of Object.keys(en.ui.divinationLabels as Record<string, unknown>)) {
+  const value = en.ui.divinationLabels[key as keyof typeof en.ui.divinationLabels];
+  if (!value || typeof value !== 'string' || value.trim().length === 0) {
+    throw new Error(
+      `Locale invariant failed: divination label '${key}' is not a non-empty string`,
+    );
+  }
+}
