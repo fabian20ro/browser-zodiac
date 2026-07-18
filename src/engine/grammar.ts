@@ -95,39 +95,42 @@ export function createGrammarEngine(grammar: Grammar, rng: SeededRandom, options
     return expandOnce(rule, 0);
   }
 
+  const MODIFIERS: Record<string, Modifier> = {
+    capitalize: (s) => s.charAt(0).toUpperCase() + s.slice(1),
+    uppercase: (s) => s.toUpperCase(),
+    sentencecase: (s) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase(),
+    lowercase: (s) => s.toLowerCase(),
+    shout: (s) => s.toUpperCase() + '!',
+    trim: (s) => s.trim(),
+    'trim-start': (s) => s.trimStart(),
+    'trim-end': (s) => s.trimEnd(),
+    'trim-all': (s) => s.trim().replace(/\s+/g, ''),
+    slugify: (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+    snake_case: (s) => s.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_'),
+    reverse: (s) => Array.from(s).reverse().join(''),
+    unquote: (s) => s.replace(/^["']|["']$/g, ''),
+    scrub: (s) => s.replace(/[aeiou]/gi, ''),
+    void: (s) => s.replace(/[aeiou]/gi, '·'),
+    bang: (s) => `${s}!`,
+    titlecase: (s) => {
+      const words = s.trim().split(/\s+/).filter(Boolean);
+      return words.map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    },
+    echo: (s) => `${s} ${s}`,
+    mystic: (s) => `✧ ${s} ✧`,
+    'wrap-emoji': (s) => `✨ ${s} ✨`,
+    celebrate: (s) => `🎉 ${s} 🎉`,
+    glitch: (s) => s.replace(/[aeiou]/gi, '§'),
+    'case-flip': (s) => s.split('').map(c => c === c.toUpperCase() ? c.toLowerCase() : c.toUpperCase()).join(''),
+    'strip-hashes': (s) => s.replace(/#/g, ''),
+    creepify: (s) => `\u{1F480} ${s}`, // 👻 emoji prefix for horror theme
+  };
+
+  Object.assign(modifiers, MODIFIERS);
+
   function addModifier(name: string, fn: Modifier) {
     modifiers[name] = fn;
   }
-
-  // Register default modifiers
-  addModifier('capitalize', (s) => s.charAt(0).toUpperCase() + s.slice(1));
-  addModifier('uppercase', (s) => s.toUpperCase());
-  addModifier('sentencecase', (s) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase());
-  addModifier('lowercase', (s) => s.toLowerCase());
-  addModifier('shout', (s) => s.toUpperCase() + '!');
-  addModifier('trim', (s) => s.trim());
-  addModifier('trim-start', (s) => s.trimStart());
-  addModifier('trim-end', (s) => s.trimEnd());
-  addModifier('trim-all', (s) => s.trim().replace(/\s+/g, ''));
-  addModifier('slugify', (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''));
-  addModifier('snake_case', (s) => s.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_'));
-  addModifier('reverse', (s) => Array.from(s).reverse().join(''));
-  addModifier('unquote', (s) => s.replace(/^["']|["']$/g, ''));
-  addModifier('scrub', (s) => s.replace(/[aeiou]/gi, ''));
-  addModifier('void', (s) => s.replace(/[aeiou]/gi, '·'));
-  addModifier('bang', (s) => `${s}!`);
-  addModifier('titlecase', (s) => {
-    const words = s.trim().split(/\s+/).filter(Boolean);
-    return words.map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-  });
-  addModifier('echo', (s) => `${s} ${s}`);
-  addModifier('mystic', (s) => `✧ ${s} ✧`);
-  addModifier('wrap-emoji', (s) => `✨ ${s} ✨`);
-  addModifier('celebrate', (s) => `🎉 ${s} 🎉`);
-  addModifier('glitch', (s) => s.replace(/[aeiou]/gi, '§'));
-  addModifier('case-flip', (s) => s.split('').map(c => c === c.toUpperCase() ? c.toLowerCase() : c.toUpperCase()).join(''));
-  addModifier('strip-hashes', (s) => s.replace(/#/g, ''));
-  addModifier('creepify', (s) => `\u{1F480} ${s}`); // 👻 emoji prefix for horror theme
 
   return { expand, addModifier };
 }
