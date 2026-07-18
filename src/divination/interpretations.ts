@@ -22,7 +22,7 @@ export const readingInterpretations: Record<string, InterpretationFn> = {
   soul_alignment: (raw) => article(raw, `The alignment is set to a ${raw}.`, `The alignment is set to an ${raw}.`),
   cosmic_mood: (raw) => `The cosmic mood is currently ${raw}.`,
   parallel_lives: (raw) => `You exist across ${raw === 'unknowable' ? 'a' : article(raw, 'a', 'an')} ${raw} threads.`,
-  cosmic_platform: (raw) => article(raw, `Rooted in the a ${raw} plane.`, `Rooted in the an ${raw} plane.`).replace('the an', 'an'),
+  cosmic_platform: (raw) => article(raw, `Rooted in a ${raw} plane.`, `Rooted in an ${raw} plane.`),
   network_speed: (raw) => `The pace of destiny is ${raw}.`,
   social_connectivity: (raw) => `You are ${raw}.`,
   cosmic_timezone: (raw) => `Temporal flow: ${raw}.`,
