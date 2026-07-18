@@ -74,12 +74,26 @@ export async function loadGrammar(
   const base = basePath ?? `${import.meta.env.BASE_URL}data/`;
   const mainUrl = `${base}${localeId}.txt`;
 
-  const response = await fetchFn(mainUrl);
+  let response;
+  try {
+    response = await fetchFn(mainUrl);
+  } catch (err) {
+    throw new Error(
+      `Failed to load grammar from ${mainUrl}: ${(err as Error).message}`,
+    );
+  }
   if (!response.ok) {
     throw new Error(`Failed to load grammar: ${mainUrl} (${response.status})`);
   }
 
-  const content = await response.text();
+  let content;
+  try {
+    content = await response.text();
+  } catch (err) {
+    throw new Error(
+      `Failed to read grammar from ${mainUrl}: ${(err as Error).message}`,
+    );
+  }
   const parsed = parseGrammarText(content);
 
   const grammar: Grammar = {};
@@ -104,7 +118,15 @@ export async function loadGrammar(
     if (visitedUrls.has(url)) continue; // avoid infinite recursion on circular imports
     visitedUrls.add(url);
 
-    const res = await fetchFn(url);
+    let res;
+    try {
+      res = await fetchFn(url);
+    } catch (err) {
+      const errorMsg = `Failed to load ${url}: ${(err as Error).message}`;
+      if (strict) throw new Error(errorMsg);
+      console.warn(errorMsg);
+      continue;
+    }
     if (!res.ok) {
       const errorMsg = `Failed to load ${url}: ${res.status}`;
       if (strict) throw new Error(errorMsg);
@@ -112,7 +134,15 @@ export async function loadGrammar(
       continue;
     }
 
-    const text = await res.text();
+    let text: string;
+    try {
+      text = await res.text();
+    } catch (err) {
+      const errorMsg = `Failed to read ${url}: ${(err as Error).message}`;
+      if (strict) throw new Error(errorMsg);
+      console.warn(errorMsg);
+      continue;
+    }
     const parsedImport = parseGrammarText(text);
 
     // Queue nested imports for later processing
