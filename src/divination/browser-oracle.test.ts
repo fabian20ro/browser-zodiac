@@ -521,6 +521,21 @@ describe('readBrowserOracle', () => {
     expect(osReading?.raw).toBe('Windows');
   });
 
+  it('detects Edge on iOS via EdgiOS', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/91 Mobile Safari/537.36 EdgiOS/91.0.864',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'iPhone',
+      onLine: true,
+      maxTouchPoints: 5,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
+    expect(browserReading?.raw).toBe('Edge');
+  });
+
   it('detects Android', () => {
     vi.stubGlobal('navigator', {
       userAgent: 'Mozilla/5.0 (Linux; Android 10; SM-G973F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4449.82 Mobile Safari/537.36',
