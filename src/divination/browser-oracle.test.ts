@@ -814,6 +814,20 @@ describe('readBrowserOracle', () => {
     expect(profile.readings.find(r => r.key === 'cosmic_thriftiness')?.raw).toBe('thrifty');
   });
 
+  it('defaults cosmic_thriftiness to lavish when saveData is absent', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'cosmic_thriftiness')?.raw).toBe('lavish');
+  });
+
   it('handles detection of dark mode and evening time', () => {
     vi.stubGlobal('window', {
       innerWidth: 1920,
