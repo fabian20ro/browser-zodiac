@@ -1,6 +1,31 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { readBrowserOracle, detectMobile, getTimeOfDay } from './browser-oracle.ts';
 
+describe('getTimeOfDay', () => {
+  const cases: Array<[number, string]> = [
+    [0, 'deep_night'],
+    [3, 'deep_night'],
+    [5, 'deep_night'],
+    [6, 'morning'],
+    [9, 'morning'],
+    [11, 'morning'],
+    [12, 'afternoon'],
+    [14, 'afternoon'],
+    [16, 'afternoon'],
+    [17, 'evening'],
+    [19, 'evening'],
+    [20, 'evening'],
+    [21, 'night'],
+    [23, 'night'],
+  ];
+
+  for (const [hour, expected] of cases) {
+    it(`returns ${expected} for hour ${hour}`, () => {
+      expect(getTimeOfDay(hour)).toBe(expected);
+    });
+  }
+});
+
 describe('detectMobile', () => {
   const mobileOSes = ['iOS', 'Android'];
   const desktopOSes = ['Windows', 'macOS', 'Linux', 'Unknown'];
