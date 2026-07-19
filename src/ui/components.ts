@@ -120,16 +120,10 @@ export function createHoroscopeCard(
 
   const details = el('div', 'horoscope-card__details');
 
-  const items: [string, string][] = [
-    [ui.luckyNumber, String(horoscope.luckyNumber)],
-    [ui.luckyColor, horoscope.luckyColor],
-    [ui.cosmicWarning, horoscope.warning],
-    [ui.compatibility, horoscope.compatibility],
-  ];
-
-  for (const [label, value] of items) {
-    appendDetailRow(details, label, value);
-  }
+  appendDetailRow(details, ui.luckyNumber, String(horoscope.luckyNumber));
+  appendDetailRow(details, ui.luckyColor, horoscope.luckyColor);
+  appendDetailRow(details, ui.cosmicWarning, horoscope.warning);
+  appendDetailRow(details, ui.compatibility, horoscope.compatibility);
 
   card.append(headingRow, text, details);
   return card;
