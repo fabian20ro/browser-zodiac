@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { assignSign, assignDailySign, assignSignWithSymbol, assignSigns, assignRandomSign, getSignElement } from './sign-assigner.ts';
+import { assignSign, assignDailySign, assignSignWithSymbol, assignSigns, assignRandomSign, getSignElement, assignSignWithElement } from './sign-assigner.ts';
 import { ZODIAC_SIGNS, ZODIAC_SYMBOLS } from '../horoscope/zodiac.ts';
 
 describe('sign-assigner', () => {
@@ -205,6 +205,36 @@ describe('sign-assigner', () => {
     it('does not map two signs to the same symbol', () => {
       const symbols = new Set(Object.values(ZODIAC_SYMBOLS));
       expect(symbols.size).toBe(ZODIAC_SIGNS.length);
+    });
+  });
+
+  describe('assignSignWithElement', () => {
+    it('returns a valid sign with its corresponding element', () => {
+      const result = assignSignWithElement('test');
+      expect(ZODIAC_SIGNS).toContain(result.sign);
+      expect(['fire', 'earth', 'air', 'water']).toContain(result.element);
+    });
+
+    it('element matches getSignElement for the derived sign', () => {
+      const result = assignSignWithElement('aries');
+      expect(result.element).toBe(getSignElement(result.sign));
+    });
+
+    it('covers all four elements across many fingerprints', () => {
+      const seenElements = new Set<string>();
+      for (let i = 0; i < ZODIAC_SIGNS.length * 25; i++) {
+        const result = assignSignWithElement(`fingerprint-${i}`);
+        expect(['fire', 'earth', 'air', 'water']).toContain(result.element);
+        seenElements.add(result.element);
+      }
+      expect(seenElements.size).toBe(4);
+    });
+
+    it('is deterministic', () => {
+      const fingerprint = 'element-determinism';
+      const r1 = assignSignWithElement(fingerprint);
+      const r2 = assignSignWithElement(fingerprint);
+      expect(r1).toEqual(r2);
     });
   });
 

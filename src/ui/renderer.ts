@@ -44,12 +44,13 @@ export function render(
 
   container.appendChild(wrapper);
 
-  // Staggered entrance animations
-  requestAnimationFrame(() => {
-    const cards = wrapper.querySelectorAll('.card');
-    cards.forEach((card, i) => {
-      (card as HTMLElement).style.animationDelay = `${i * 0.15}s`;
-      card.classList.add('card--visible');
-    });
+  requestAnimationFrame(() => applyStaggerAnimations(wrapper));
+
+function applyStaggerAnimations(wrapper: HTMLDivElement): void {
+  const cards = wrapper.querySelectorAll('.card');
+  cards.forEach((card, i) => {
+    (card as HTMLElement).style.animationDelay = `${i * 0.15}s`;
+    card.classList.add('card--visible');
   });
+}
 }

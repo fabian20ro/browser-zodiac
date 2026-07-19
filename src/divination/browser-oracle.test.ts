@@ -1,6 +1,31 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { readBrowserOracle, detectMobile, getTimeOfDay } from './browser-oracle.ts';
 
+describe('getTimeOfDay', () => {
+  const cases: Array<[number, string]> = [
+    [0, 'deep_night'],
+    [3, 'deep_night'],
+    [5, 'deep_night'],
+    [6, 'morning'],
+    [9, 'morning'],
+    [11, 'morning'],
+    [12, 'afternoon'],
+    [14, 'afternoon'],
+    [16, 'afternoon'],
+    [17, 'evening'],
+    [19, 'evening'],
+    [20, 'evening'],
+    [21, 'night'],
+    [23, 'night'],
+  ];
+
+  for (const [hour, expected] of cases) {
+    it(`returns ${expected} for hour ${hour}`, () => {
+      expect(getTimeOfDay(hour)).toBe(expected);
+    });
+  }
+});
+
 describe('detectMobile', () => {
   const mobileOSes = ['iOS', 'Android'];
   const desktopOSes = ['Windows', 'macOS', 'Linux', 'Unknown'];
@@ -787,6 +812,20 @@ describe('readBrowserOracle', () => {
     });
     const profile = readBrowserOracle();
     expect(profile.readings.find(r => r.key === 'cosmic_thriftiness')?.raw).toBe('thrifty');
+  });
+
+  it('defaults cosmic_thriftiness to lavish when saveData is absent', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'cosmic_thriftiness')?.raw).toBe('lavish');
   });
 
   it('handles detection of dark mode and evening time', () => {

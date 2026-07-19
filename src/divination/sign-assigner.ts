@@ -49,6 +49,14 @@ export function assignSignWithSymbol(fingerprint: string): { sign: ZodiacSign; s
 }
 
 /**
+ * Assigns a sign with its astrological element (fire/earth/air/water).
+ */
+export function assignSignWithElement(fingerprint: string): { sign: ZodiacSign; element: AstroElement } {
+  const sign = assignSign(fingerprint);
+  return { sign, element: getSignElement(sign) };
+}
+
+/**
  * Assigns signs to a batch of fingerprints. Useful for reading multiple people at once.
  */
 export function assignSigns(fingerprints: string[]): ZodiacSign[] {

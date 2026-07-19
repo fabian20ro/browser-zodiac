@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createGrammarEngine } from './grammar.ts';
+import { createGrammarEngine, validateGrammar } from './grammar.ts';
 import { mulberry32 } from './random.ts';
 
 function makeEngine(grammar: Record<string, string[]>, seed = 42, maxDepth?: number) {
