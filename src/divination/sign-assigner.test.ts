@@ -278,6 +278,13 @@ describe('sign-assigner', () => {
       expect(getSignElement('scorpio')).toBe('water');
       expect(getSignElement('pisces')).toBe('water');
     });
+
+    it('assigns every zodiac sign to a valid element — catches drift between ZODIAC_SIGNS and ELEMENT_BY_SIGN', () => {
+      const elements = new Set<AstroElement>(['fire', 'earth', 'air', 'water']);
+      for (const sign of ZODIAC_SIGNS) {
+        expect(elements).toContain(getSignElement(sign));
+      }
+    });
   });
 
   describe('assignRandomSign', () => {
