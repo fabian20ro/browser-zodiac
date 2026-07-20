@@ -187,6 +187,22 @@ describe('sign-assigner', () => {
      }
      expect(foundTwoDifferent).toBe(true);
     });
+
+    it('distributes signs roughly uniformly across a year of consecutive dates', () => {
+     const counts: Record<string, number> = {};
+     ZODIAC_SIGNS.forEach(s => counts[s] = 0);
+
+     for (let dayOffset = 0; dayOffset < 365; dayOffset++) {
+       const date = new Date(2024, 0, 1 + dayOffset);
+       const sign = assignDailySign('uniform-fingerprint', date);
+       counts[sign]++;
+     }
+
+     for (const sign of ZODIAC_SIGNS) {
+       expect(counts[sign]).toBeGreaterThan(20);
+       expect(counts[sign]).toBeLessThan(50);
+     }
+    });
     });
 
   describe('assignSignWithSymbol', () => {
