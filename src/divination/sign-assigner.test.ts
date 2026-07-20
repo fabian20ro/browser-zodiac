@@ -152,10 +152,16 @@ describe('sign-assigner', () => {
      );
     });
 
-    it('throws when given an InvalidDate (e.g., new Date(NaN))', () => {
+    it('throws a TypeError with a specific message when given an InvalidDate (e.g., new Date(NaN))', () => {
      const fingerprint = 'invalid-date-test';
      const invalidDate = new Date(NaN);
-     expect(() => assignDailySign(fingerprint, invalidDate)).toThrow();
+     expect(() => assignDailySign(fingerprint, invalidDate)).toThrow(TypeError);
+     try {
+       assignDailySign(fingerprint, invalidDate);
+     } catch (err) {
+       expect(err).toBeInstanceOf(TypeError);
+       expect((err as TypeError).message).toBe('assignDailySign requires a valid Date');
+     }
     });
 
     it('accepts out-of-range calendar dates by normalizing to the real local date (e.g., Feb 29 in non-leap year → March 1)', () => {
@@ -186,6 +192,22 @@ describe('sign-assigner', () => {
        }
      }
      expect(foundTwoDifferent).toBe(true);
+    });
+
+    it('distributes signs roughly uniformly across a year of consecutive dates', () => {
+     const counts: Record<string, number> = {};
+     ZODIAC_SIGNS.forEach(s => counts[s] = 0);
+
+     for (let dayOffset = 0; dayOffset < 365; dayOffset++) {
+       const date = new Date(2024, 0, 1 + dayOffset);
+       const sign = assignDailySign('uniform-fingerprint', date);
+       counts[sign]++;
+     }
+
+     for (const sign of ZODIAC_SIGNS) {
+       expect(counts[sign]).toBeGreaterThan(20);
+       expect(counts[sign]).toBeLessThan(50);
+     }
     });
     });
 
