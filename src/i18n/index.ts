@@ -51,7 +51,8 @@ export function detectLanguage(): string {
     // localStorage unavailable
   }
   const browserLang = normalizeLocaleId(navigator.language ?? '').slice(0, 2);
-  if (registry.has(browserLang)) return browserLang;
+  const candidate = registry.has(browserLang) ? browserLang : 'en';
+  if (registry.has(candidate)) return candidate;
   return 'en';
 }
 

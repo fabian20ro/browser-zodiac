@@ -310,6 +310,38 @@ describe('createActionButton', () => {
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
+  it('shows feedback icon when async result is undefined and feedbackIcon is set', async () => {
+    vi.useFakeTimers();
+    const btn = createActionButton({
+      icon: '⧉',
+      feedbackIcon: '✓',
+      ariaLabel: 'Copy',
+      onClick: () => {}, // returns undefined (void)
+    });
+
+    btn.click();
+    await Promise.resolve();
+
+    expect(btn.textContent).toBe('✓');
+    expect(btn.classList.contains('action-btn--feedback')).toBe(true);
+
+    vi.advanceTimersByTime(1500);
+    expect(btn.textContent).toBe('⧉');
+    expect(btn.classList.contains('action-btn--feedback')).toBe(false);
+    vi.useRealTimers();
+  });
+
+  it('does not show feedback when async result is undefined and no feedbackIcon', () => {
+    const btn = createActionButton({
+      icon: '→',
+      ariaLabel: 'Go',
+      onClick: () => {}, // returns undefined (void)
+    });
+
+    btn.click();
+    expect(btn.textContent).toBe('→');
+  });
+
   it('does not show feedback on second click while first is still pending', async () => {
     vi.useFakeTimers();
     let resolveFirst!: (value: boolean) => void;
