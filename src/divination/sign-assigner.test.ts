@@ -152,10 +152,16 @@ describe('sign-assigner', () => {
      );
     });
 
-    it('throws when given an InvalidDate (e.g., new Date(NaN))', () => {
+    it('throws a TypeError with a specific message when given an InvalidDate (e.g., new Date(NaN))', () => {
      const fingerprint = 'invalid-date-test';
      const invalidDate = new Date(NaN);
-     expect(() => assignDailySign(fingerprint, invalidDate)).toThrow();
+     expect(() => assignDailySign(fingerprint, invalidDate)).toThrow(TypeError);
+     try {
+       assignDailySign(fingerprint, invalidDate);
+     } catch (err) {
+       expect(err).toBeInstanceOf(TypeError);
+       expect((err as TypeError).message).toBe('assignDailySign requires a valid Date');
+     }
     });
 
     it('accepts out-of-range calendar dates by normalizing to the real local date (e.g., Feb 29 in non-leap year → March 1)', () => {
