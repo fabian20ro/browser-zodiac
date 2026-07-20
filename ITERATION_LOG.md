@@ -26,8 +26,6 @@
 **Insight:** Recursive timeout schedulers need an explicit cancelled flag; clearing the current handle alone does not prevent the callback from re-arming the next timeout.
 **Promoted to Lessons Learned:** Yes
 
----
-
 ### [2026-05-08] Guard action-button clicks against rejection
 
 **Context:** A small UI hardening pass on `src/ui/actions.ts`.
@@ -306,4 +304,14 @@
 **What happened:** Traced both to parent templates hardcoding article/preposition context around mixed-gender grammar symbols. Added `creaturaCuArticol`, switched affected `creatura` and `obiect` templates to article-bearing variants, rewrote dative/interior forms to avoid impossible case agreement, and removed pasted `170|` line-number artifacts from `ro.txt`. Added grammar validation for pasted line-number artifacts.
 **Outcome:** Success — no remaining searched hardcoded `un/o/unui #creatura#` or bare `pe/unui/un #obiect#` patterns; `npm run validate:grammar`, `npm test`, and `npm run build` pass.
 **Insight:** Romanian article agreement must live in data variants for mixed-gender symbols; validators should catch pasted line-number artifacts because grammar files treat them as valid entries.
+**Promoted to Lessons Learned:** Yes
+
+---
+
+### [2026-07-21] Fix Romanian agreement in generated prediction
+
+**Context:** User reported `Blestemată momentul`, `un departamentul IT`, and `prin o ușă`, and requested an audit of nearby similar issues.
+**What happened:** Reframed `salutTimpuriu` around the masculine noun `salut`; replaced the mixed, externally articulated `profesionist` symbol with self-contained `profesionistCuArticol`; updated every use, including a dative and a fixed masculine participle; fixed the `printr-o` contraction. Audited neighboring templates and removed fixed-gender adjectives, pronouns, clitics, and adverbial `scurt` from mixed-gender contexts.
+**Outcome:** Grammar validation and build pass. All 548 tests pass under `TZ=UTC`; the default Europe/Bucharest run exposes one pre-existing timezone-sensitive sign-assigner test.
+**Insight:** Mixed-gender/time symbols need self-contained or invariant framing; external adjectives, articles, and referential clitics eventually generate invalid combinations.
 **Promoted to Lessons Learned:** Yes

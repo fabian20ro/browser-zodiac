@@ -33,7 +33,7 @@ Conform regulamentului cosmic, #signName#: #predictie# #dispozitivulTau.capitali
 #deschidere.capitalize# Un audit intern al #aspectViataTa# a concluzionat: #predictie# #consecinta# #sfat#
 Departamentul de afaceri cosmice regretă să te informeze, #signName#: #predictie# #consecinta#
 #deschidere.capitalize# #predictie# #corpCosmic.capitalize# a depus scuze oficiale. #consecinta# #sfat#
-#salutTimpuriu.capitalize#, #signName#! #predictie# Un #profesionist# a fost trimis. #sfat#
+#salutTimpuriu.capitalize#, #signName#! #predictie# A sosit #profesionistCuArticol#. #sfat#
 
 
 === deschidere ===
@@ -74,34 +74,34 @@ re: factura ta restantă pentru fericire, #signName#,
 
 
 === salutTimpuriu ===
-bună #momentulZilei#
-binecuvântată #momentulZilei#
-suspectă #momentulZilei#
-blestemată #momentulZilei#
-magnifică #momentulZilei#
-tulbure #momentulZilei#
-regretabilă #momentulZilei#
-structural nesigură #momentulZilei#
-legal distinctă #momentulZilei#
-suspect de veselă #momentulZilei#
-suspect de normală #momentulZilei#
-cosmic mandatată #momentulZilei#
-financiar discutabilă #momentulZilei#
-romantic volatilă #momentulZilei#
-medical nerecomandabilă #momentulZilei#
-conștientă de buget #momentulZilei#
-emoțional pârghiată #momentulZilei#
-deficitară în wellness #momentulZilei#
-bolnavă de dragoste dar facturabilă #momentulZilei#
-cardiac adiacentă #momentulZilei#
-adiacentă valorii nete #momentulZilei#
-prescriptiv dubioasă #momentulZilei#
-sentimental auditată #momentulZilei#
-preaprobată dar regretabilă #momentulZilei#
-romantic auditată #momentulZilei#
-deductibilă fiscal #momentulZilei#
-cu aromă de inimă frântă #momentulZilei#
-clinic fără precedent #momentulZilei#
+salut bun pentru #momentulZilei#
+salut binecuvântat pentru #momentulZilei#
+salut suspect pentru #momentulZilei#
+salut blestemat pentru #momentulZilei#
+salut magnific pentru #momentulZilei#
+salut tulbure pentru #momentulZilei#
+salut regretabil pentru #momentulZilei#
+salut structural nesigur pentru #momentulZilei#
+salut distinct din punct de vedere legal pentru #momentulZilei#
+salut suspect de vesel pentru #momentulZilei#
+salut suspect de normal pentru #momentulZilei#
+salut mandatat cosmic pentru #momentulZilei#
+salut discutabil financiar pentru #momentulZilei#
+salut volatil romantic pentru #momentulZilei#
+salut nerecomandabil medical pentru #momentulZilei#
+salut conștient de buget pentru #momentulZilei#
+salut pârghiat emoțional pentru #momentulZilei#
+salut deficitar în wellness pentru #momentulZilei#
+salut bolnav de dragoste, dar facturabil pentru #momentulZilei#
+salut adiacent cardiologiei pentru #momentulZilei#
+salut adiacent valorii nete pentru #momentulZilei#
+salut dubios din punct de vedere prescriptiv pentru #momentulZilei#
+salut auditat sentimental pentru #momentulZilei#
+salut preaprobat, dar regretabil pentru #momentulZilei#
+salut auditat romantic pentru #momentulZilei#
+salut deductibil fiscal pentru #momentulZilei#
+salut cu aromă de inimă frântă pentru #momentulZilei#
+salut fără precedent clinic pentru #momentulZilei#
 
 
 === momentulZilei ===
@@ -155,26 +155,26 @@ Vei primi #cadou# de la #celebritate#.
 O eroare cosmică va face ca #aspectViata# să funcționeze perfect pentru exact 7 minute.
 #corpCosmic# îți va revela #secret# printr-un semn subtil.
 Vei descoperi un talent ascuns pentru #subiect# în timp ce eviți #evitare#.
-Umbra ta va fi scurt în dezacord cu direcția ta la #locatie#.
-O ceață #adjectiv# se va așeza peste #aspectViataTa# și va refuza să plece.
+Umbra ta va fi pentru scurt timp în dezacord cu direcția ta la #locatie#.
+O ceață cu aer #adjectiv# se va așeza peste #aspectViataTa# și va refuza să plece.
 Vei auzi #intalnire# explicând #subiect# pentru #creaturaCuArticol#.
 #dispozitivulTau.capitalize# îți va corecta automat numele în ceva profund profetic.
 O eroare de dosare în cosmos îți va atribui temporar #aspectViata# altcuiva.
 Conceptul de #evitare# va deveni conștient și te va căuta personal.
-Vei găsi #cadou# ascuns lângă #obiectCuArticol# pe care îl ai de ani.
+Vei găsi #cadou# ascuns lângă #obiectCuArticol# care zace printre lucrurile tale de ani.
 #celebritate.capitalize# îți va da like accidental la o poză din 2014.
 Reflexia ta va clipi cu o altă frecvență decât tine.
-Vei deschide o ușă și vei vedea scurt #locatie# înainte să se schimbe.
+Vei deschide o ușă și vei vedea pentru scurt timp #locatie# înainte să se schimbe.
 Numărul #numarMic# te va urmări cu ostilitate crescândă.
 #creaturaCuArticol.capitalize# îți va înmâna o chitanță pentru ceva ce n-ai cumpărat.
 #intalnire.capitalize# îți va cere părerea despre #subiect# și chiar va asculta.
 #parteCorpTa.capitalize# va primi o notificare.
 Vei rezolva din greșeală #subiect# în timp ce-ți căutai cheile.
 WiFi-ul la #locatie# va funcționa doar când nu-l folosești.
-#dispozitivulTau.capitalize# va afișa scurt un mesaj de la #celebritate#.
+#dispozitivulTau.capitalize# va afișa pentru scurt timp un mesaj de la #celebritate#.
 
 
-O factură #adjectiv# va sosi dintr-o dimensiune în care aparent ai o ipotecă.
+O factură cu aer #adjectiv# va sosi dintr-o dimensiune în care aparent ai o ipotecă.
 #celebritate.capitalize# îți va trimite o sumă care ridică mai multe întrebări decât răspunsuri.
 #parteCorpTa.capitalize# va detecta o schimbare bruscă în economia locală.
 Te vei îndrăgosti de spreadsheet-ul cuiva la #locatie#.
@@ -186,7 +186,7 @@ Un doctor #adjectiv# va apărea la #locatie# și te va diagnostica cu „vibraț
 Vei găsi o scrisoare de dragoste adresată contului tău bancar ascunsă lângă #obiectCuArticol#.
 #creaturaCuArticol.capitalize# la #locatie# îți va înmâna o factură detaliată pentru ultimele #numarMic# decizii proaste.
 #parteCorpTa.capitalize# va începe să genereze venit pasiv fără să te anunțe.
-Un #profesionist# te va informa că viața ta amoroasă a fost achiziționată de un holding.
+#profesionistCuArticol.capitalize# te va informa că viața ta amoroasă a fost achiziționată de un holding.
 Vei descoperi că #mancare# a fost singurul lucru care-ți ținea sistemul imunitar departe de faliment.
 Abonamentul tău la sală va deveni conștient și te va da în judecată la instanța de reclamații mici.
 #celebritate.capitalize# îți va oferi un împrumut cu dobândă legată de succesul tău romantic.
@@ -210,9 +210,9 @@ Cosmosul dă din umeri.
 Cineva va face un TikTok despre asta.
 Istoricii se vor certa pe tema asta secole de-a rândul.
 Tab-urile tale din browser se vor multiplica din solidaritate.
-Asta a fost prezis de un #profesionist# în 1987.
+Asta a fost prezis de #profesionistCuArticol# în 1987.
 Linia temporală se desparte aici. Alege cu înțelepciune.
-O tăcere #adjectiv# va urma.
+O tăcere cu aer #adjectiv# va urma.
 #aspectViataTa.capitalize# va depune o plângere oficială.
 Un grup de suport se va forma în decurs de o oră.
 Asta e tehnic legal în #numarMic# dimensiuni.
@@ -233,9 +233,9 @@ O agenție de colectare dintr-o viață anterioară te va ajunge din urmă în s
 Doctorul și contabilul tău vor programa o intervenție comună.
 Scorul tău de credit și tensiunea arterială își vor schimba valorile.
 Universul va adăuga o penalizare de întârziere la contul tău de karma.
-Aplicația ta de wellness va recomanda un #profesionist# și un avocat, în ordinea asta.
+Aplicația ta de wellness va recomanda #profesionistCuArticol# și un avocat, în ordinea asta.
 #dispozitivulTau.capitalize# va #actiuneCorp# din solidaritate.
-Un #profesionist# va scrie un studiu de caz despre asta.
+#profesionistCuArticol.capitalize# va scrie un studiu de caz despre asta.
 
 
 === sfat ===
@@ -243,11 +243,11 @@ Poartă #culoare# ca să alungi #lucruRau#.
 Dacă vezi #creaturaCuArticol#, #sfatCreatura#.
 Mișcarea de putere a zilei: #miscarePutere#.
 Evită #evitare# între orele #numarMic# și #numarMare#.
-Gustarea norocoasă este #mancare#. Consumă-o #adverb#.
+Mănâncă #mancare# #adverb# pentru noroc.
 Canalizează energia de la #celebritate# pentru rezultate maxime.
 #dispozitivulTau.capitalize# deține răspunsul — aruncă o privire #adverb#.
 Șoptește „#mantra#" de trei ori pentru protecție cosmică.
-Consultă un #profesionist# înainte de ora #numarMare#.
+Consultă #profesionistCuArticol# înainte de ora #numarMare#.
 Pune #obiectCuArticol# sub pernă pentru vise profetice.
 Ține #culoare# aproape de inimă — culorile te protejează astăzi.
 Fă exact opusul a ceea ce îți spune #dispozitivulTau#.
@@ -261,21 +261,21 @@ Tipărește acest horoscop și împătură-l în formă de #creatura#.
 Mănâncă #mancare# menținând contactul vizual cu #corpCosmic#.
 Răspunde la un email vechi doar cu „#mantra#."
 Universul recomandă o siestă. Conformitatea e opțională, dar înțeleaptă.
-Mergi cu spatele prin o ușă azi pentru recalibrare.
+Mergi cu spatele printr-o ușă azi pentru recalibrare.
 Șterge #numarMic# poze din telefon. Cosmosul va ști care.
 Verifică-ți contul bancar purtând #culoare# pentru protecție emoțională.
-Nu te îndrăgosti de nimeni al cărui #dispozitiv# e pe #actiuneCorp# — ăla e un red flag.
+Nu te îndrăgosti de nimeni al cărui #dispozitiv# e pe #actiuneCorp# — e un red flag.
 Investește exact #numarMic# lei în ceva ce nu înțelegi. Universul respectă haosul.
 Mănâncă #mancare# înainte de orice decizie romantică.
-Consultă un #profesionist# despre ce face #parteCorpTa# când îți vezi soldul bancar.
+Consultă #profesionistCuArticol# despre ce face #parteCorpTa# când îți vezi soldul bancar.
 Astăzi, tratează-ți scorul de credit ca pe #creaturaCuArticol# — hrănește-l, dar nu te încrede în el.
 Trimite companiei tale de asigurări de sănătate un bilet scris de mână care zice doar „#mantra#."
 Evită să discuți despre bani, dragoste sau #subiect# cu oricine poartă #culoare#.
 Inima ta are nevoie de un update de firmware. Repornește-o mâncând #mancare# la #locatie#.
 Pune #obiectCuArticol# pe noptieră ca să atragi stabilitate financiară și să respingi întâlniri proaste.
-Cere unui #profesionist# să-ți revizuiască viața amoroasă ca pe un raport trimestrial de câștiguri.
+Cere o revizie a vieții tale amoroase de la #profesionistCuArticol#, ca pentru un raport trimestrial de câștiguri.
 Fă #numarMic# flotări de fiecare dată când #dispozitivulTau# îți arată o factură. Wellness prin suferință.
 Poartă #culoare# la următoarea vizită la doctor — confuzionează departamentul de facturare.
 Transferă #numarMic# lei într-un cont de economii și șoptește „#mantra#" pentru binecuvântări de dobândă compusă.
-#parteCorpTa.capitalize# știe că piața se va schimba. Ascult-o, dar nu-i spune contabilului.
+#parteCorpTa.capitalize# știe că piața se va schimba. Ține cont de semnal, dar nu-i spune contabilului.
 Redenumește un fișier de pe #dispozitivulTau# în „#mantra#" pentru noroc.

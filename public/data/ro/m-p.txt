@@ -453,13 +453,13 @@ Pluto (întors de la retragerea de wellness, tot nu e planetă)
 un gigant gazos care tocmai a descoperit postul intermitent
 
 
-=== profesionist ===
-vrăjitor
+=== profesionistCuArticol ===
+un vrăjitor
 departamentul IT
-pisică foarte bătrână
-biscuit cu mesaj
-rățușcă de cauciuc
-adult competent (dacă găsești vreunul)
+o pisică foarte bătrână
+un biscuit cu mesaj
+o rățușcă de cauciuc
+un adult competent (dacă găsești vreunul)
 un influencer de LinkedIn
 un chatbot care pretinde că e om
 un contabil cu al treilea ochi

@@ -33,6 +33,8 @@ Obsolete lessons → Archive section at bottom (with date and reason). Never del
 
 **[2026-06-03]** Romanian indefinite articles belong in mixed-gender variant symbols — For symbols with mixed grammatical gender, never hardcode `un/o/unui` in the parent template. Add an article-bearing variant such as `#creaturaCuArticol#` or reuse an existing one like `#obiectCuArticol#`; otherwise outputs like `un ceață` or `pe rățușcă` leak into generated text.
 
+**[2026-07-21]** Romanian time-expression symbols can mix gender and number — A collection such as `dimineața` (F), `momentul` (M), and `zorii` (P) cannot share one agreeing adjective. Use a gender-neutral framing noun/construction or split the symbol and its modifiers by gender and number.
+
 **[2026-05-08]** Catch rejected async UI actions in helpers — `createActionButton`-style wrappers should handle callback rejections deliberately so a failed `Promise` does not become an unhandled rejection or a false success state. Keep the control visually stable on failure and cover the rejection path in tests.
 
 **[2026-05-11]** Transient feedback buttons need timer cancellation on reactivation — If a control shows temporary success/error feedback after async completion, clear any pending revert timer and reset to the base icon/class at the start of a new click. Otherwise an older timeout can restore the stale state too early or leave the previous feedback visible after a new failed/no-op action.
