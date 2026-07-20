@@ -337,6 +337,25 @@ describe('sign-assigner', () => {
         expect(elements).toContain(getSignElement(sign));
       }
     });
+
+    it('forms a bijective partition — each element covers exactly 3 signs, no duplicates, all 12 covered', () => {
+      const counts: Record<string, number> = {};
+      for (const el of ['fire', 'earth', 'air', 'water'] as AstroElement[]) {
+        counts[el] = ZODIAC_SIGNS.filter(s => getSignElement(s) === el).length;
+      }
+      for (const el of ['fire', 'earth', 'air', 'water']) {
+        expect(counts[el]).toBe(3);
+      }
+    });
+
+    it('maps every zodiac sign — no sign left unassigned in ELEMENT_BY_SIGN', () => {
+      const seen = new Set<string>();
+      for (const sign of ZODIAC_SIGNS) {
+        expect(getSignElement(sign)).toBeDefined();
+        seen.add(sign);
+      }
+      expect(seen.size).toBe(ZODIAC_SIGNS.length);
+    });
   });
 
   describe('assignRandomSign', () => {
