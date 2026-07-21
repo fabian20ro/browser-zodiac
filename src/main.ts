@@ -15,6 +15,16 @@ import './style.css';
 
 const THEME_KEY = 'horror-scope-theme';
 
+const ERROR_TEMPLATE = `
+  <main style="min-height:100vh;display:grid;place-items:center;padding:1.5rem;">
+    <section style="max-width:38rem;text-align:center;font-family:Georgia, serif;">
+      <h1>Cosmic connection interrupted</h1>
+      <p>We couldn't load the horoscope grammar files. Please retry.</p>
+      <button id="retry-init" style="margin-top:1rem;padding:0.6rem 1.1rem;cursor:pointer;">Retry</button>
+    </section>
+  </main>
+`;
+
 export function detectTheme(): 'dark' | 'light' {
   try {
     const saved = localStorage.getItem(THEME_KEY);
@@ -46,15 +56,7 @@ async function initApp(): Promise<void> {
     await loadAllGrammars();
   } catch (error) {
     console.error('Failed to load grammar files during startup', error);
-    container.innerHTML = `
-      <main style="min-height:100vh;display:grid;place-items:center;padding:1.5rem;">
-        <section style="max-width:38rem;text-align:center;font-family:Georgia, serif;">
-          <h1>Cosmic connection interrupted</h1>
-          <p>We couldn't load the horoscope grammar files. Please retry.</p>
-          <button id="retry-init" style="margin-top:1rem;padding:0.6rem 1.1rem;cursor:pointer;">Retry</button>
-        </section>
-      </main>
-    `;
+    container.innerHTML = ERROR_TEMPLATE;
     const retryBtn = document.getElementById('retry-init');
     retryBtn?.addEventListener('click', () => {
       void initApp();
