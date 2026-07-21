@@ -886,6 +886,124 @@ describe('readBrowserOracle', () => {
     expect(profile.readings.find(r => r.key === 'cosmic_thriftiness')?.raw).toBe('lavish');
   });
 
+  it('maps parallel_lives and vibration_intensity to "unknowable" when hardwareConcurrency is zero', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 0,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'parallel_lives')?.raw).toBe('unknowable');
+    expect(profile.readings.find(r => r.key === 'vibration_intensity')?.raw).toBe('unknowable');
+  });
+
+  it('maps parallel_lives and vibration_intensity to "unknowable" when hardwareConcurrency is absent', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'parallel_lives')?.raw).toBe('unknowable');
+    expect(profile.readings.find(r => r.key === 'vibration_intensity')?.raw).toBe('unknowable');
+  });
+
+  it('propagates platform into cosmic_platform reading', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'Windows NT 10.0; Win64; x64',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'cosmic_platform')?.raw).toBe('Windows NT 10.0; Win64; x64');
+  });
+
+  it('returns cosmic_timezone_offset as string of getTimezoneOffset minutes', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const offsetReading = profile.readings.find(r => r.key === 'cosmic_timezone_offset');
+    expect(typeof offsetReading?.raw).toBe('string');
+    // The raw value should match the actual timezone offset (in minutes)
+    expect(Number(offsetReading?.raw)).toBe(new Date().getTimezoneOffset());
+  });
+
+  it('returns cosmic_noise as string of UA length', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'cosmic_noise')?.raw).toBe(String('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36'.length));
+  });
+
+  it('asserts full fingerprint format with all ten pipe-separated fields', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'UA-string',
+      language: 'en-US',
+      hardwareConcurrency: 4,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: 'wifi' },
+    });
+    vi.stubGlobal('window', {
+      innerWidth: 1024,
+      innerHeight: 768,
+      devicePixelRatio: 2,
+      matchMedia: vi.fn().mockReturnValue({ matches: false }),
+    });
+    const profile = readBrowserOracle();
+    const parts = profile.fingerprint.split('|');
+    expect(parts.length).toBe(10);
+    expect(parts[0]).toBe('UA-string');           // ua
+    expect(parts[1]).toBe('en-US');               // lang (trimmed)
+    expect(parts[2]).toBe('1920x1080');            // screenRes from beforeEach mock
+    expect(parts[3]).toBe('MacIntel');             // platform
+    expect(typeof parts[5]).toBe('string');        // networkSpeed
+    expect(parts[6]).toBe('light');                // colorScheme (from beforeEach)
+    expect(typeof parts[7]).toBe('string');        // timeOfDay
+    expect(parts[8]).toBe('2');                    // devicePixelRatio
+    expect(parts[9]).toBe('desktop');              // mobileIndicator
+  });
+
+  it('uses trim() when parsing navigator.language', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)',
+      language: ' en-US ',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'cultural_destiny')?.raw).toBe('en-US');
+  });
+
   it('handles detection of dark mode and evening time', () => {
     vi.stubGlobal('window', {
       innerWidth: 1920,
