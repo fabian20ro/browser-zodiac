@@ -152,6 +152,13 @@ describe('sign-assigner', () => {
      );
     });
 
+    it('is insensitive to fingerprint casing', () => {
+     const date = new Date('2024-06-15');
+     expect(assignDailySign('Fingerprint', date)).toBe(
+       assignDailySign('fingerprint', date)
+     );
+    });
+
     it('throws a TypeError with a specific message when given an InvalidDate (e.g., new Date(NaN))', () => {
      const fingerprint = 'invalid-date-test';
      const invalidDate = new Date(NaN);
