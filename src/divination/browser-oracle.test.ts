@@ -701,6 +701,34 @@ describe('readBrowserOracle', () => {
       const profile = readBrowserOracle();
       expect(profile.readings.find(r => r.key === 'spirit_browser')?.raw).toBe('Opera');
     });
+
+    it('prioritises Firefox over Vivaldi when both keywords appear in UA', () => {
+      vi.stubGlobal('navigator', {
+        userAgent: `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/91.0.4472 Firefox/120.0 Vivaldi/3.6`,
+        language: 'en-US',
+        hardwareConcurrency: 8,
+        platform: 'Linux x86_64',
+        onLine: true,
+        maxTouchPoints: 0,
+        connection: { effectiveType: 'wifi' },
+      });
+      const profile = readBrowserOracle();
+      expect(profile.readings.find(r => r.key === 'spirit_browser')?.raw).toBe('Firefox');
+    });
+
+    it('prioritises Brave over Chrome when both keywords appear in UA', () => {
+      vi.stubGlobal('navigator', {
+        userAgent: `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36 Brave/1.28`,
+        language: 'en-US',
+        hardwareConcurrency: 8,
+        platform: 'MacIntel',
+        onLine: true,
+        maxTouchPoints: 0,
+        connection: { effectiveType: '4g' },
+      });
+      const profile = readBrowserOracle();
+      expect(profile.readings.find(r => r.key === 'spirit_browser')?.raw).toBe('Brave');
+    });
   });
 
   it('handles empty user agent', () => {
