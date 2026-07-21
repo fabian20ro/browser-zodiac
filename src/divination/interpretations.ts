@@ -6,7 +6,7 @@ export type InterpretationFn = (raw: string) => string;
  */
 const VOWELS = 'aeiou';
 
-/** Letters that are silent or vowel-like at word start: vowels, plus h before a vowel. */
+// Letters that are silent or vowel-like at word start: vowels, plus h before a vowel.
 function startsWithVowelSound(ch: string): boolean {
   if (VOWELS.includes(ch)) return true;
   // Silent-h rule: "h" followed by a vowel is pronounced as a vowel sound.
