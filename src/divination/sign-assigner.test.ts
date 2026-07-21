@@ -275,6 +275,15 @@ describe('sign-assigner', () => {
       const r2 = assignSignWithElement(fingerprint);
       expect(r1).toEqual(r2);
     });
+
+    it('cross-checks against assignSign and getSignElement for every reachable sign — drift-proof', () => {
+      for (let i = 0; i < ZODIAC_SIGNS.length * 50; i++) {
+        const fp = `drift-test-${i}`;
+        const derived = assignSignWithElement(fp);
+        expect(derived.sign).toBe(assignSign(fp));
+        expect(derived.element).toBe(getSignElement(derived.sign));
+      }
+    });
   });
 
   describe('assignSigns', () => {
