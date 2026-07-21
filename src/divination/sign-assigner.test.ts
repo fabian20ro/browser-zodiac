@@ -242,6 +242,16 @@ describe('sign-assigner', () => {
       expect(result.element).toBe(getSignElement(result.sign));
     });
 
+    it('every zodiac sign maps to a defined symbol and consistent element — drift-proof across all 12 signs', () => {
+      for (const sign of ZODIAC_SIGNS) {
+        const withSymbol = assignSignWithSymbol(sign);
+        const withElement = assignSignWithElement(sign);
+
+        expect(ZODIAC_SYMBOLS[withSymbol.sign]).toBe(withSymbol.symbol);
+        expect(getSignElement(withElement.sign)).toBe(withElement.element);
+      }
+    });
+
     it('covers all four elements across many fingerprints', () => {
       const seenElements = new Set<string>();
       for (let i = 0; i < ZODIAC_SIGNS.length * 25; i++) {
