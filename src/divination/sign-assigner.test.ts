@@ -330,6 +330,27 @@ describe('sign-assigner', () => {
         expect(batchResult[i]).toBe(assignSign(fingerprints[i]));
       }
     });
+
+    it('filters out null, undefined, and empty-string entries — does not throw on falsy input', () => {
+      const mixed: Array<string | null | undefined> = ['alice', null, 'bob', '', undefined, 'carol'];
+      expect(() => assignSigns(mixed)).not.toThrow();
+      const signs = assignSigns(mixed);
+      // Empty strings and falsy entries must be excluded from the output.
+      for (const s of signs) {
+        expect(s).toBeTruthy();
+        expect(ZODIAC_SIGNS).toContain(s);
+      }
+    });
+
+    it('preserves positional correspondence after filtering', () => {
+      const fingerprints: Array<string | null | undefined> = ['alice', null, 'bob', undefined];
+      const batchResult = assignSigns(fingerprints);
+      const nonEmpty = fingerprints.filter(Boolean) as string[];
+      expect(batchResult.length).toBe(nonEmpty.length);
+      for (let i = 0; i < nonEmpty.length; i++) {
+        expect(batchResult[i]).toBe(assignSign(nonEmpty[i]));
+      }
+    });
   });
 
   describe('getSignElement', () => {
