@@ -360,4 +360,55 @@ describe('createGrammarEngine', () => {
     });
 
   });
+
+  describe('validateGrammar', () => {
+    it('throws on symbol starting with a digit', () => {
+      expect(() => validateGrammar({ '123bad': ['hello'] })).toThrow(/Invalid grammar symbol name: '123bad'/);
+    });
+
+    it('throws on symbol containing spaces', () => {
+      expect(() => validateGrammar({ 'my symbol': ['hello'] })).toThrow();
+    });
+
+    it('passes valid symbols with underscores and hyphens', () => {
+      expect(() => validateGrammar({ _leading: ['ok'], 'hyphen-ated': ['ok'], camelCase123: ['ok'] })).not.toThrow();
+    });
+
+    it('throws on rule entry that is a number', () => {
+      expect(() => validateGrammar({ word: [42 as any] })).toThrow(/Empty rule entry/);
+    });
+
+    it('throws on empty string rule entry', () => {
+      expect(() => validateGrammar({ word: ['', 'valid'] })).toThrow(/Empty rule entry.*at index 0/);
+    });
+
+    it('throws on whitespace-only rule entry', () => {
+      expect(() => validateGrammar({ word: ['   ', 'valid'] })).toThrow();
+    });
+
+    it('throws on unbalanced single # in rule entry', () => {
+      expect(() => validateGrammar({ word: ['# lone'] })).toThrow(/contains unbalanced '#'/);
+    });
+
+    it('allows balanced ## literal in rule entry', () => {
+      expect(() => validateGrammar({ word: ['text ## more'] })).not.toThrow();
+    });
+
+    it('passes a valid grammar with no errors', () => {
+      const grammar = {
+        greeting: ['hello world', 'hi there'],
+        farewell: ['#greeting# !'],
+        numbers: ['one~~10', 'two~~20'],
+      };
+      expect(() => validateGrammar(grammar)).not.toThrow();
+    });
+
+    it('throws on an empty symbol name string', () => {
+      expect(() => validateGrammar({ '': ['hello'] })).toThrow(/Invalid grammar symbol/);
+    });
+
+    it('throws when rule entry is null', () => {
+      expect(() => validateGrammar({ word: [null as any] })).toThrow();
+    });
+  });
 });

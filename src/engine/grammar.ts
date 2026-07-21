@@ -5,7 +5,7 @@ const EXPANSION_RE = /#([^#]+)#/g;
 const WEIGHT_SEPARATOR = '~~';
 const MAX_DEPTH = 10;
 
-function validateGrammar(grammar: Grammar): void {
+export function validateGrammar(grammar: Grammar): void {
   for (const symbol of Object.keys(grammar)) {
     if (!/^[a-zA-Z_][a-zA-Z0-9_-]*$/.test(symbol)) {
       throw new Error(`Invalid grammar symbol name: '${symbol}'`);
