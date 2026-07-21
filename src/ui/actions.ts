@@ -3,6 +3,7 @@ export interface ActionButtonOptions {
   feedbackIcon?: string;
   errorIcon?: string;
   ariaLabel: string;
+  durationMs?: number;
   onClick: () => void | Promise<boolean>;
 }
 
@@ -24,7 +25,7 @@ export function createActionButton(options: ActionButtonOptions): HTMLButtonElem
       btn.textContent = options.icon;
       btn.classList.remove('action-btn--feedback');
       revertTimer = null;
-    }, 1500);
+    }, options.durationMs ?? 1500);
   }
 
   function showAndRevert(icon: string): void {
@@ -35,7 +36,7 @@ export function createActionButton(options: ActionButtonOptions): HTMLButtonElem
       revertTimer = setTimeout(() => {
         btn.textContent = options.icon;
         revertTimer = null;
-      }, 1500);
+      }, options.durationMs ?? 1500);
     }
   }
 
