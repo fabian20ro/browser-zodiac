@@ -275,6 +275,15 @@ describe('sign-assigner', () => {
       const r2 = assignSignWithElement(fingerprint);
       expect(r1).toEqual(r2);
     });
+
+    it('cross-checks against assignSign and getSignElement for every reachable sign — drift-proof', () => {
+      for (let i = 0; i < ZODIAC_SIGNS.length * 50; i++) {
+        const fp = `drift-test-${i}`;
+        const derived = assignSignWithElement(fp);
+        expect(derived.sign).toBe(assignSign(fp));
+        expect(derived.element).toBe(getSignElement(derived.sign));
+      }
+    });
   });
 
   describe('assignSigns', () => {
@@ -319,6 +328,27 @@ describe('sign-assigner', () => {
       const batchResult = assignSigns(fingerprints);
       for (let i = 0; i < fingerprints.length; i++) {
         expect(batchResult[i]).toBe(assignSign(fingerprints[i]));
+      }
+    });
+
+    it('filters out null, undefined, and empty-string entries — does not throw on falsy input', () => {
+      const mixed: Array<string | null | undefined> = ['alice', null, 'bob', '', undefined, 'carol'];
+      expect(() => assignSigns(mixed)).not.toThrow();
+      const signs = assignSigns(mixed);
+      // Empty strings and falsy entries must be excluded from the output.
+      for (const s of signs) {
+        expect(s).toBeTruthy();
+        expect(ZODIAC_SIGNS).toContain(s);
+      }
+    });
+
+    it('preserves positional correspondence after filtering', () => {
+      const fingerprints: Array<string | null | undefined> = ['alice', null, 'bob', undefined];
+      const batchResult = assignSigns(fingerprints);
+      const nonEmpty = fingerprints.filter(Boolean) as string[];
+      expect(batchResult.length).toBe(nonEmpty.length);
+      for (let i = 0; i < nonEmpty.length; i++) {
+        expect(batchResult[i]).toBe(assignSign(nonEmpty[i]));
       }
     });
   });

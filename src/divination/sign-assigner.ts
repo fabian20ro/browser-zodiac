@@ -60,7 +60,7 @@ export function assignSignWithElement(fingerprint: string): { sign: ZodiacSign; 
  * Assigns signs to a batch of fingerprints. Useful for reading multiple people at once.
  */
 export function assignSigns(fingerprints: string[]): ZodiacSign[] {
-  return fingerprints.map(assignSign);
+  return fingerprints.filter(Boolean).map(assignSign);
 }
 
 /**
