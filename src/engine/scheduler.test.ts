@@ -306,4 +306,59 @@ describe('scheduleMidnightGmt', () => {
     // Cancel after the loop has fired — must not throw.
     expect(() => cancel()).not.toThrow();
   });
+
+  it('a new scheduler fires normally after cancelling a completed one', async () => {
+    // Observable contract: after cancellation of an already-completed loop, a fresh
+    // scheduleMidnightGmt call should fire at its first scheduled midnight — not skip
+    // or double-fire due to stale state from the previous loop.
+    const firstCallback = vi.fn();
+    const secondCallback = vi.fn();
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+
+    const cancelFirst = scheduleMidnightGmt(firstCallback);
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(firstCallback).toHaveBeenCalledTimes(1);
+
+    // Cancel the completed loop — must not throw, state should be reset.
+    cancelFirst();
+
+    // Start a new scheduler immediately after cancellation.
+    scheduleMidnightGmt(secondCallback);
+
+    // Advance to next midnight (24h later).
+    vi.setSystemTime(new Date('2026-01-03T23:59:59.000Z'));
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(secondCallback).toHaveBeenCalledTimes(1);
+
+    // Advance to the following midnight — should fire again.
+    vi.setSystemTime(new Date('2026-01-04T23:59:59.000Z'));
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(secondCallback).toHaveBeenCalledTimes(2);
+  });
+
+  it('a new scheduler does not double-fire when the old one completed mid-cycle', async () => {
+    // Observable contract: if an old loop has already fired and is rescheduling itself,
+    // calling scheduleMidnightGmt again must cancel the old pending handle cleanly —
+    // the new scheduler's first tick fires exactly once at the next midnight.
+    const firstCallback = vi.fn();
+    const secondCallback = vi.fn();
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+
+    scheduleMidnightGmt(firstCallback);
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(firstCallback).toHaveBeenCalledTimes(1);
+
+    // Advance just past midnight — the first scheduler is now rescheduling for next day.
+    vi.setSystemTime(new Date('2026-01-02T00:00:01.000Z'));
+    scheduleMidnightGmt(secondCallback);
+
+    // First callback must NOT have fired again (it was cancelled by the new call).
+    expect(firstCallback).toHaveBeenCalledTimes(1);
+
+    // Advance to next midnight from second scheduler's perspective (~24h away).
+    vi.setSystemTime(new Date('2026-01-03T23:59:59.000Z'));
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(secondCallback).toHaveBeenCalledTimes(1);
+  });
+
 });
