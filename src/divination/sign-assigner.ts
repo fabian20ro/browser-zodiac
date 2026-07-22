@@ -14,11 +14,15 @@ export function getSignElement(sign: ZodiacSign): AstroElement {
   return ELEMENT_BY_SIGN[sign];
 }
 
+function _assignFromHash(hash: number, length: number): ZodiacSign {
+  const index = (hash % length + length) % length;
+  return ZODIAC_SIGNS[index >= length ? 0 : index];
+}
+
 export function assignSign(fingerprint: string): ZodiacSign {
   const normalized = fingerprint.normalize().toLowerCase();
   const hash = hashString(normalized);
-  const index = hash % ZODIAC_SIGNS.length;
-  return ZODIAC_SIGNS[index];
+  return _assignFromHash(hash, ZODIAC_SIGNS.length);
 }
 
 /**
@@ -36,8 +40,7 @@ export function assignDailySign(fingerprint: string, date: Date): ZodiacSign {
   const dateStr = `${y}-${m}-${d}`;
   const normalized = `${fingerprint}:${dateStr}`.toLowerCase();
   const hash = hashString(normalized);
-  const index = hash % ZODIAC_SIGNS.length;
-  return ZODIAC_SIGNS[index];
+  return _assignFromHash(hash, ZODIAC_SIGNS.length);
 }
 
 /**
@@ -70,5 +73,5 @@ export function assignSigns(fingerprints: string[]): ZodiacSign[] {
  */
 export function assignRandomSign(): ZodiacSign {
   const rng = mulberry32(Math.floor(Math.random() * 0x80000000));
-  return ZODIAC_SIGNS[rng() * ZODIAC_SIGNS.length | 0];
+  return _assignFromHash(rng() * ZODIAC_SIGNS.length | 0, ZODIAC_SIGNS.length);
 }
