@@ -263,4 +263,44 @@ describe('scheduleMidnightGmt resilience', () => {
     cancelOriginal();
     if (innerCancel) innerCancel();
   });
+
+  it('should not leak when cancel() is called from within its own callback during execution', async () => {
+    // Exercises clearTimeout(activeHandle) inside the cancel function (line 67-70)
+    // triggered by a replacement scheduleMidnightGmt call arriving mid-execution.
+    // When a running scheduler's callback calls scheduleMidnightGmt again while
+    // isLoopRunning=true, production: clears activeHandle, sets wasStartedDuringLoop=true.
+    // The replacement's first tick is suppressed (line 47-50), then resumes normally
+    // on the second tick — proving no stale-timer leak occurs across the cancel-and-reschedule path.
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+
+    let selfCancel: (() => void) | null = null;
+
+    const cancelSelfCallback = async () => {
+      count++;
+      if (selfCancel === null) {
+        // Calling scheduleMidnightGmt from within the running callback triggers
+        // clearTimeout(activeHandle) inside scheduleMidnightGmt's replace path,
+        // then schedules a new loop with wasStartedDuringLoop=true.
+        selfCancel = (() => {}); // placeholder — actual cancel will be reassigned below
+        const actualCancel = scheduleMidnightGmt(callback);
+        selfCancel = actualCancel;
+      }
+    };
+
+    const cancelOriginal = scheduleMidnightGmt(cancelSelfCallback);
+
+    // First tick: original callback fires → count=1, triggers re-schedule mid-execution.
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(count).toBe(1);
+
+    // Second tick: replacement's first iteration is suppressed (wasStartedDuringLoop=true), no leak.
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(count).toBe(1);
+
+    // Third tick: replacement fires normally — proves the loop resumed after suppression without stale-timer leak.
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(count).toBe(2);
+
+    cancelOriginal();
+  });
 });
