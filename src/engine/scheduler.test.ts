@@ -236,6 +236,23 @@ describe('scheduleMidnightGmt', () => {
     expect(callCount).toBe(2); // inner scheduler's iteration finally runs after the skip
   });
 
+  it('fires its first iteration normally when not scheduled during an active loop', async () => {
+    // Observable contract: when scheduleMidnightGmt is called outside any active loop,
+    // wasStartedDuringLoop=false — the scheduler must fire its callback at the first
+    // scheduled midnight without skipping. This verifies the happy-path skip-tick logic.
+    const callback = vi.fn();
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+    scheduleMidnightGmt(callback);
+
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(callback).toHaveBeenCalledTimes(1);
+
+    // Advance to next midnight — second iteration fires normally too
+    vi.setSystemTime(new Date('2026-01-02T23:59:59.000Z'));
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(callback).toHaveBeenCalledTimes(2);
+  });
+
   it('fires after ~24h when scheduled exactly at midnight', async () => {
     const callback = vi.fn();
     // At exact midnight, getNextMidnightGmt returns next-day midnight (86400000ms away).
