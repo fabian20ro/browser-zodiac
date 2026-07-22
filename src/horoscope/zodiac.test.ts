@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ZODIAC_SIGNS, ZODIAC_SYMBOLS, randomSign, getSignDisplayName, getSignByDate } from './zodiac.ts';
+import { ZODIAC_SIGNS, ZODIAC_SYMBOLS, randomSign, getSignDisplayName, getSignByDate, ZodiacSign } from './zodiac.ts';
 import { mulberry32 } from '../engine/random.ts';
 
 describe('ZODIAC_SIGNS', () => {
@@ -200,6 +200,61 @@ describe('getSignByDate', () => {
       }
     }
 
-    expect(signSet.size).toBeGreaterThanOrEqual(10); // At least most signs covered
+    expect(signSet.size).toBe(12); // All signs covered
+  });
+
+  it('tests all boundary dates including wrap-around', () => {
+    const boundaries: [number, number][] = [
+      [3, 21], [4, 20], [5, 21], [6, 21],
+      [7, 23], [8, 23], [9, 23], [10, 23],
+      [11, 22], [12, 22], [1, 20], [2, 19]
+    ];
+
+    const expectedSigns = ['aries', 'taurus', 'gemini', 'cancer',
+                           'leo', 'virgo', 'libra', 'scorpio',
+                           'sagittarius', 'capricorn', 'aquarius', 'pisces'];
+
+    for (let i = 0; i < boundaries.length; i++) {
+      const [m, d] = boundaries[i];
+      expect(getSignByDate(m, d), `boundary ${i} (${m}/${d})`).toBe(expectedSigns[i]);
+    }
+  });
+
+  it('tests mid-period dates for all signs', () => {
+    // Mid-range dates within each sign's period
+    const expected: [number, number, ZodiacSign][] = [
+      [4, 10, 'aries'],       // Aries: Mar 21 – Apr 19
+      [5, 10, 'taurus'],      // Taurus: Apr 20 – May 20
+      [6, 10, 'gemini'],      // Gemini: May 21 – Jun 20
+      [7, 10, 'cancer'],      // Cancer: Jun 21 – Jul 22
+      [8, 5, 'leo'],          // Leo: Jul 23 – Aug 22
+      [9, 5, 'virgo'],        // Virgo: Aug 23 – Sep 22
+      [10, 5, 'libra'],       // Libra: Sep 23 – Oct 22
+      [11, 5, 'scorpio'],     // Scorpio: Oct 23 – Nov 21
+      [12, 5, 'sagittarius'], // Sagittarius: Nov 22 – Dec 21
+      [12, 28, 'capricorn'],  // Capricorn: Dec 22 – Jan 19
+      [2, 5, 'aquarius'],     // Aquarius: Jan 20 – Feb 18
+      [3, 5, 'pisces'],       // Pisces: Feb 19 – Mar 20
+    ];
+
+    for (const [m, d, sign] of expected) {
+      expect(getSignByDate(m, d), `${sign} mid-period (${m}/${d})`).toBe(sign);
+    }
+  });
+
+  it('tests year-wrap-around boundary dates', () => {
+    // Capricorn ends Jan 19, Pisces starts Feb 19 — test the Dec/Jan transition
+    expect(getSignByDate(12, 31)).toBe('capricorn');   // Last day of Capricorn period
+    expect(getSignByDate(1, 19)).toBe('capricorn');    // End of Capricorn
+    expect(getSignByDate(1, 20)).toBe('aquarius');     // Start of Aquarius (wraps to next year)
+    expect(getSignByDate(2, 18)).toBe('aquarius');     // Last day of Aquarius
+    expect(getSignByDate(2, 19)).toBe('pisces');       // Start of Pisces
+    expect(getSignByDate(3, 20)).toBe('pisces');       // End of Pisces
+    expect(getSignByDate(3, 21)).toBe('aries');        // Start of Aries (new zodiac year)
+
+    // Test edge cases around the wrap-around
+    expect(getSignByDate(12, 22)).toBe('capricorn');   // First day Capricorn period
+    expect(getSignByDate(1, 1)).toBe('capricorn');     // Jan 1 in middle of Capricorn period
+    expect(getSignByDate(2, 19)).toBe('pisces');       // Pisces starts here
   });
 });
