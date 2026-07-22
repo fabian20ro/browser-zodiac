@@ -1,6 +1,5 @@
 import { createGrammarEngine } from '../engine/grammar.ts';
 import { mulberry32, dailySeed } from '../engine/random.ts';
-import type { Grammar } from '../engine/types.ts';
 import type { DivinationProfile } from '../divination/browser-oracle.ts';
 import type { LocalePack } from '../i18n/types.ts';
 import type { ZodiacSign } from './zodiac.ts';
@@ -15,6 +14,19 @@ export interface Horoscope {
   warning: string;
   compatibility: string;
   date: string;
+}
+
+/** Merge locale grammar with divination readings — signName symbol + reading keys as symbols. */
+function buildContextGrammar(
+  localeGrammar: LocalePack['grammar'],
+  signName: string,
+  readings: DivinationProfile['readings'],
+): Record<string, string[]> {
+  return {
+    ...localeGrammar,
+    signName: [signName],
+    ...Object.fromEntries(readings.map((r) => [r.key, [r.raw]])),
+  };
 }
 
 export function generateHoroscope(
@@ -34,12 +46,7 @@ export function generateHoroscope(
     throw new Error(`Unrecognized zodiac sign key: ${String(sign)}`);
   }
 
-  // Merge locale grammar with divination context symbols; readings overwrite colliding keys.
-  const contextGrammar: Grammar = {
-    ...locale.grammar,
-    signName: [signName],
-    ...Object.fromEntries(divination.readings.map((r) => [r.key, [r.raw]])),
-  };
+  const contextGrammar = buildContextGrammar(locale.grammar, signName, divination.readings);
 
   const engine = createGrammarEngine(contextGrammar, rng);
 
