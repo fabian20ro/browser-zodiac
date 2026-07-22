@@ -378,4 +378,34 @@ describe('scheduleMidnightGmt', () => {
     expect(secondCallback).toHaveBeenCalledTimes(1);
   });
 
+  it('cancel during active callback execution leaves state clean for a new scheduler', async () => {
+    // Observable contract: canceling while the current callback is still executing must
+    // not corrupt module-level state — subsequent scheduling should behave normally, firing
+    // at its first scheduled midnight without skip-tick or double-fire surprises.
+    let outerCallCount = 0;
+    const outerCallback = () => {
+      outerCallCount++;
+      if (outerCallCount === 1) {
+        scheduleMidnightGmt(() => {}); // inner scheduler: should be skipped since active loop is true
+      }
+    };
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+    const cancelOuter = scheduleMidnightGmt(outerCallback);
+
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(outerCallCount).toBe(1); // outer fired once
+
+    // Cancel while still inside the callback's setTimeout handler — state is mid-execution.
+    cancelOuter();
+
+    // Start a new scheduler immediately after cancellation during execution.
+    const newCallback = vi.fn();
+    vi.setSystemTime(new Date('2026-01-03T23:59:59.000Z'));
+    scheduleMidnightGmt(newCallback);
+
+    // Advance to next midnight — new scheduler must fire exactly once at its first tick.
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(newCallback).toHaveBeenCalledTimes(1);
+  });
+
 });

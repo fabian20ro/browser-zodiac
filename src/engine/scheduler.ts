@@ -68,5 +68,6 @@ export function scheduleMidnightGmt(callback: () => void): () => void {
       clearTimeout(activeHandle);
       activeHandle = undefined;
     }
+    isLoopRunning = false;
   };
 }

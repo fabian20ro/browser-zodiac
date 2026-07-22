@@ -251,6 +251,7 @@ describe('generateHoroscope', () => {
         warning: ['ignore danger'],
         compatibility: ['peaceful'],
         luckyColor: ['red'],
+        origin: ['ignore origin text'],
       },
     };
     const divinationWithCollisions: DivinationProfile = {
@@ -258,13 +259,15 @@ describe('generateHoroscope', () => {
         { key: 'warning', raw: 'SHE PULLS THE KNIFE FIRST', interpretation: '' },
         { key: 'compatibility', raw: 'SCORPIO', interpretation: '' },
         { key: 'luckyColor', raw: 'BLACK', interpretation: '' },
+        { key: 'origin', raw: 'THE STARS CONSPIRE IN SILENCE', interpretation: '' },
       ],
-      fingerprint: 'triple-collision-fp',
+      fingerprint: 'quadruple-collision-fp',
     };
     const h = generateHoroscope('aries', locale, divinationWithCollisions, fixedDate);
     expect(h.warning).toBe('SHE PULLS THE KNIFE FIRST');
     expect(h.compatibility).toBe('SCORPIO');
     expect(h.luckyColor).toBe('BLACK');
+    expect(h.text).toBe('THE STARS CONSPIRE IN SILENCE');
   });
 
   it('throws on unrecognized zodiac sign key in every locale that lacks the symbol', () => {

@@ -377,4 +377,48 @@ describe('dailySeed', () => {
     const eveningC = Math.floor(mulberry32(dailySeed('2026-07-09', 'aries', '18:45'))() * numSigns);
     expect(eveningC).not.toBe(morningA); // differs across hours
   });
+
+  it('rejects out-of-range hour and falls back to date-only seed', () => {
+    // Out-of-range timeParts must not produce distinct seeds — they fall back to no-timePart.
+    const invalidHour = dailySeed('2026-07-09', 'aries', '25:00');
+    const withoutTime = dailySeed('2026-07-09', 'aries');
+    expect(invalidHour).toBe(withoutTime);
+
+    const negativeHour = dailySeed('2026-07-09', 'aries', '-1:00');
+    expect(negativeHour).toBe(withoutTime);
+  });
+
+  it('rejects out-of-range minute and falls back to date-only seed', () => {
+    const invalidMinute = dailySeed('2026-07-09', 'aries', '14:60');
+    const withoutTime = dailySeed('2026-07-09', 'aries');
+    expect(invalidMinute).toBe(withoutTime);
+
+    const negativeMinute = dailySeed('2026-07-09', 'aries', '14:-5');
+    expect(negativeMinute).toBe(withoutTime);
+  });
+
+  it('accepts boundary-valid hour and minute values', () => {
+    // Hour=0, minute=0 should be valid; same as any other valid time.
+    const withoutTime = dailySeed('2026-07-09', 'aries');
+    const midnight = dailySeed('2026-07-09', 'aries', '00:00');
+    expect(Number.isInteger(midnight)).toBe(true);
+
+    const lastHour = dailySeed('2026-07-09', 'aries', '23:59');
+    expect(Number.isInteger(lastHour)).toBe(true);
+    // Boundary values must differ from each other and from no-timePart
+    expect(midnight).not.toBe(withoutTime);
+    expect(lastHour).not.toBe(withoutTime);
+  });
+
+  it('boundary valid seeds can feed mulberry32 successfully', () => {
+    // Boundary-valid timeParts must produce valid mulberry32 output.
+    for (const t of ['00:00', '23:59']) {
+      const seed = dailySeed('2026-07-09', 'aries', t);
+      const rng = mulberry32(seed);
+      for (let i = 0; i < 5; i++) {
+        expect(rng()).toBeGreaterThanOrEqual(0);
+        expect(rng()).toBeLessThan(1);
+      }
+    }
+  });
 });
