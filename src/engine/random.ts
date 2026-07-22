@@ -31,6 +31,9 @@ function normalizeTimePart(timePart: string | undefined): string {
   const parts = timePart.split(':');
   const h = Number(parts[0]) || 0;
   const m = Number(parts[1]) || 0;
+  // Validate range to prevent invalid seeds from malformed input
+  if (h < 0 || h > 23) return '';
+  if (m < 0 || m > 59) return '';
   return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
 }
 
