@@ -437,4 +437,26 @@ describe('scheduleMidnightGmt', () => {
     expect(newCallback).toHaveBeenCalledTimes(1);
   });
 
+  it('only the latest callback fires when two are scheduled synchronously', async () => {
+    // Observable contract: when scheduleMidnightGmt() is called twice in rapid succession
+    // (without any time advance between calls), only the most recent scheduler should fire —
+    // the earlier one must be cancelled before its timer can tick. The first callback should
+    // never execute, and the second should fire exactly once at midnight.
+    const firstCallback = vi.fn();
+    const secondCallback = vi.fn();
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+
+    scheduleMidnightGmt(firstCallback);
+    scheduleMidnightGmt(secondCallback);
+
+    // No time advance — both are set up synchronously; first is cancelled before any tick
+    expect(firstCallback).not.toHaveBeenCalled();
+    expect(secondCallback).not.toHaveBeenCalled();
+
+    // Advance past midnight — only the second scheduler fires
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(firstCallback).toHaveBeenCalledTimes(0);
+    expect(secondCallback).toHaveBeenCalledTimes(1);
+  });
+
 });
