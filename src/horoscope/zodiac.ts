@@ -69,7 +69,7 @@ interface SignBoundary {
   sign: ZodiacSign;
 }
 
-const ZODIAC_BOUNDARIES: SignBoundary[] = [
+export const ZODIAC_BOUNDARIES: SignBoundary[] = [
   { month: 3, day: 21, sign: 'aries' },
   { month: 4, day: 20, sign: 'taurus' },
   { month: 5, day: 21, sign: 'gemini' },
