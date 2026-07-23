@@ -451,6 +451,29 @@ describe('createActionButton', () => {
     expect(btn.classList.contains('action-btn--feedback')).toBe(false);
   });
 
+  it('respects a custom durationMs for feedback revert', async () => {
+    vi.useFakeTimers();
+    const btn = createActionButton({
+      icon: '⧉',
+      feedbackIcon: '✓',
+      ariaLabel: 'Copy',
+      durationMs: 3000,
+      onClick: () => {},
+    });
+
+    btn.click();
+    await Promise.resolve();
+    expect(btn.textContent).toBe('✓');
+
+    vi.advanceTimersByTime(2999);
+    expect(btn.textContent).toBe('✓');
+
+    vi.advanceTimersByTime(1);
+    expect(btn.textContent).toBe('⧉');
+    expect(btn.classList.contains('action-btn--feedback')).toBe(false);
+    vi.useRealTimers();
+  });
+
   it('shows error icon (not feedback) when both are set and action rejects', async () => {
     vi.useFakeTimers();
     const btn = createActionButton({

@@ -238,6 +238,28 @@ describe('createTopBar', () => {
     expect(themeButton.textContent).toBe('\u{1F319}');
     expect(themeButton.getAttribute('aria-label')).toBe('Switch to dark theme');
   });
+
+  it('displays ro → en flags and "Switch to English" label when starting in Romanian', () => {
+    const bar = createTopBar(locales, 'ro', minimalUi, () => {}, true, () => {});
+    const buttons = bar.querySelectorAll('button');
+    const languageButton = buttons[0] as HTMLButtonElement;
+    const themeButton = buttons[1] as HTMLButtonElement;
+
+    expect(languageButton.textContent).toBe('\u{1F1F7}\u{1F1F4} → \u{1F1EC}\u{1F1E7}'); // 🇷🇴 → 🇬🇧
+    expect(languageButton.getAttribute('aria-label')).toBe('Switch to English');
+    expect(languageButton.type).toBe('button');
+    // default theme is dark → sun icon, aria-switches-to-light
+    expect(themeButton.textContent).toBe('\u2600\uFE0F');
+    expect(themeButton.getAttribute('aria-label')).toBe('Switch to light theme');
+  });
+
+  it('calls onLanguageChange with "en" when starting in Romanian and language button is clicked', () => {
+    const onLangChange = vi.fn();
+    const bar = createTopBar(locales, 'ro', minimalUi, onLangChange, true, () => {});
+    const buttons = bar.querySelectorAll('button');
+    (buttons[0] as HTMLButtonElement).click();
+    expect(onLangChange).toHaveBeenCalledWith('en');
+  });
 });
 
 describe('createDivinationPanel', () => {
