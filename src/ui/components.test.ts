@@ -241,6 +241,14 @@ describe('createTopBar', () => {
 });
 
 describe('createDivinationPanel', () => {
+  it('renders a heading with aria-controls pointing to the list', () => {
+    const panel = createDivinationPanel({ readings: [], fingerprint: 'f' }, minimalUi);
+    const heading = panel.querySelector('.divination-card__heading');
+    const toggle = panel.querySelector('.divination-card__toggle') as HTMLButtonElement;
+    expect(heading?.tagName).toBe('H3');
+    expect(toggle.getAttribute('aria-controls')).toBe('divination-card__list');
+  });
+
   it('uses localized aria label for details toggle', () => {
     const panel = createDivinationPanel({ readings: [], fingerprint: 'f' }, minimalUi);
     const toggle = panel.querySelector('.divination-card__toggle');
