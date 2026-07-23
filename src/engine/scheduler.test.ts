@@ -236,6 +236,35 @@ describe('scheduleMidnightGmt', () => {
     expect(callCount).toBe(2); // inner scheduler's iteration finally runs after the skip
   });
 
+  it('skips its first iteration when scheduleMidnightGmt is called during callback execution', async () => {
+    // Observable contract: when scheduleMidnightGmt() is invoked from within an
+    // actively executing callback (not at loop setup time), wasStartedDuringLoop=true —
+    // the inner scheduler must skip its first scheduled tick and resume on the next.
+    let callCount = 0;
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+    scheduleMidnightGmt(() => {
+      callCount++;
+      // Trigger a nested scheduler while still executing the outer callback —
+      // this sets wasStartedDuringLoop=true for the inner loop.
+      scheduleMidnightGmt(() => {
+        callCount++;
+      });
+    });
+
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(callCount).toBe(1); // outer fires; inner's first tick is skipped due to active-loop flag
+
+    // Advance to the next midnight — inner scheduler skips its first iteration, reschedules
+    vi.setSystemTime(new Date('2026-01-02T23:59:59.000Z'));
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(callCount).toBe(1); // inner scheduler still skipped its first iteration
+
+    // Advance to the following midnight — inner scheduler's actual callback fires now
+    vi.setSystemTime(new Date('2026-01-03T23:59:59.000Z'));
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(callCount).toBe(2); // inner scheduler fires after the skip tick
+  });
+
   it('fires its first iteration normally when not scheduled during an active loop', async () => {
     // Observable contract: when scheduleMidnightGmt is called outside any active loop,
     // wasStartedDuringLoop=false — the scheduler must fire its callback at the first

@@ -65,6 +65,41 @@ export function parseEntriesFile(content: string): string[] {
  * All imported sections are merged into the main grammar. Files are
  * fetched in parallel for optimal performance.
  */
+/** Internal: fetch a URL and return its text content, or null on failure. */
+async function safeFetchText(
+  url: string,
+  fetchFn: typeof fetch,
+  strict: boolean,
+): Promise<string | null> {
+  let res;
+  try {
+    res = await fetchFn(url);
+  } catch (err) {
+    const errorMsg = `Failed to load ${url}: ${(err as Error).message}`;
+    if (strict) throw new Error(errorMsg);
+    console.warn(errorMsg);
+    return null;
+  }
+  if (!res.ok) {
+    const errorMsg = `Failed to load ${url}: ${res.status}`;
+    if (strict) throw new Error(errorMsg);
+    console.warn(errorMsg);
+    return null;
+  }
+
+  let text: string;
+  try {
+    text = await res.text();
+  } catch (err) {
+    const errorMsg = `Failed to read ${url}: ${(err as Error).message}`;
+    if (strict) throw new Error(errorMsg);
+    console.warn(errorMsg);
+    return null;
+  }
+
+  return text;
+}
+
 export async function loadGrammar(
   localeId: string,
   basePath?: string,
@@ -118,31 +153,9 @@ export async function loadGrammar(
     if (visitedUrls.has(url)) continue; // avoid infinite recursion on circular imports
     visitedUrls.add(url);
 
-    let res;
-    try {
-      res = await fetchFn(url);
-    } catch (err) {
-      const errorMsg = `Failed to load ${url}: ${(err as Error).message}`;
-      if (strict) throw new Error(errorMsg);
-      console.warn(errorMsg);
-      continue;
-    }
-    if (!res.ok) {
-      const errorMsg = `Failed to load ${url}: ${res.status}`;
-      if (strict) throw new Error(errorMsg);
-      console.warn(errorMsg);
-      continue;
-    }
+    const text = await safeFetchText(url, fetchFn, strict);
+    if (text === null) continue;
 
-    let text: string;
-    try {
-      text = await res.text();
-    } catch (err) {
-      const errorMsg = `Failed to read ${url}: ${(err as Error).message}`;
-      if (strict) throw new Error(errorMsg);
-      console.warn(errorMsg);
-      continue;
-    }
     const parsedImport = parseGrammarText(text);
 
     // Queue nested imports for later processing
