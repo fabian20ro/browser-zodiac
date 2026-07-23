@@ -213,6 +213,21 @@ describe('detectLanguage', () => {
 
     expect(detectLanguage()).toBe('en');
   });
+
+  it('falls through to browser language when localStorage throws (privacy-mode simulation)', () => {
+    // Simulate Safari private mode / blocked localStorage: getItem throws.
+    const originalGetItem = localStorageStub.getItem.bind(localStorageStub);
+    (localStorageStub as unknown as { getItem: (key: string) => string | null }).getItem = (_key: string) => {
+      throw new Error('QuotaExceededError');
+    };
+
+    setNavigatorProperty('language', 'ro');
+
+    expect(detectLanguage()).toBe('ro');
+
+    // Restore original behavior for other tests.
+    (localStorageStub as unknown as { getItem: (key: string) => string | null }).getItem = originalGetItem;
+  });
 });
 
 describe('getAvailableLocales', () => {
