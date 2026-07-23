@@ -303,4 +303,28 @@ describe('scheduleMidnightGmt resilience', () => {
 
     cancelOriginal();
   });
+
+  it('should recover after synchronous (non-async) callback throws', async () => {
+    let errorCount = 0;
+    const syncFailingCallback = () => {
+      count++;
+      if (errorCount === 0) {
+        errorCount++;
+        throw new Error('sync callback failure');
+      }
+    };
+
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+    const cancel = scheduleMidnightGmt(syncFailingCallback);
+
+    await vi.advanceTimersByTimeAsync(1000);
+    // First iteration: sync throw → try/catch must suppress and reschedule.
+    expect(count).toBe(1);
+
+    await vi.advanceTimersByTimeAsync(86400000);
+    // Second iteration: callback succeeds → count increments again.
+    expect(count).toBe(2);
+
+    cancel();
+  });
 });
