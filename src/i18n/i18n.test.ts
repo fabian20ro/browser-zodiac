@@ -214,6 +214,16 @@ describe('detectLanguage', () => {
     expect(detectLanguage()).toBe('en');
   });
 
+  it('treats stored multi-character locale id as invalid and falls back to navigator.language', () => {
+    // Stored 'eng' normalizes to 'eng'; not registered → falls through to browser.
+    // Browser detection applies slice(0,2) which would match 'ro'.
+    window.localStorage.setItem('horror-scope-lang', 'ENG');
+
+    setNavigatorProperty('language', 'ro');
+
+    expect(detectLanguage()).toBe('ro');
+  });
+
   it('falls through to browser language when localStorage throws (privacy-mode simulation)', () => {
     // Simulate Safari private mode / blocked localStorage: getItem throws.
     const originalGetItem = localStorageStub.getItem.bind(localStorageStub);
