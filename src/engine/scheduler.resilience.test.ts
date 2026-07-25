@@ -327,4 +327,34 @@ describe('scheduleMidnightGmt resilience', () => {
 
     cancel();
   });
+
+  it('should keep rescheduling through consecutive callback failures without leaking', async () => {
+    let failureCount = 0;
+    const alwaysFailingCallback = () => {
+      count++;
+      throw new Error(`synthetic failure ${++failureCount}`);
+    };
+
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+    const cancel = scheduleMidnightGmt(alwaysFailingCallback);
+
+    // Advance through 4 consecutive daily iterations — each throws synchronously.
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(count).toBe(1);
+
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(count).toBe(2);
+
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(count).toBe(3);
+
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(count).toBe(4);
+
+    cancel();
+
+    // A further advance after cancellation must not fire — proving no stale-timer leak through the error path.
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(count).toBe(4);
+  });
 });
