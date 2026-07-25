@@ -36,25 +36,21 @@ export const DEFAULT_MODIFIERS: ModifierEntry[] = [
 ];
 
 /** Runtime contract assertion — titlecase must produce canonical output */
-const TITLECASE_CONTRACT = DEFAULT_MODIFIERS.find(
-  (m) => m.name === 'titlecase'
-);
-if (TITLECASE_CONTRACT) {
-  const samples: Record<string, string> = {
-    'hello world': 'Hello World',
-    'the quick brown fox': 'The Quick Brown Fox',
-    'already Titlecased': 'Already Titlecased',
-    'multiple   spaces': 'Multiple Spaces',
-    '  leading-trailing ': 'Leading Trailing',
-  };
-  for (const [input, expected] of Object.entries(samples)) {
-    const actual = TITLECASE_CONTRACT.fn(input);
-    if (actual !== expected) {
-      throw new Error(
-        `titlecase contract violated: ${JSON.stringify(input)} → ` +
-          `${JSON.stringify(actual)} (expected ${JSON.stringify(expected)})`
-      );
-    }
+const TITLECASE_FN = DEFAULT_MODIFIERS.find(m => m.name === 'titlecase')!.fn;
+const SAMPLES: Record<string, string> = {
+  'hello world': 'Hello World',
+  'the quick brown fox': 'The Quick Brown Fox',
+  'already Titlecased': 'Already Titlecased',
+  'multiple   spaces': 'Multiple Spaces',
+  '  leading-trailing ': 'Leading Trailing',
+};
+for (const [input, expected] of Object.entries(SAMPLES)) {
+  const actual = TITLECASE_FN(input);
+  if (actual !== expected) {
+    throw new Error(
+      `titlecase contract violated: ${JSON.stringify(input)} → ` +
+        `${JSON.stringify(actual)} (expected ${JSON.stringify(expected)})`
+    );
   }
 }
 
