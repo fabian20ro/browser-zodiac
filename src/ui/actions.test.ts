@@ -356,6 +356,26 @@ describe('createActionButton', () => {
     expect(btn.textContent).toBe('→');
   });
 
+  it('shows feedback icon when sync onClick returns true and feedbackIcon is set', async () => {
+    vi.useFakeTimers();
+    const btn = createActionButton({
+      icon: '⧉',
+      feedbackIcon: '✓',
+      ariaLabel: 'Copy',
+      onClick: () => Promise.resolve(true),
+    });
+
+    btn.click();
+    await Promise.resolve();
+    expect(btn.textContent).toBe('✓');
+    expect(btn.classList.contains('action-btn--feedback')).toBe(true);
+
+    vi.advanceTimersByTime(1500);
+    expect(btn.textContent).toBe('⧉');
+    expect(btn.classList.contains('action-btn--feedback')).toBe(false);
+    vi.useRealTimers();
+  });
+
   it('does not show feedback on second click while first is still pending', async () => {
     vi.useFakeTimers();
     let resolveFirst!: (value: boolean) => void;
