@@ -97,6 +97,14 @@ describe('randomSign', () => {
     expect(result).not.toBe('libra');
     expect(ZODIAC_SIGNS).toContain(result);
   });
+
+  it('unrecognized current sign is never returned as output (defensive)', () => {
+    const seed = 99;
+    const rng = mulberry32(seed);
+    const result = randomSign('nonexistent' as any, rng);
+    expect(ZODIAC_SIGNS).toContain(result);
+    expect(result).not.toBe('nonexistent');
+  });
 });
 
 describe('getSignDisplayName', () => {
