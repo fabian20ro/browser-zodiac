@@ -380,6 +380,14 @@ describe('createFooter', () => {
     expect(badgeLink!.href).toContain('fabian20ro/horror-scope');
   });
 
+  it('renders a deploy badge image with correct src and alt', () => {
+    const footer = createFooter(minimalUi);
+    const img = (footer.querySelector('.footer__badge') as HTMLAnchorElement)!.querySelector('img') as HTMLImageElement;
+    expect(img).not.toBeNull();
+    expect(img.src).toContain('/actions/workflows/deploy.yml/badge.svg');
+    expect(img.alt).toBe('Deploy to GitHub Pages');
+  });
+
   it('has the expected child order: generated, disclaimer, badge', () => {
     const footer = createFooter(minimalUi);
     expect(footer.children.length).toBe(3);

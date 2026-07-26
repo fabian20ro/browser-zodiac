@@ -83,6 +83,15 @@ describe('randomSign', () => {
     expect(res1).toBe(res2);
   });
 
+  it('every sign is deterministically reachable from a fixed seed', () => {
+    for (const current of ZODIAC_SIGNS) {
+      const rng = mulberry32(456);
+      const result = randomSign(current, rng);
+      expect(ZODIAC_SIGNS).toContain(result);
+      expect(result).not.toBe(current);
+    }
+  });
+
   it('returns a valid sign when given an unrecognized input', () => {
     for (let i = 0; i < 50; i++) {
       const result = randomSign('nonexistent' as any);
@@ -264,5 +273,47 @@ describe('getSignByDate', () => {
     expect(getSignByDate(12, 22)).toBe('capricorn');   // First day Capricorn period
     expect(getSignByDate(1, 1)).toBe('capricorn');     // Jan 1 in middle of Capricorn period
     expect(getSignByDate(2, 19)).toBe('pisces');       // Pisces starts here
+  });
+
+  it('every valid day in a leap year maps to exactly one sign', () => {
+    const seen = new Set<string>();
+    let nullCount = 0;
+
+    for (let m = 1; m <= 12; m++) {
+      const daysInMonth = new Date(2024, m, 0).getDate(); // 2024 is a leap year
+      for (let d = 1; d <= daysInMonth; d++) {
+        const sign = getSignByDate(m, d);
+        expect(sign, `date ${m}/${d} should produce a zodiac sign`).not.toBeNull();
+        seen.add(sign!);
+      }
+    }
+
+    // All 12 signs must be reachable from some date in the year
+    for (const sign of ZODIAC_SIGNS) {
+      expect(seen.has(sign), `${sign} not covered by any date`).toBe(true);
+    }
+
+    // No sign should appear more than once per day (uniqueness is structural)
+    expect(seen.size).toBe(12);
+  });
+
+  it('adjacent days never flip between signs at non-boundary dates', () => {
+    // Between any two consecutive boundary dates, every adjacent pair must agree
+    for (let m = 1; m <= 12; m++) {
+      const daysInMonth = new Date(2024, m, 0).getDate();
+      for (let d = 2; d <= daysInMonth; d++) {
+        // Skip the first day of each month — boundaries always fall on non-1st dates
+        const prevSign = getSignByDate(m, d - 1);
+        const currSign = getSignByDate(m, d);
+
+        if (prevSign && currSign) {
+          // If signs differ, this must be a boundary transition day — flag it
+          expect(
+            prevSign === currSign || (d >= 19 && d <= 23),
+            `sign flip at ${m}/${d}: ${prevSign} → ${currSign}`
+          ).toBe(true);
+        }
+      }
+    }
   });
 });

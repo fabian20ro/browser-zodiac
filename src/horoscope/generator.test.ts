@@ -391,4 +391,80 @@ describe('generateHoroscope', () => {
     const h2 = generateHoroscope('taurus', locale, divinationWithLatency, fixedDate);
     expect(h1.compatibility).toBe(h2.compatibility);
   });
+
+  it('signName flows through every grammar section that references it', () => {
+    const locale: LocalePack = {
+      ...minimalLocale,
+      grammar: {
+        ...minimalLocale.grammar,
+        origin: ['#signName# rises'],
+        warning: ['Beware #signName#'],
+        compatibility: ['with #signName#'],
+        luckyColor: ['#signName# prefers dark'],
+      },
+    };
+    const h = generateHoroscope('leo', locale, minimalDivination, fixedDate);
+    expect(h.text).toBe('Leo rises');
+    expect(h.warning).toBe('Beware Leo');
+    expect(h.compatibility).toBe('with Leo');
+    expect(h.luckyColor).toBe('Leo prefers dark');
+  });
+
+  it('determinism holds across every Horoscope field under many reading collisions', () => {
+    const locale: LocalePack = {
+      ...minimalLocale,
+      grammar: {
+        ...minimalLocale.grammar,
+        origin: ['#origin# and #warning#'],
+        warning: ['#compatibility# meets #luckyColor#'],
+        luckyColor: ['#signName# shade'],
+        compatibility: ['#spirit_browser# fate'],
+      },
+    };
+    const divinationWithManyCollisions: DivinationProfile = {
+      readings: [
+        { key: 'origin' as any, raw: 'FATE WEAVES', interpretation: '' },
+        { key: 'warning' as any, raw: 'SHE WATCHES', interpretation: '' },
+        { key: 'compatibility' as any, raw: 'SCORPIO BLOOD', interpretation: '' },
+        { key: 'luckyColor' as any, raw: 'VOID BLACK', interpretation: '' },
+        { key: 'signName' as any, raw: 'LEO THE LION', interpretation: '' },
+        { key: 'spirit_browser', raw: 'DARKNET', interpretation: '' },
+      ],
+      fingerprint: 'many-collision-fp',
+    };
+    const h1 = generateHoroscope('leo', locale, divinationWithManyCollisions, fixedDate);
+    const h2 = generateHoroscope('leo', locale, divinationWithManyCollisions, fixedDate);
+    expect(h1.text).toBe(h2.text);
+    expect(h1.warning).toBe(h2.warning);
+    expect(h1.luckyColor).toBe(h2.luckyColor);
+    expect(h1.compatibility).toBe(h2.compatibility);
+    expect(h1.signSymbol).toBe(h2.signSymbol);
+    expect(h1.luckyNumber).toBe(h2.luckyNumber);
+  });
+
+  it('unusual divination values (special chars) do not corrupt output shape', () => {
+    const locale: LocalePack = {
+      ...minimalLocale,
+      grammar: {
+        ...minimalLocale.grammar,
+        origin: ['#weird#'],
+        warning: ['quiet'],
+        luckyColor: ['red'],
+        compatibility: ['alone'],
+      },
+    };
+    const divinationWithWeirdValues: DivinationProfile = {
+      readings: [
+        { key: 'weird' as any, raw: 'line\nbreak\tand "quotes"', interpretation: '' },
+      ],
+      fingerprint: 'weird-fp',
+    };
+    const h = generateHoroscope('aries', locale, divinationWithWeirdValues, fixedDate);
+    expect(typeof h.text).toBe('string');
+    expect(h.text.length).toBeGreaterThan(0);
+    expect(typeof h.warning).toBe('string');
+    expect(h.luckyColor).toBe('red');
+    expect(h.compatibility).toBe('alone');
+    expect(Number.isInteger(h.luckyNumber)).toBe(true);
+  });
 });
