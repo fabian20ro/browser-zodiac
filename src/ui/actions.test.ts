@@ -211,6 +211,20 @@ describe('createActionButton', () => {
     expect(btn.classList.contains('action-btn--feedback')).toBe(false);
   });
 
+  it('leaves button unchanged when async click returns non-boolean truthy and no feedback/error icon', async () => {
+    const btn = createActionButton({
+      icon: '→',
+      ariaLabel: 'Go',
+      onClick: () => Promise.resolve('done'),
+    });
+
+    btn.click();
+    await Promise.resolve();
+
+    expect(btn.textContent).toBe('→');
+    expect(btn.classList.contains('action-btn--feedback')).toBe(false);
+  });
+
   it('shows error icon when async click returns false and errorIcon is set', async () => {
     vi.useFakeTimers();
     const btn = createActionButton({
