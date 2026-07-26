@@ -516,4 +516,20 @@ describe('createActionButton', () => {
 
     vi.useRealTimers();
   });
+
+  it('shows feedback icon (not error) when async result is truthy non-boolean and both icons are set', async () => {
+    const btn = createActionButton({
+      icon: '⧉',
+      feedbackIcon: '✓',
+      errorIcon: '✕',
+      ariaLabel: 'Copy',
+      onClick: () => (Promise.resolve('done') as unknown as Promise<boolean>),
+    });
+
+    btn.click();
+    await Promise.resolve();
+
+    expect(btn.textContent).toBe('✓');
+    expect(btn.classList.contains('action-btn--feedback')).toBe(true);
+  });
 });
