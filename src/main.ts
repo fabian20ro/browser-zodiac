@@ -52,6 +52,15 @@ async function initApp(): Promise<void> {
     container.innerHTML = '';
   }
 
+  // Brief loading feedback while grammars are fetched — prevents blank white flash.
+  const LOADING_TEMPLATE = `\
+  <main style="min-height:100vh;display:grid;place-items:center;padding:1.5rem;">
+    <section style="max-width:38rem;text-align:center;font-family:Georgia, serif;color:#aaa;">
+      <p>Cosmic connection being established…</p>
+    </section>
+  </main>`;
+  container.innerHTML = LOADING_TEMPLATE;
+
   try {
     await loadAllGrammars();
   } catch (error) {
