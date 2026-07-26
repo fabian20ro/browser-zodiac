@@ -192,13 +192,16 @@ describe('createTopBar', () => {
     expect(themeButton.textContent).toBe('\u2600\uFE0F'); // ☀️ for dark mode starting point
   });
 
-  it('shows moon icon and switches-to-dark label when starting in light mode', () => {
-    const bar = createTopBar(locales, 'en', minimalUi, () => {}, false, () => {});
-    const buttons = bar.querySelectorAll('button') as NodeListOf<HTMLButtonElement>;
-    const themeButton = buttons[1];
+  it('reflects current theme with correct icon and aria label in both modes', () => {
+    const darkBar = createTopBar(locales, 'en', minimalUi, () => {}, true, () => {});
+    const darkThemeBtn = (darkBar.querySelectorAll('button') as NodeListOf<HTMLButtonElement>)[1];
+    expect(darkThemeBtn.textContent).toBe('\u2600\uFE0F'); // ☀️
+    expect(darkThemeBtn.getAttribute('aria-label')).toBe('Switch to light theme');
 
-    expect(themeButton.textContent).toBe('\u{1F319}'); // 🌙 for light mode starting point
-    expect(themeButton.getAttribute('aria-label')).toBe('Switch to dark theme');
+    const lightBar = createTopBar(locales, 'en', minimalUi, () => {}, false, () => {});
+    const lightThemeBtn = (lightBar.querySelectorAll('button') as NodeListOf<HTMLButtonElement>)[1];
+    expect(lightThemeBtn.textContent).toBe('\u{1F319}'); // 🌙
+    expect(lightThemeBtn.getAttribute('aria-label')).toBe('Switch to dark theme');
   });
 
   it('shows both flags (current → target) on the language button', () => {
@@ -228,15 +231,6 @@ describe('createTopBar', () => {
     const buttons = bar.querySelectorAll('button');
     (buttons[0] as HTMLButtonElement).click();
     expect(onLangChange).toHaveBeenCalledWith('ro');
-  });
-
-  it('shows moon icon and switches-to-dark label when starting in light mode', () => {
-    const bar = createTopBar(locales, 'en', minimalUi, () => {}, false, () => {});
-    const buttons = bar.querySelectorAll('button') as NodeListOf<HTMLButtonElement>;
-    const themeButton = buttons[1];
-
-    expect(themeButton.textContent).toBe('\u{1F319}');
-    expect(themeButton.getAttribute('aria-label')).toBe('Switch to dark theme');
   });
 
   it('displays ro → en flags and "Switch to English" label when starting in Romanian', () => {
