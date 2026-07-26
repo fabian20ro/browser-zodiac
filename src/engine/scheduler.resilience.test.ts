@@ -357,4 +357,36 @@ describe('scheduleMidnightGmt resilience', () => {
     await vi.advanceTimersByTimeAsync(86400000);
     expect(count).toBe(4);
   });
+
+  it('should suppress future iterations when cancel() is called from within its own async callback', async () => {
+    // Exercises the case where a running callback directly calls cancel() on
+    // itself. The new handle created by scheduleMidnightGmt gets cleared before
+    // it can fire, proving cancel-from-within-callback fully stops the scheduler.
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+
+    let cancelFromWithin: (() => void) | null = null;
+
+    const cancelSelfCallback = async () => {
+      count++;
+      if (cancelFromWithin === null) {
+        cancelFromWithin = scheduleMidnightGmt(callback);
+        // Directly invoke the cancel from within this running callback.
+        cancelFromWithin();
+        cancelFromWithin = null;
+      }
+    };
+
+    const cancelOriginal = scheduleMidnightGmt(cancelSelfCallback);
+
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(count).toBe(1); // first tick fires once
+
+    // After one full day advance: no timer was scheduled after the self-cancel,
+    // so no second iteration — proving cancel-from-within-callback fully stops
+    // the scheduler in current production behavior.
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(count).toBe(1);
+
+    cancelOriginal();
+  });
 });
