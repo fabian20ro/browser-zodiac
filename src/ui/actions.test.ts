@@ -470,6 +470,32 @@ describe('createActionButton', () => {
     vi.useRealTimers();
   });
 
+  it('reverts error icon after a custom durationMs', async () => {
+    vi.useFakeTimers();
+    const btn = createActionButton({
+      icon: '⧉',
+      feedbackIcon: '✓',
+      errorIcon: '✕',
+      ariaLabel: 'Copy',
+      durationMs: 5000,
+      onClick: () => Promise.reject(new Error('boom')),
+    });
+
+    btn.click();
+    await Promise.resolve();
+    expect(btn.textContent).toBe('✕');
+    expect(btn.classList.contains('action-btn--feedback')).toBe(false);
+
+    vi.advanceTimersByTime(4999);
+    expect(btn.textContent).toBe('✕');
+    expect(btn.classList.contains('action-btn--feedback')).toBe(false);
+
+    vi.advanceTimersByTime(1);
+    expect(btn.textContent).toBe('⧉');
+    expect(btn.classList.contains('action-btn--feedback')).toBe(false);
+    vi.useRealTimers();
+  });
+
   it('does not add feedback class when error icon is shown', async () => {
     const btn = createActionButton({
       icon: '⧉',

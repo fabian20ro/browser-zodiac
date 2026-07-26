@@ -1,5 +1,6 @@
 import type { Grammar } from '../engine/types.ts';
 import type { ZodiacSign } from '../horoscope/zodiac.ts';
+import { ZODIAC_SIGNS } from '../horoscope/zodiac.ts';
 
 export interface UIStrings {
   title: string;
@@ -103,4 +104,13 @@ export function validateLocalePack(pack: LocalePack): { ok: true } | { ok: false
   }
 
   return errors.length > 0 ? { ok: false, errors } : { ok: true };
+}
+
+// Runtime invariant: ZodiacSign union must have exactly 12 members.
+// Catches drift between the type definition and runtime data structures.
+const EXPECTED_ZODIAC_COUNT = 12;
+if (ZODIAC_SIGNS.length !== EXPECTED_ZODIAC_COUNT) {
+  throw new Error(
+    `Types invariant failed: expected ${EXPECTED_ZODIAC_COUNT} ZodiacSign values, got ${ZODIAC_SIGNS.length}`,
+  );
 }
