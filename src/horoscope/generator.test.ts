@@ -106,6 +106,20 @@ describe('generateHoroscope', () => {
     expect(withDefault).toEqual(withExplicitZero);
   });
 
+  it('non-default consultations produce deterministic distinct horoscopes', () => {
+    const hNeg = generateHoroscope('aries', minimalLocale, minimalDivination, fixedDate, -1);
+    const hOne = generateHoroscope('aries', minimalLocale, minimalDivination, fixedDate, 1);
+    const hTwo = generateHoroscope('aries', minimalLocale, minimalDivination, fixedDate, 2);
+    expect(hNeg.luckyNumber).not.toBe(hOne.luckyNumber);
+    expect(hNeg.luckyNumber).not.toBe(hTwo.luckyNumber);
+    expect(hOne.luckyNumber).not.toBe(hTwo.luckyNumber);
+    // Determinism holds for each non-default consultation.
+    const hNeg2 = generateHoroscope('aries', minimalLocale, minimalDivination, fixedDate, -1);
+    expect(hNeg2.text).toBe(hNeg.text);
+    expect(hNeg2.warning).toBe(hNeg.warning);
+    expect(hNeg2.luckyColor).toBe(hNeg.luckyColor);
+  });
+
   it('injects divination readings as grammar symbols', () => {
     const locale: LocalePack = {
       ...minimalLocale,
