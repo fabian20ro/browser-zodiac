@@ -83,6 +83,15 @@ describe('randomSign', () => {
     expect(res1).toBe(res2);
   });
 
+  it('every sign is deterministically reachable from a fixed seed', () => {
+    for (const current of ZODIAC_SIGNS) {
+      const rng = mulberry32(456);
+      const result = randomSign(current, rng);
+      expect(ZODIAC_SIGNS).toContain(result);
+      expect(result).not.toBe(current);
+    }
+  });
+
   it('returns a valid sign when given an unrecognized input', () => {
     for (let i = 0; i < 50; i++) {
       const result = randomSign('nonexistent' as any);
