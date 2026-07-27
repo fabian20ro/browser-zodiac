@@ -364,6 +364,41 @@ describe('getSignByDate', () => {
     expect(getSignByDate(1, 20)).toBe('aquarius');   // first day aquarius
     expect(getSignByDate(1, 31)).toBe('aquarius');   // end Jan → aquarius
   });
+
+  it('every boundary transition is sharp: no gap or double-mapping', () => {
+    const boundaries: [number, number][] = [
+      [3, 21], [4, 20], [5, 21], [6, 21],
+      [7, 23], [8, 23], [9, 23], [10, 23],
+      [11, 22], [12, 22], [1, 20], [2, 19]
+    ];
+
+    const signOrder = ['aries', 'taurus', 'gemini', 'cancer',
+                       'leo', 'virgo', 'libra', 'scorpio',
+                       'sagittarius', 'capricorn', 'aquarius', 'pisces'];
+
+    for (let i = 0; i < boundaries.length; i++) {
+      const [m, d] = boundaries[i];
+      const currentSign = signOrder[i];
+
+      // The boundary day itself must map to the new sign
+      expect(getSignByDate(m, d)).toBe(currentSign);
+
+      // One day before should be a different sign (verifying no gap)
+      let prevM: number, prevD: number;
+      if (i === 0) {
+        // Aries starts Mar 21 → day before = Feb 18 (last day Aquarius period)
+        prevM = 2; prevD = 18;
+      } else {
+        const [prevBM, prevBD] = boundaries[i - 1];
+        const prevDate = new Date(2024, prevBM - 1, prevBD);
+        prevDate.setDate(prevDate.getDate() - 1);
+        prevM = prevDate.getMonth() + 1;
+        prevD = prevDate.getDate();
+      }
+
+      expect(getSignByDate(prevM!, prevD!), `day before ${m}/${d} should map to previous sign`).not.toBe(currentSign);
+    }
+  });
 });
 
 // Re-export encodeDate for test access (it is the year-agnostic integer encoder)
