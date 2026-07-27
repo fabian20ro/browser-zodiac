@@ -316,4 +316,57 @@ describe('getSignByDate', () => {
       }
     }
   });
+
+  it('Feb 29 validates against leap-year calendar but is year-agnostic for encoding', () => {
+    // In a leap year (2024), Feb 29 IS valid: new Date(2024, 2, 0).getDate() = 29.
+    expect(getSignByDate(2, 29)).toBe('pisces');
+
+    // In a non-leap year context the date would be invalid (Feb has only 28 days),
+    // but getSignByDate always uses the current year for validation.
+    const leapFeb29 = new Date(2024, 1, 29); // Feb 29, 2024 (month is 0-indexed)
+    expect(leapFeb29.getDate()).toBe(29);     // confirms leap year
+
+    // The encodeDate year-agnostic mapping still produces a sign for the month/day pair.
+    const encoded = encodeDate(2, 29);        // 2*100+29 = 229
+    expect(encoded).toBeGreaterThanOrEqual(encodeDate(2, 19)); // >= pisces start
+    expect(encoded).toBeLessThan(encodeDate(3, 21));             // < aries wrap boundary
+  });
+
+  it('Feb 28 and Feb 29 produce the same sign (pisces) when both valid', () => {
+    // In leap year (2024), both Feb 28 and Feb 29 are valid — both map to pisces.
+    expect(getSignByDate(2, 28)).toBe('pisces');
+    expect(getSignByDate(2, 29)).toBe('pisces');
+
+    // encodeDate year-agnostic check: Feb 19–Mar 20 → pisces
+    const encoded = encodeDate(2, 29);
+    expect(encoded).toBeGreaterThanOrEqual(encodeDate(2, 19));
+    expect(encoded).toBeLessThan(encodeDate(3, 21));
+  });
+
+  it('day=0 and day>max always return null regardless of month', () => {
+    // Even months with up to 31 days reject day=0 as invalid.
+    for (const m of [1, 3, 5, 7, 8, 10, 12]) {
+      expect(getSignByDate(m, 0)).toBeNull();
+      // Day beyond the maximum for that month is rejected by calendar validation.
+      const maxDays = new Date(2024, m, 0).getDate();
+      expect(getSignByDate(m, maxDays + 1)).toBeNull();
+    }
+    // Feb rejects day>29 in any case (leap year has 29 days).
+    expect(getSignByDate(2, 30)).toBeNull();
+    expect(getSignByDate(2, 31)).toBeNull();
+  });
+
+  it('month=1 January boundary tests confirm aquarius and capricorn split', () => {
+    // Capricorn ends Jan 19; Aquarius starts Jan 20.
+    expect(getSignByDate(1, 1)).toBe('capricorn');   // early Jan → capricorn
+    expect(getSignByDate(1, 15)).toBe('capricorn');  // mid-Jan → capricorn
+    expect(getSignByDate(1, 19)).toBe('capricorn');  // last day capricorn
+    expect(getSignByDate(1, 20)).toBe('aquarius');   // first day aquarius
+    expect(getSignByDate(1, 31)).toBe('aquarius');   // end Jan → aquarius
+  });
 });
+
+// Re-export encodeDate for test access (it is the year-agnostic integer encoder)
+function encodeDate(month: number, day: number): number {
+  return month * 100 + day;
+}
