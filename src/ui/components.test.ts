@@ -254,6 +254,30 @@ describe('createTopBar', () => {
     (buttons[0] as HTMLButtonElement).click();
     expect(onLangChange).toHaveBeenCalledWith('en');
   });
+
+  it('handles single-locale gracefully — shows identical flags when only one available', () => {
+    // Observable contract: when only one locale is provided, the language button still renders
+    // without crashing. The fallback logic at line 41 (locales.find(l => l.id !== currentLangId) ?? locales[0])
+    // means single-locale usage falls back to showing both flags as identical (current === other).
+    const singleLocale = [{ id: 'en', name: 'English', ui: minimalUi, grammar: {} }];
+
+    const bar = createTopBar(singleLocale, 'en', minimalUi, () => {}, true, () => {});
+    const buttons = bar.querySelectorAll('button');
+    const languageButton = buttons[0] as HTMLButtonElement;
+
+    // Both flags render identically because fallback finds same locale — no crash, valid state
+    expect(languageButton.textContent).toBe('\u{1F1EC}\u{1F1E7} → \u{1F1EC}\u{1F1E7}'); // 🇬🇧 → 🇬🇧 (identical)
+
+    // The aria-label should still be present and reference the locale name
+    expect(languageButton.getAttribute('aria-label')).toContain('English');
+
+    // Clicking it calls onLanguageChange with 'en' (self-referential but valid)
+    const onChange = vi.fn();
+    const bar2 = createTopBar(singleLocale, 'en', minimalUi, onChange, true, () => {});
+    const buttons2 = bar2.querySelectorAll('button');
+    buttons2[0].click();
+    expect(onChange).toHaveBeenCalledWith('en');
+  });
 });
 
 describe('createDivinationPanel', () => {
