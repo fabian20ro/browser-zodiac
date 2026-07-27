@@ -1,6 +1,8 @@
 import type { Grammar } from '../engine/types.ts';
 import type { ZodiacSign } from '../horoscope/zodiac.ts';
 import { ZODIAC_SIGNS } from '../horoscope/zodiac.ts';
+import type { DivinationReadingKey } from '../divination/types.ts';
+import { DIVINATION_READING_KEYS } from '../divination/types.ts';
 
 export interface UIStrings {
   title: string;
@@ -25,7 +27,7 @@ export interface UIStrings {
   generatedBy: string;
   footer: string;
   signNames: Record<ZodiacSign, string>;
-  divinationLabels: Record<string, string>;
+  divinationLabels: Record<DivinationReadingKey, string>;
 }
 
 export interface LocalePack {
@@ -79,15 +81,24 @@ export function validateLocalePack(pack: LocalePack): { ok: true } | { ok: false
     }
   }
 
-  // divinationLabels must be populated.
+  // divinationLabels must be populated and cover all known keys.
   const labels = ui.divinationLabels;
   if (!labels || typeof labels !== 'object' || Object.keys(labels).length === 0) {
     errors.push('UIStrings.divinationLabels is missing or empty');
   } else {
     for (const key of Object.keys(labels)) {
-      const val = labels[key];
-      if (typeof val !== 'string' || String(val).trim().length === 0) {
+      const typedKey = key as DivinationReadingKey;
+      if (!(typedKey in labels)) {
+        errors.push(`UIStrings.divinationLabels missing key "${key}"`);
+      } else if (typeof labels[typedKey] !== 'string' || String(labels[typedKey]).trim().length === 0) {
         errors.push(`UIStrings.divinationLabels["${key}"] is not a non-empty string`);
+      }
+    }
+
+    // Exhaustiveness: every known key must be present.
+    for (const expected of DIVINATION_READING_KEYS) {
+      if (!(expected in labels)) {
+        errors.push(`UIStrings.divinationLabels missing required key "${expected}"`);
       }
     }
   }
