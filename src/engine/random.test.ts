@@ -97,6 +97,30 @@ describe('mulberry32', () => {
       expect(Math.abs(c - expected)).toBeLessThanOrEqual(maxDeviation);
     }
   });
+
+  it('advances state between consecutive calls (no constant-return bug)', () => {
+    // Catches degenerate PRNGs that update seed but forget to return new value,
+    // or have period-1 bugs not caught by distribution alone.
+    const rng = mulberry32(7);
+    let prev = -1;
+    for (let i = 0; i < 100; i++) {
+      const val = rng();
+      expect(val).not.toBe(prev); // consecutive values must differ
+      prev = val;
+    }
+  });
+
+  it('produces diverse output over long sequences', () => {
+    // Catches period-2 or short-period PRNGs: 10k samples should have no duplicates.
+    const rng = mulberry32(7);
+    const seen = new Set<number>();
+    for (let i = 0; i < 10_000; i++) {
+      const v = rng();
+      if (!seen.has(v)) seen.add(v as never);
+    }
+    // With 2^53 distinct double values in [0,1), duplicates among 10k are vanishingly rare.
+    expect(seen.size).toBe(10_000); // no duplicates expected from a proper PRNG
+  });
 });
 
 describe('hashString', () => {
