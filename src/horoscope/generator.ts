@@ -21,10 +21,12 @@ function buildContextGrammar(
   localeGrammar: LocalePack['grammar'],
   signName: string,
   readings: DivinationProfile['readings'],
+  signSymbol?: string,
 ): Record<string, string[]> {
   return {
     ...localeGrammar,
     signName: [signName],
+    ...(signSymbol ? { signSymbol: [signSymbol] } : {}),
     ...Object.fromEntries(readings.map((r) => [r.key, [r.raw]])),
   };
 }
@@ -46,7 +48,7 @@ export function generateHoroscope(
     throw new Error(`Unrecognized zodiac sign key: ${String(sign)}`);
   }
 
-  const contextGrammar = buildContextGrammar(locale.grammar, signName, divination.readings);
+  const contextGrammar = buildContextGrammar(locale.grammar, signName, divination.readings, ZODIAC_SYMBOLS[sign]);
 
   const engine = createGrammarEngine(contextGrammar, rng);
 

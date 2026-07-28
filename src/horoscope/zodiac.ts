@@ -90,7 +90,7 @@ function encodeDate(month: number, day: number): number {
 }
 
 /** Check if encoded date 'current' falls between two boundaries (inclusive start, exclusive end). */
-function isInRange(current: number, startEnc: number, endEnc: number): boolean {
+export function isInRange(current: number, startEnc: number, endEnc: number): boolean {
   // Handle year wrap cases properly using modular logic
 
   const startMonth = Math.floor(startEnc / 100);

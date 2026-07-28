@@ -127,6 +127,23 @@ unicorn`;
       expect(Object.keys(result.sections).length).toBe(1);
     });
 
+    it('accumulates entries when a section header is repeated', () => {
+      // Re-entering an existing section appends to that section rather than
+      // resetting or erroring — the parser only creates the array on first
+      // encounter (grammar-loader.ts line 32).
+      const content = `=== creature ===
+unicorn
+
+=== food ===
+toast
+
+=== creature ===
+dragon`;
+      const result = parseGrammarText(content);
+      expect(result.sections.creature).toEqual(['unicorn', 'dragon']);
+      expect(result.sections.food).toEqual(['toast']);
+    });
+
     it('handles an empty file gracefully', () => {
       const content = '';
       const result = parseGrammarText(content);
