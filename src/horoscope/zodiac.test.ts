@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ZODIAC_SIGNS, ZODIAC_SYMBOLS, randomSign, getSignDisplayName, getSignByDate, ZodiacSign } from './zodiac.ts';
+import { ZODIAC_SIGNS, ZODIAC_SYMBOLS, randomSign, getSignDisplayName, getSignByDate, isInRange, ZodiacSign } from './zodiac.ts';
 import { mulberry32 } from '../engine/random.ts';
 
 describe('ZODIAC_SIGNS', () => {
@@ -398,6 +398,58 @@ describe('getSignByDate', () => {
 
       expect(getSignByDate(prevM!, prevD!), `day before ${m}/${d} should map to previous sign`).not.toBe(currentSign);
     }
+  });
+});
+
+describe('isInRange', () => {
+  it('standard case: current between start and end (inclusive start, exclusive end)', () => {
+    // Aries period: Mar 21 – Apr 20 encoded as 321..420
+    expect(isInRange(321, 321, 420)).toBe(true);   // inclusive start
+    expect(isInRange(419, 321, 420)).toBe(true);   // just before exclusive end
+    expect(isInRange(420, 321, 420)).toBe(false);  // exclusive end excluded
+    expect(isInRange(320, 321, 420)).toBe(false);  // one below start
+    expect(isInRange(500, 321, 420)).toBe(false);  // well above end
+  });
+
+  it('year-wrap case: current >= start OR current < end', () => {
+    // Capricorn wraps year boundary: Dec 22 – Jan 19 encoded as 1222..119
+    expect(isInRange(1222, 1222, 119)).toBe(true);   // inclusive start
+    expect(isInRange(1300, 1222, 119)).toBe(true);   // well above start (Dec)
+    expect(isInRange(50, 1222, 119)).toBe(true);     // below end (Jan/Feb)
+    expect(isInRange(119, 1222, 119)).toBe(false);   // exclusive end excluded
+    expect(isInRange(200, 1222, 119)).toBe(false);   // mid-range between start and end
+  });
+
+  it('year-wrap: current exactly at boundary values', () => {
+    const jan20 = encodeDate(1, 20), feb18 = encodeDate(2, 18), feb19 = encodeDate(2, 19);
+    // Aquarius period: Jan 20 – Feb 19 encoded as 120..219
+    expect(isInRange(jan20, 120, 219)).toBe(true);   // start inclusive
+    expect(isInRange(feb18, 120, 219)).toBe(true);   // before end exclusive
+    expect(isInRange(feb19, 120, 219)).toBe(false);  // end exclusive excluded
+  });
+
+  it('standard case: current at exact start and just below', () => {
+    const mar21 = encodeDate(3, 21), apr20 = encodeDate(4, 20), feb18 = encodeDate(2, 18);
+    // Aries period: Mar 21 – Apr 20 encoded as 321..420
+    expect(isInRange(mar21, 321, 420)).toBe(true);   // start inclusive
+    expect(isInRange(feb18, 321, 420)).toBe(false);  // below start (Feb)
+  });
+
+  it('year-wrap: non-wrapping boundary pair in standard range', () => {
+    // Taurus: Apr 20 – May 21 encoded as 420..521 (both >= 3, no wrap)
+    expect(isInRange(420, 420, 521)).toBe(true);   // start inclusive
+    expect(isInRange(470, 420, 521)).toBe(true);   // mid-range
+    expect(isInRange(521, 420, 521)).toBe(false);  // end exclusive excluded
+    expect(isInRange(399, 420, 521)).toBe(false);  // below start
+  });
+
+  it('edge: current equals both boundaries', () => {
+    // Same value for start and end — only that exact value matches (start inclusive == end exclusive = impossible unless equal)
+    expect(isInRange(420, 420, 420)).toBe(false);  // 420 >= 420 && !(420 < 420) → false
+  });
+
+  it('edge: empty range (start > end in standard case)', () => {
+    expect(isInRange(150, 300, 100)).toBe(false);   // start > end, neither branch matches
   });
 });
 
