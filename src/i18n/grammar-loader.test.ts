@@ -250,14 +250,14 @@ unicorn`,
     const fetch = mockFetch({});
     await expect(
       loadGrammar('en', 'http://test/data/', fetch),
-    ).rejects.toThrow('Failed to load grammar');
+    ).rejects.toThrow('Failed to load http://test/data/en.txt');
   });
 
   it('throws with full URL when the main grammar file fails in strict mode', async () => {
     const fetch = mockFetch({});
     await expect(
       loadGrammar('en', 'http://test/data/', fetch, true),
-    ).rejects.toThrow('Failed to load grammar: http://test/data/en.txt (404)');
+    ).rejects.toThrow('Failed to load http://test/data/en.txt: 404');
   });
 
   it('deduplicates fetch calls when multiple @from point to the same file', async () => {

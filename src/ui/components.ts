@@ -149,7 +149,7 @@ export function createDivinationPanel(
   const toggle = el('button', 'divination-card__toggle', '\u25BC');
   toggle.type = 'button';
   toggle.setAttribute('aria-expanded', 'false');
-  toggle.setAttribute('aria-label', ui.toggleDivinationDetails);
+  toggle.setAttribute('aria-label', 'Show ' + ui.toggleDivinationDetails);
   heading.appendChild(toggle);
 
   const list = el('div', 'divination-card__list');

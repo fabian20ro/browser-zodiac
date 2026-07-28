@@ -18,25 +18,19 @@ export function createActionButton(options: ActionButtonOptions): HTMLButtonElem
   let revertTimer: ReturnType<typeof setTimeout> | null = null;
   let isRunning = false;
 
-  function showFeedback(icon: string): void {
-    btn.textContent = icon;
-    btn.classList.add('action-btn--feedback');
-    revertTimer = setTimeout(() => {
-      btn.textContent = options.icon;
-      btn.classList.remove('action-btn--feedback');
-      revertTimer = null;
-    }, options.durationMs ?? 1500);
-  }
-
-  function showAndRevert(icon: string): void {
-    if (icon === options.feedbackIcon) {
-      showFeedback(icon);
-    } else if (options.errorIcon) {
+  function showIcon(icon: string, addFeedbackClass?: boolean): void {
+    if (icon !== options.icon) {
       btn.textContent = icon;
+      if (addFeedbackClass) {
+        btn.classList.add('action-btn--feedback');
+      }
       revertTimer = setTimeout(() => {
         btn.textContent = options.icon;
+        btn.classList.remove('action-btn--feedback');
         revertTimer = null;
       }, options.durationMs ?? 1500);
+    } else if (!addFeedbackClass) {
+      btn.classList.remove('action-btn--feedback');
     }
   }
 
@@ -54,12 +48,12 @@ export function createActionButton(options: ActionButtonOptions): HTMLButtonElem
     try {
       const result = await options.onClick();
       if (typeof result === 'boolean' && !result) {
-        showAndRevert(options.errorIcon ?? options.icon);
+        showIcon(options.errorIcon ?? options.icon, false);
       } else if (options.feedbackIcon) {
-        showFeedback(options.feedbackIcon);
+        showIcon(options.feedbackIcon, true);
       }
     } catch {
-      showAndRevert(options.errorIcon ?? options.icon);
+      showIcon(options.errorIcon ?? options.icon, false);
     } finally {
       isRunning = false;
     }
