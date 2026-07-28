@@ -238,6 +238,20 @@ describe('detectLanguage', () => {
     // Restore original behavior for other tests.
     (localStorageStub as unknown as { getItem: (key: string) => string | null }).getItem = originalGetItem;
   });
+
+  it('returns English when both stored and browser language are unregistered', () => {
+    window.localStorage.setItem('horror-scope-lang', 'zz');
+    setNavigatorProperty('language', 'de-DE');
+
+    expect(detectLanguage()).toBe('en');
+  });
+
+  it('returns English when the two-letter truncated browser tag is not registered', () => {
+    // Navigator returns a language whose first-two-char prefix isn't in registry.
+    setNavigatorProperty('language', 'fr-FR');
+
+    expect(detectLanguage()).toBe('en');
+  });
 });
 
 describe('getAvailableLocales', () => {
