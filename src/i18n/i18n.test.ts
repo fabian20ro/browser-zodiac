@@ -317,6 +317,18 @@ describe('persistLanguage', () => {
 
     expect(detectLanguage()).toBe('ro');
   });
+
+  it('does not crash when localStorage.setItem throws (privacy-mode simulation)', () => {
+    const originalSetItem = localStorageStub.setItem.bind(localStorageStub);
+    (localStorageStub as unknown as { setItem: (key: string, value: string) => void }).setItem = (_key: string, _value: string) => {
+      throw new Error('QuotaExceededError');
+    };
+
+    expect(() => persistLanguage('ro')).not.toThrow();
+
+    // Restore original behavior for other tests.
+    localStorageStub.setItem = originalSetItem;
+  });
 });
 
 // Note: loadAllGrammars tests removed - they require network/file access
