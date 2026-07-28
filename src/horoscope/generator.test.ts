@@ -189,6 +189,20 @@ describe('generateHoroscope', () => {
     expect(h.warning).toBe('SHE PULLS THE KNIFE FIRST');
   });
 
+  it('signSymbol flows through grammar expansion when referenced in templates', () => {
+    const locale: LocalePack = {
+      ...minimalLocale,
+      grammar: {
+        ...minimalLocale.grammar,
+        origin: ['#signSymbol# rises — the stars align'],
+        warning: ['Beware #signSymbol#'],
+      },
+    };
+    const h = generateHoroscope('aries', locale, minimalDivination, fixedDate);
+    expect(h.text).toBe('♈ rises — the stars align');
+    expect(h.warning).toBe('Beware ♈');
+  });
+
   it.each(Object.keys(ZODIAC_SYMBOLS) as ZodiacSign[])(
     'every zodiac sign %s generates without error and produces all fields',
     (sign) => {
