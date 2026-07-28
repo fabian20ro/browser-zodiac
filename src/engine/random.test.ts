@@ -97,6 +97,30 @@ describe('mulberry32', () => {
       expect(Math.abs(c - expected)).toBeLessThanOrEqual(maxDeviation);
     }
   });
+
+  it('advances state between consecutive calls (no constant-return bug)', () => {
+    // Catches degenerate PRNGs that update seed but forget to return new value,
+    // or have period-1 bugs not caught by distribution alone.
+    const rng = mulberry32(7);
+    let prev = -1;
+    for (let i = 0; i < 100; i++) {
+      const val = rng();
+      expect(val).not.toBe(prev); // consecutive values must differ
+      prev = val;
+    }
+  });
+
+  it('produces diverse output over long sequences', () => {
+    // Catches period-2 or short-period PRNGs: 10k samples should have no duplicates.
+    const rng = mulberry32(7);
+    const seen = new Set<number>();
+    for (let i = 0; i < 10_000; i++) {
+      const v = rng();
+      if (!seen.has(v)) seen.add(v as never);
+    }
+    // With 2^53 distinct double values in [0,1), duplicates among 10k are vanishingly rare.
+    expect(seen.size).toBe(10_000); // no duplicates expected from a proper PRNG
+  });
 });
 
 describe('hashString', () => {
@@ -446,5 +470,20 @@ describe('dailySeed', () => {
   it('letters in hour position normalize to "00:MM" (Number("zz") = NaN → 0)', () => {
     const letter = dailySeed('2026-07-09', 'aries', 'zz:30');
     expect(letter).toBe(dailySeed('2026-07-09', 'aries', '00:30'));
+  });
+
+  it('timePart of just ":" coerces to "00:00" (empty split parts become zero)', () => {
+    // normalizeTimePart splits on ':' — a lone colon gives ["", ""], both NaN → 0.
+    expect(dailySeed('2026-07-09', 'aries', ':')).toBe(
+      dailySeed('2026-07-09', 'aries', '00:00'),
+    );
+    // Leading colon: ":30" → hour="" → NaN→0, minute="30" → "00:30"
+    expect(dailySeed('2026-07-09', 'aries', ':30')).toBe(
+      dailySeed('2026-07-09', 'aries', '00:30'),
+    );
+    // Trailing colon: "5:" → hour="5", minute="" → NaN→0 → "05:00"
+    expect(dailySeed('2026-07-09', 'aries', '5:')).toBe(
+      dailySeed('2026-07-09', 'aries', '05:00'),
+    );
   });
 });
