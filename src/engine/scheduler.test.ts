@@ -81,6 +81,35 @@ describe('toGmtDateString', () => {
   it('returns the expected YYYY-MM-DD for a future date', () => {
     expect(toGmtDateString(new Date('2030-01-01T12:00:00.000Z'))).toBe('2030-01-01');
   });
+
+  it('returns the expected YYYY-MM-DD for a date near century boundary', () => {
+    expect(toGmtDateString(new Date('1999-12-31T23:59:59.999Z'))).toBe('1999-12-31');
+  });
+
+  it('returns the expected YYYY-MM-DD at exact midnight', () => {
+    expect(toGmtDateString(new Date('2026-06-15T00:00:00.000Z'))).toBe('2026-06-15');
+  });
+
+  it('returns the expected YYYY-MM-DD across leap day', () => {
+    expect(toGmtDateString(new Date('2024-02-29T18:30:00.000Z'))).toBe('2024-02-29');
+  });
+
+  it('returns the expected YYYY-MM-DD across Feb boundary in non-leap year', () => {
+    expect(toGmtDateString(new Date('2025-03-01T00:00:00.000Z'))).toBe('2025-03-01');
+  });
+
+  it('sub-millisecond precision does not corrupt the date string', () => {
+    // Contract: YYYY-MM-DD — any sub-day precision must be stripped by slice(0,10).
+    expect(toGmtDateString(new Date('2026-07-04T14:22:33.999Z'))).toBe('2026-07-04');
+  });
+
+  it('returns a fresh string (not mutated by repeated calls)', () => {
+    const date = new Date('2026-08-15T10:00:00.000Z');
+    const first = toGmtDateString(date);
+    const second = toGmtDateString(date);
+    expect(first).toBe(second);
+    expect(typeof first).toBe('string');
+  });
 });
 
 describe('msUntilNextMidnightGmt', () => {

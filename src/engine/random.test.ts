@@ -421,4 +421,30 @@ describe('dailySeed', () => {
       }
     }
   });
+
+  it('non-numeric timePart coerces to "00:00" via Number(x) || 0', () => {
+    // normalizeTimePart uses `Number(parts[0]) || 0` — garbage strings silently
+    // become hour=0, minute=0 (midnight seed). Empty timePart is falsy → date-only.
+    const garbage = dailySeed('2026-07-09', 'aries', 'garbage');
+    expect(garbage).toBe(dailySeed('2026-07-09', 'aries', '00:00'));
+
+    // Empty string is falsy, falls through to no-timePart path (date-only seed)
+    const empty = dailySeed('2026-07-09', 'aries', '');
+    expect(empty).toBe(dailySeed('2026-07-09', 'aries'));
+
+    // 'abc:def' → Number('abc')=NaN→0, Number('def')=NaN→0 → "00:00"
+    const letters = dailySeed('2026-07-09', 'aries', 'abc:def');
+    expect(letters).toBe(dailySeed('2026-07-09', 'aries', '00:00'));
+  });
+
+  it('non-numeric minute also coerces to zero (matches valid-time seed)', () => {
+    // '14:xyz' → normalizeTimePart returns "14:00", so same as a valid time.
+    const mixed = dailySeed('2026-07-09', 'aries', '14:xyz');
+    expect(mixed).toBe(dailySeed('2026-07-09', 'aries', '14:00'));
+  });
+
+  it('letters in hour position normalize to "00:MM" (Number("zz") = NaN → 0)', () => {
+    const letter = dailySeed('2026-07-09', 'aries', 'zz:30');
+    expect(letter).toBe(dailySeed('2026-07-09', 'aries', '00:30'));
+  });
 });

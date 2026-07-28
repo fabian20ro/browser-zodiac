@@ -389,4 +389,41 @@ describe('scheduleMidnightGmt resilience', () => {
 
     cancelOriginal();
   });
+
+  it('should replace loop when scheduleMidnightGmt is called from within a synchronous callback', () => {
+    // Exercises the same replacement path as "replacement initiated from within its own callback"
+    // but with a synchronous (non-async) callback. The source's try/catch/finally in scheduleNext()
+    // must handle sync throws and replacement identically to async — activeHandle cleared, new loopId
+    // created with wasStartedDuringLoop=true, original's finally skips reschedule on loopId mismatch,
+    // replacement fires normally on its second tick.
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+
+    let innerCancel: (() => void) | null = null;
+
+    const syncReplaceCallback = () => {
+      count++;
+      // Trigger replacement from within the running synchronous callback.
+      if (innerCancel === null) {
+        innerCancel = scheduleMidnightGmt(callback);
+      }
+    };
+
+    const cancelOriginal = scheduleMidnightGmt(syncReplaceCallback);
+
+    // First tick fires the original sync callback, which re-schedules mid-tick.
+    vi.advanceTimersByTime(1000);
+    expect(count).toBe(1); // only one invocation from original loop
+
+    // The replacement's first iteration is suppressed (wasStartedDuringLoop=true),
+    // and the original loop body exits without rescheduling (loopId mismatch in finally).
+    vi.advanceTimersByTime(86400000);
+    expect(count).toBe(1); // replacement's first tick skipped, no double-fire
+
+    // Second tick of replacement fires normally — proves the sync path resumes correctly.
+    vi.advanceTimersByTime(86400000);
+    expect(count).toBe(2); // second tick fires normally in sync context
+
+    cancelOriginal();
+    if (innerCancel) innerCancel();
+  });
 });
