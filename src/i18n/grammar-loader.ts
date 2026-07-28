@@ -109,25 +109,11 @@ export async function loadGrammar(
   const base = basePath ?? `${import.meta.env.BASE_URL}data/`;
   const mainUrl = `${base}${localeId}.txt`;
 
-  let response;
-  try {
-    response = await fetchFn(mainUrl);
-  } catch (err) {
-    throw new Error(
-      `Failed to load grammar from ${mainUrl}: ${(err as Error).message}`,
-    );
-  }
-  if (!response.ok) {
-    throw new Error(`Failed to load grammar: ${mainUrl} (${response.status})`);
-  }
-
-  let content;
-  try {
-    content = await response.text();
-  } catch (err) {
-    throw new Error(
-      `Failed to read grammar from ${mainUrl}: ${(err as Error).message}`,
-    );
+  const content = await safeFetchText(mainUrl, fetchFn, true);
+  if (content === null) {
+    // strict mode — safeFetchText would have thrown; we keep the explicit
+    // error message for consistency with the pre-refactor contract.
+    throw new Error(`Failed to load grammar: ${mainUrl}`);
   }
   const parsed = parseGrammarText(content);
 
