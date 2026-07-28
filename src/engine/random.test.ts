@@ -447,4 +447,19 @@ describe('dailySeed', () => {
     const letter = dailySeed('2026-07-09', 'aries', 'zz:30');
     expect(letter).toBe(dailySeed('2026-07-09', 'aries', '00:30'));
   });
+
+  it('timePart of just ":" coerces to "00:00" (empty split parts become zero)', () => {
+    // normalizeTimePart splits on ':' — a lone colon gives ["", ""], both NaN → 0.
+    expect(dailySeed('2026-07-09', 'aries', ':')).toBe(
+      dailySeed('2026-07-09', 'aries', '00:00'),
+    );
+    // Leading colon: ":30" → hour="" → NaN→0, minute="30" → "00:30"
+    expect(dailySeed('2026-07-09', 'aries', ':30')).toBe(
+      dailySeed('2026-07-09', 'aries', '00:30'),
+    );
+    // Trailing colon: "5:" → hour="5", minute="" → NaN→0 → "05:00"
+    expect(dailySeed('2026-07-09', 'aries', '5:')).toBe(
+      dailySeed('2026-07-09', 'aries', '05:00'),
+    );
+  });
 });
