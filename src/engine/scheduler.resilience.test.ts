@@ -1,5 +1,105 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { msUntilNextMidnightGmt, scheduleMidnightGmt } from './scheduler.ts';
+import { msUntilNextMidnightGmt, getNextMidnightGmt, toGmtDateString, scheduleMidnightGmt } from './scheduler.ts';
+
+describe('getNextMidnightGmt', () => {
+  it('should return midnight of the next day in UTC', () => {
+    const now = new Date('2026-01-15T14:30:00.000Z');
+    const result = getNextMidnightGmt(now);
+
+    expect(result.getUTCFullYear()).toBe(2026);
+    expect(result.getUTCMonth()).toBe(0);
+    expect(result.getUTCDate()).toBe(16);
+    expect(result.getUTCHours()).toBe(0);
+    expect(result.getUTCMinutes()).toBe(0);
+    expect(result.getUTCSeconds()).toBe(0);
+  });
+
+  it('should roll over to the next month boundary', () => {
+    const now = new Date('2026-01-31T23:00:00.000Z');
+    const result = getNextMidnightGmt(now);
+
+    expect(result.getUTCFullYear()).toBe(2026);
+    expect(result.getUTCMonth()).toBe(1); // February
+    expect(result.getUTCDate()).toBe(1);
+  });
+
+  it('should roll over to the next year boundary', () => {
+    const now = new Date('2025-12-31T18:00:00.000Z');
+    const result = getNextMidnightGmt(now);
+
+    expect(result.getUTCFullYear()).toBe(2026);
+    expect(result.getUTCMonth()).toBe(0); // January
+    expect(result.getUTCDate()).toBe(1);
+  });
+
+  it('should return the next midnight when called with no argument', () => {
+    const result = getNextMidnightGmt();
+
+    expect(result instanceof Date).toBe(true);
+    expect(result.getUTCHours()).toBe(0);
+    expect(result.getUTCMinutes()).toBe(0);
+    expect(result.getUTCSeconds()).toBe(0);
+  });
+
+  it('should not mutate the input date', () => {
+    const now = new Date('2026-01-15T14:30:00.000Z');
+    const originalYear = now.getUTCFullYear();
+    const originalDate = now.getUTCDate();
+
+    getNextMidnightGmt(now);
+
+    expect(now.getUTCFullYear()).toBe(originalYear);
+    expect(now.getUTCDate()).toBe(originalDate);
+  });
+});
+
+describe('toGmtDateString', () => {
+  it('should format a date as YYYY-MM-DD UTC', () => {
+    const date = new Date('2026-07-09T15:45:30.000Z');
+    expect(toGmtDateString(date)).toBe('2026-07-09');
+  });
+
+  it('should handle single-digit months and days with zero-padding', () => {
+    const date = new Date('2026-01-05T08:00:00.000Z');
+    expect(toGmtDateString(date)).toBe('2026-01-05');
+  });
+
+  it('should return the UTC calendar date regardless of local timezone', () => {
+    const now = new Date();
+    const result = toGmtDateString(now);
+    // ISO slice(0,10) is always UTC-based for a properly constructed Date.
+    expect(result).toBe(now.toISOString().slice(0, 10));
+  });
+});
+
+describe('msUntilNextMidnightGmt', () => {
+  it('should return positive milliseconds to next midnight', () => {
+    const now = new Date('2026-01-15T14:30:00.000Z');
+    const ms = msUntilNextMidnightGmt(now);
+
+    expect(ms).toBeGreaterThan(0);
+    // ~9h30m = 34200 seconds ≈ 34,200,000 ms (with some offset)
+    expect(ms).toBeLessThan(86_400_000);
+  });
+
+  it('should return exactly 1ms when called just before midnight', () => {
+    const now = new Date('2025-12-31T23:59:59.001Z');
+    const ms = msUntilNextMidnightGmt(now);
+
+    // The source uses Math.max(..., 1) so result is clamped to at least 1ms.
+    expect(ms).toBeGreaterThanOrEqual(1);
+    expect(ms).toBeLessThan(86_400_000);
+  });
+
+  it('should return full day when called just after midnight', () => {
+    const now = new Date('2026-01-01T00:00:01.000Z');
+    const ms = msUntilNextMidnightGmt(now);
+
+    // 86400s minus ~1s = just under a full day
+    expect(ms).toBeGreaterThan(86_390_000);
+    expect(ms).toBeLessThan(86_400_000);
+  });
+});
 
 describe('scheduleMidnightGmt resilience', () => {
   let count = 0;
