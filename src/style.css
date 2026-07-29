@@ -498,6 +498,14 @@ body::before {
   overflow: hidden;
 }
 
+/* ---- Reduced Motion ---- */
+
+@media (prefers-reduced-motion: reduce) {
+  .horoscope-card::before {
+    animation: none;
+  }
+}
+
 @keyframes shimmer {
   0%,
   100% {
