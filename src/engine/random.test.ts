@@ -294,6 +294,17 @@ describe('dailySeed', () => {
     expect(withTime).toBe(withoutTime);
   });
 
+  it('whitespace-padded timePart normalizes correctly via Number() trim', () => {
+    // normalizeTimePart uses Number(x) || 0 — JS Number trims whitespace, so
+    // " 09:15 " and "\t14:30\n" parse identically to their trimmed equivalents.
+    expect(dailySeed('2026-07-09', 'aries', ' 09:15 ')).toBe(
+      dailySeed('2026-07-09', 'aries', '09:15'),
+    );
+    expect(dailySeed('2026-07-09', 'aries', '\t14:30\n')).toBe(
+      dailySeed('2026-07-09', 'aries', '14:30'),
+    );
+  });
+
   it('timePart seed can feed mulberry32 and produce valid samples', () => {
     const seed = dailySeed('2026-07-09', 'aries', '18:00');
     const rng = mulberry32(seed);
