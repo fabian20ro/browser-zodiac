@@ -426,4 +426,24 @@ describe('scheduleMidnightGmt resilience', () => {
     cancelOriginal();
     if (innerCancel) innerCancel();
   });
+
+  it('should invoke the new callback after replacement, not the old one', () => {
+    // When scheduleMidnightGmt is called again while an active scheduler exists,
+    // only the *new* callback should fire. This verifies correct routing through
+    // the loopId replacement path (line 37), not just absence of leaks.
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+
+    let countA = 0;
+    let countB = 0;
+    const cancelA = scheduleMidnightGmt(() => { countA++; });
+    const cancelB = scheduleMidnightGmt(() => { countB++; });
+
+    vi.advanceTimersByTime(1000);
+
+    expect(countA).toBe(0);
+    expect(countB).toBe(1);
+
+    cancelA();
+    cancelB();
+  });
 });
