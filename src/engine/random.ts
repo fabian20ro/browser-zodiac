@@ -20,10 +20,6 @@ export function hashString(str: string): number {
   return hash >>> 0;
 }
 
-/** Create a daily seed from date string + optional time-part + salt.
- * When `timePart` is provided (e.g., "09:30"), seeds differ by hour,
- * so the same sign consulted at different times on the same day
- * can produce distinct horoscopes. */
 /** Normalize a time-part to zero-padded HH:MM. Handles "9" → "09", "14:3" → "14:03".
  * Rejects seconds precision — treats 'HH:MM:SS' as 'HH:MM'. */
 function normalizeTimePart(timePart: string | undefined): string {
