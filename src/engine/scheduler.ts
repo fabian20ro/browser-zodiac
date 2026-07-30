@@ -35,16 +35,15 @@ export function scheduleMidnightGmt(callback: () => void): () => void {
     clearTimeout(activeHandle);
   }
   const loopId = ++activeLoopId;
-  let iteration = 0;
-  let wasStartedDuringLoop = isLoopRunning;
+  let skipFirstTick = isLoopRunning;
 
   function scheduleNext(): void {
     const delay = Math.max(msUntilNextMidnightGmt(new Date()), 1);
     activeHandle = setTimeout(async () => {
       if (loopId !== activeLoopId) return;
 
-      iteration++;
-      if (iteration === 1 && wasStartedDuringLoop) {
+      if (skipFirstTick) {
+        skipFirstTick = false;
         scheduleNext();
         return;
       }

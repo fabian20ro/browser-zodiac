@@ -10,6 +10,7 @@ export interface Horoscope {
   signSymbol: string;
   text: string;
   luckyNumber: number;
+  mood: string;
   luckyColor: string;
   warning: string;
   compatibility: string;
@@ -52,14 +53,22 @@ export function generateHoroscope(
 
   const engine = createGrammarEngine(contextGrammar, rng);
 
+  const text = engine.expand('#origin#');
+  const warning = engine.expand('#warning#');
+  const luckyColor = engine.expand('#luckyColor#');
+  const compatibility = engine.expand('#compatibility#');
+  const luckyNumber = Math.floor(rng() * 99) + 1;
+  const mood = luckyNumber <= 30 ? 'turbulent' : luckyNumber <= 70 ? 'balanced' : 'radiant';
+
   return {
     sign,
     signSymbol: ZODIAC_SYMBOLS[sign],
-    text: engine.expand('#origin#'),
-    warning: engine.expand('#warning#'),
-    luckyColor: engine.expand('#luckyColor#'),
-    compatibility: engine.expand('#compatibility#'),
-    luckyNumber: Math.floor(rng() * 99) + 1,
+    text,
+    warning,
+    mood,
+    luckyColor,
+    compatibility,
+    luckyNumber,
     date: dateStr,
   };
 }
