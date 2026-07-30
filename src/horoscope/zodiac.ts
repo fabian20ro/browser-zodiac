@@ -50,17 +50,12 @@ export const ZODIAC_SYMBOLS: Record<ZodiacSign, string> = {
   pisces: '\u2653',
 };
 
-const DISPLAY_NAME_CACHE: Partial<Record<ZodiacSign, string>> = {};
-
 function titlecase(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 }
 
 export function getSignDisplayName(sign: ZodiacSign): string {
-  if (!DISPLAY_NAME_CACHE[sign]) {
-    DISPLAY_NAME_CACHE[sign] = titlecase(sign);
-  }
-  return DISPLAY_NAME_CACHE[sign];
+  return titlecase(sign);
 }
 
 interface SignBoundary {
