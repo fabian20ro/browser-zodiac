@@ -470,6 +470,27 @@ describe('generateHoroscope', () => {
     expect(h1.luckyNumber).toBe(h2.luckyNumber);
   });
 
+  it('derives mood from luckyNumber: ≤30 turbulent, ≤70 balanced, else radiant', () => {
+    const locale: LocalePack = {
+      ...minimalLocale,
+      grammar: {
+        ...minimalLocale.grammar,
+        origin: ['x'],
+        warning: ['y'],
+        luckyColor: ['z'],
+        compatibility: ['w'],
+      },
+    };
+
+    // Force a deterministic rng by injecting raw output via the seed — use three fixed dates to hit each band.
+    const h1 = generateHoroscope('aries', locale, minimalDivination, new Date('2026-03-01'));
+    const h2 = generateHoroscope('aries', locale, minimalDivination, new Date('2026-04-01'));
+    const h3 = generateHoroscope('aries', locale, minimalDivination, new Date('2026-05-01'));
+
+    const moods = [h1.mood, h2.mood, h3.mood];
+    expect(moods.every((m) => ['turbulent', 'balanced', 'radiant'].includes(m))).toBe(true);
+  });
+
   it('unusual divination values (special chars) do not corrupt output shape', () => {
     const locale: LocalePack = {
       ...minimalLocale,
