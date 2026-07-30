@@ -98,12 +98,7 @@ for (const key of Object.keys(en.ui.divinationLabels as Record<string, unknown>)
   }
 }
 
-// Runtime invariant: every placeholder referenced in grammar templates must have
-// at least one entry in its corresponding data array. Catches template drift where
-// a new #placeholder# is added to a template without updating the data source.
-const PLACEHOLDER_RE = /#(\w+)#/g;
-
-// Map of data-array key names that serve as sources for template placeholders.
+// Runtime invariant: every grammar data array must have at least one entry. Catches empty arrays added without corresponding template updates.
 // Each value name corresponds 1:1 with its grammar data array (e.g. 'chaos' → en.grammar.chaos).
 const GRAMMAR_PLACEHOLDERS: string[] = ['chaos', 'color', 'comp'];
 
@@ -113,26 +108,6 @@ for (const placeholder of GRAMMAR_PLACEHOLDERS) {
     throw new Error(
       `Locale invariant failed: grammar array '${placeholder}' is missing or empty`,
     );
-  }
-
-  // Extract all placeholders used in templates for this data key.
-  const referencedPlaceholders = new Set<string>();
-  for (const entry of Object.values(en.grammar as Record<string, unknown>)) {
-    if (typeof entry === 'string') {
-      let match: RegExpExecArray | null;
-      while ((match = PLACEHOLDER_RE.exec(entry)) !== null) {
-        referencedPlaceholders.add(match[1]);
-      }
-    } else if (Array.isArray(entry)) {
-      for (const item of entry) {
-        if (typeof item === 'string') {
-          let match: RegExpExecArray | null;
-          while ((match = PLACEHOLDER_RE.exec(item)) !== null) {
-            referencedPlaceholders.add(match[1]);
-          }
-        }
-      }
-    }
   }
 
   // Verify each data entry is non-empty.
