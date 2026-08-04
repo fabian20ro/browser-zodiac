@@ -229,6 +229,20 @@ describe('sign-assigner', () => {
        expect(counts[sign]).toBeLessThan(50);
      }
     });
+
+    it('treats 2024-12-31 as the same local day regardless of construction method — verifies boundary behavior', () => {
+     const fingerprint = 'boundary-test';
+     // new Date(year, monthIndex, day) constructs in local midnight.
+     const fromConstructor = new Date(2024, 11, 31);
+     // ISO string "2024-12-31" parses as UTC midnight; getDate() returns 31 locally only if timezone is UTC or east of UTC offset enough that local date remains Dec 31.
+     const fromISO = new Date('2024-12-31');
+     expect(fromConstructor.getFullYear()).toBe(2024);
+     expect(fromConstructor.getMonth()).toBe(11);
+     expect(fromConstructor.getDate()).toBe(31);
+     expect(assignDailySign(fingerprint, fromConstructor)).toBe(
+       assignDailySign(fingerprint, fromISO)
+     );
+    });
     });
 
   describe('assignSignWithSymbol', () => {
