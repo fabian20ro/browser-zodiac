@@ -834,6 +834,21 @@ describe('readBrowserOracle', () => {
     expect(profile.readings.find(r => r.key === 'network_speed')?.raw).toBe('slow-2g');
   });
 
+  it('returns dark when prefers-color-scheme is dark', () => {
+    vi.stubGlobal('window', {
+      innerWidth: 1920,
+      innerHeight: 1080,
+      devicePixelRatio: 1,
+      matchMedia: vi.fn().mockReturnValue({
+        matches: true,
+      }),
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'soul_alignment')?.raw).toBe('dark');
+    const parts = profile.fingerprint.split('|');
+    expect(parts[6]).toBe('dark');
+  });
+
   it('falls back to unknown when navigator.deviceMemory is absent', () => {
     vi.stubGlobal('navigator', {
       userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
