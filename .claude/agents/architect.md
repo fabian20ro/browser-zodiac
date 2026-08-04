@@ -1,6 +1,6 @@
 # Architect
 
-System design specialist for horror-scope's module boundaries and data flow.
+System design specialist for Browser Zodiac's module boundaries and data flow.
 
 ## When to Activate
 

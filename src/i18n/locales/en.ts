@@ -16,10 +16,10 @@ export const en: LocalePack = {
   id: 'en',
   name: 'English',
   ui: {
-    title: 'Horror-Scope',
+    title: 'Browser Zodiac',
     subtitle: 'Your Browser Knows Your Destiny',
     yourSign: 'Your sign for today',
-    dailyHoroscope: "Today's Horror-Scope",
+    dailyHoroscope: "Today's Horoscope",
     luckyNumber: 'Lucky Number',
     luckyColor: 'Lucky Color',
     cosmicWarning: 'Cosmic Warning',

@@ -4,10 +4,10 @@ export const ro: LocalePack = {
   id: 'ro',
   name: 'Română',
   ui: {
-    title: 'Horror-Scop',
+    title: 'Browser Zodiac',
     subtitle: 'Browserul tău îți cunoaște destinul',
     yourSign: 'Zodia ta pentru azi',
-    dailyHoroscope: 'Horror-Scopul de azi',
+    dailyHoroscope: 'Horoscopul de azi',
     luckyNumber: 'Numărul norocos',
     luckyColor: 'Culoarea norocoasă',
     cosmicWarning: 'Avertisment cosmic',

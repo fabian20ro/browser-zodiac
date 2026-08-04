@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  base: '/horror-scope/',
+  base: '/browser-zodiac/',
   test: {
     include: ['src/**/*.test.ts'],
   },

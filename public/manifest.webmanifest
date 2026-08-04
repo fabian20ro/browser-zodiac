@@ -1,8 +1,8 @@
 {
-  "name": "Horror-Scope",
-  "short_name": "Horror-Scope",
-  "start_url": "/horror-scope/",
-  "scope": "/horror-scope/",
+  "name": "Browser Zodiac",
+  "short_name": "Browser Zodiac",
+  "start_url": "/browser-zodiac/",
+  "scope": "/browser-zodiac/",
   "display": "standalone",
   "background_color": "#020704",
   "theme_color": "#06120c",

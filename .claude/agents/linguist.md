@@ -1,6 +1,6 @@
 # Linguist
 
-Romanian grammar and gender agreement specialist for horror-scope locale content.
+Romanian grammar and gender agreement specialist for Browser Zodiac locale content.
 
 ## When to Activate
 

@@ -395,7 +395,7 @@ describe('createFooter', () => {
     expect(badgeLink).not.toBeNull();
     expect(badgeLink!.target).toBe('_blank');
     expect(badgeLink!.rel).toContain('noopener');
-    expect(badgeLink!.href).toContain('fabian20ro/horror-scope');
+    expect(badgeLink!.href).toContain('fabian20ro/browser-zodiac');
   });
 
   it('renders a deploy badge image with correct src and alt', () => {

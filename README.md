@@ -1,8 +1,8 @@
-[![Deploy to GitHub Pages](https://github.com/fabian20ro/horror-scope/actions/workflows/deploy.yml/badge.svg)](https://github.com/fabian20ro/horror-scope/actions/workflows/deploy.yml)
+[![Deploy to GitHub Pages](https://github.com/fabian20ro/browser-zodiac/actions/workflows/deploy.yml/badge.svg)](https://github.com/fabian20ro/browser-zodiac/actions/workflows/deploy.yml)
 
-**[Live Demo](https://fabian20ro.github.io/horror-scope/)**
+**[Live Demo](https://fabian20ro.github.io/browser-zodiac/)**
 
-# Horror-Scope
+# Browser Zodiac
 
 *Your Browser Knows Your Destiny*
 

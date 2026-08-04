@@ -315,3 +315,18 @@
 **Outcome:** Grammar validation and build pass. All 548 tests pass under `TZ=UTC`; the default Europe/Bucharest run exposes one pre-existing timezone-sensitive sign-assigner test.
 **Insight:** Mixed-gender/time symbols need self-contained or invariant framing; external adjectives, articles, and referential clitics eventually generate invalid combinations.
 **Promoted to Lessons Learned:** Yes
+
+---
+
+### [2026-08-04] Migrate the project to Browser Zodiac
+
+**Context:** GitHub REST still exposed the original repository, but Git transport returned HTTP 403, so the active project moved from `horror-scope` to a fresh `browser-zodiac` repository.
+**What happened:**
+- Preserved all GitHub branches and local recovery commits in a verified migration bundle.
+- Updated repository, Pages, workflow badge, package, PWA manifest, visible product copy, and internal diagnostic references.
+- Preserved the existing `horror-scope-*` storage and cache keys to avoid discarding user preferences or offline data.
+- Allowed manual workflow dispatches to publish Pages artifacts while keeping pull requests build-only.
+- Kept the original repository as the archived `browser-zodiac-disabled-archive` audit record.
+**Outcome:** Success — the application now targets `https://fabian20ro.github.io/browser-zodiac/` from `fabian20ro/browser-zodiac`.
+**Insight:** A renamed path-based PWA must move its public base, start URL, scope, and repository links together while retaining stable client-storage identifiers.
+**Promoted to Lessons Learned:** No

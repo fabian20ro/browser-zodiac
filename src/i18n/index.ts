@@ -62,7 +62,7 @@ export function persistLanguage(id: string): void {
   const normalized = normalizeLocaleId(id);
   if (!getValidLocaleIds().includes(normalized)) {
     console.warn(
-      `[horror-scope] Attempted to save unsupported locale "${id}". ` +
+      `[browser-zodiac] Attempted to save unsupported locale "${id}". ` +
         `Supported locales: ${getValidLocaleIds().join(', ')}`,
     );
     return;
