@@ -183,6 +183,19 @@ describe('sign-assigner', () => {
      expect(ZODIAC_SIGNS).toContain(sign);
     });
 
+    it('zero-pads month and day so single-digit dates hash identically regardless of construction', () => {
+     const fingerprint = 'zeropad-test';
+     // new Date(2024, 0, 5) → local midnight, getMonth()=0, getDate()=5
+     // ISO string: "2024-01-05T00:00:00..." — has zero-padding in YYYY-MM-DD prefix.
+     // But the production code uses .padStart(2, '0') on month/day extracted from Date
+     // accessor methods, so single-digit values must still produce "01" and "05".
+     const fromConstructor = new Date(2024, 0, 5);
+     const fromISO = new Date('2024-01-05');
+     const signA = assignDailySign(fingerprint, fromConstructor);
+     const signB = assignDailySign(fingerprint, fromISO);
+     expect(signA).toBe(signB);
+    });
+
     it('returns different signs for different dates with the same fingerprint', () => {
      const fingerprint = 'daily-test-fingerprint';
      const seenDays: string[] = [];
