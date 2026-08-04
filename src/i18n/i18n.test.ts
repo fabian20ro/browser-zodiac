@@ -239,6 +239,20 @@ describe('detectLanguage', () => {
     (localStorageStub as unknown as { getItem: (key: string) => string | null }).getItem = originalGetItem;
   });
 
+  it('falls back to English when localStorage throws and browser language is empty', () => {
+    const originalGetItem = localStorageStub.getItem.bind(localStorageStub);
+    (localStorageStub as unknown as { getItem: (key: string) => string | null }).getItem = (_key: string) => {
+      throw new Error('QuotaExceededError');
+    };
+
+    setNavigatorProperty('language', '');
+
+    expect(detectLanguage()).toBe('en');
+
+    // Restore original behavior for other tests.
+    (localStorageStub as unknown as { getItem: (key: string) => string | null }).getItem = originalGetItem;
+  });
+
   it('returns English when both stored and browser language are unregistered', () => {
     window.localStorage.setItem('horror-scope-lang', 'zz');
     setNavigatorProperty('language', 'de-DE');
