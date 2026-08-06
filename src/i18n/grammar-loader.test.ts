@@ -260,6 +260,17 @@ unicorn`,
     ).rejects.toThrow('Failed to load http://test/data/en.txt: 404');
   });
 
+  it('throws when fetch itself throws in strict mode (network failure)', async () => {
+    // Network-level failures (DNS, timeout, etc.) throw before a Response object
+    // is created. safeFetchText must surface these as URL-prefixed errors in
+    // strict mode so callers see the problematic URL instead of a raw TypeError.
+    const fetch = vi.fn(() => Promise.reject(new Error('Network request failed'))) as FetchFn;
+
+    await expect(
+      loadGrammar('en', 'http://test/data/', fetch, true),
+    ).rejects.toThrow(/Failed to load http:\/\/test\/data\/en\.txt/);
+  });
+
   it('deduplicates fetch calls when multiple @from point to the same file', async () => {
     const fetchCalls: string[] = [];
     const fetch = vi.fn(async (url: string) => {
