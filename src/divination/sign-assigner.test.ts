@@ -183,6 +183,19 @@ describe('sign-assigner', () => {
      expect(ZODIAC_SIGNS).toContain(sign);
     });
 
+    it('zero-pads month and day so single-digit dates hash identically regardless of construction', () => {
+     const fingerprint = 'zeropad-test';
+     // new Date(2024, 0, 5) → local midnight, getMonth()=0, getDate()=5
+     // ISO string: "2024-01-05T00:00:00..." — has zero-padding in YYYY-MM-DD prefix.
+     // But the production code uses .padStart(2, '0') on month/day extracted from Date
+     // accessor methods, so single-digit values must still produce "01" and "05".
+     const fromConstructor = new Date(2024, 0, 5);
+     const fromISO = new Date('2024-01-05');
+     const signA = assignDailySign(fingerprint, fromConstructor);
+     const signB = assignDailySign(fingerprint, fromISO);
+     expect(signA).toBe(signB);
+    });
+
     it('returns different signs for different dates with the same fingerprint', () => {
      const fingerprint = 'daily-test-fingerprint';
      const seenDays: string[] = [];
@@ -215,6 +228,20 @@ describe('sign-assigner', () => {
        expect(counts[sign]).toBeGreaterThan(20);
        expect(counts[sign]).toBeLessThan(50);
      }
+    });
+
+    it('treats 2024-12-31 as the same local day regardless of construction method — verifies boundary behavior', () => {
+     const fingerprint = 'boundary-test';
+     // new Date(year, monthIndex, day) constructs in local midnight.
+     const fromConstructor = new Date(2024, 11, 31);
+     // ISO string "2024-12-31" parses as UTC midnight; getDate() returns 31 locally only if timezone is UTC or east of UTC offset enough that local date remains Dec 31.
+     const fromISO = new Date('2024-12-31');
+     expect(fromConstructor.getFullYear()).toBe(2024);
+     expect(fromConstructor.getMonth()).toBe(11);
+     expect(fromConstructor.getDate()).toBe(31);
+     expect(assignDailySign(fingerprint, fromConstructor)).toBe(
+       assignDailySign(fingerprint, fromISO)
+     );
     });
     });
 

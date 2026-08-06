@@ -29,6 +29,9 @@ export function render(
   container.className = 'app';
   container.setAttribute('aria-live', 'polite');
 
+  // propagate theme to documentElement so page-wide CSS transitions work on toggle
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+
   const wrapper = document.createElement('div');
   wrapper.className = 'app__wrapper';
 
