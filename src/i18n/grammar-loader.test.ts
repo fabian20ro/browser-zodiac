@@ -410,4 +410,45 @@ ghost sandwich`,
     expect(grammar.creature).toContain('unicorn');
     expect(grammar.food).toEqual(['toast']);
   });
+
+  it('tolerates @from files that return empty body in non-strict mode', async () => {
+    // A fetched file whose response.ok is true but whose .text() returns ""
+    // contributes no sections to the grammar. safeFetchText treats this as a
+    // successful fetch (not null), so parseGrammarText must produce an empty
+    // result and visitedUrls must prevent re-fetching it later.
+    const fetchCalls: string[] = [];
+    const fetch = vi.fn(async (url: string) => {
+      fetchCalls.push(url);
+      if (files[url]) {
+        return Promise.resolve({
+          ok: true,
+          text: () => Promise.resolve(files[url]),
+        } as Response);
+      }
+      // Empty body — simulates a server that returns 200 but no content.
+      return Promise.resolve({
+        ok: true,
+        text: () => Promise.resolve(''),
+      } as Response);
+    }) as FetchFn;
+
+    const files: Record<string, string> = {
+      'http://test/data/en.txt': `@from empty.txt import *\n\n=== food ===\ntoast`,
+      'http://test/data/en/empty.txt': '',
+    };
+
+    const grammar = await loadGrammar('en', 'http://test/data/', fetch, false);
+
+    expect(grammar.food).toEqual(['toast']);
+    // The empty file should not have contributed any symbols.
+    for (const [symbol, entries] of Object.entries(grammar)) {
+      if (symbol === 'food') continue;
+      expect(entries.length).toBe(0);
+    }
+    // Should only have fetched the main file and the empty import once each.
+    expect(fetchCalls.filter((c) => c.endsWith('empty.txt'))).toHaveLength(1);
+
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    warnSpy.mockRestore();
+  });
 });
