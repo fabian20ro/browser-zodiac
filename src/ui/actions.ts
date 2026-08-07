@@ -18,6 +18,15 @@ export function createActionButton(options: ActionButtonOptions): HTMLButtonElem
   let revertTimer: ReturnType<typeof setTimeout> | null = null;
   let isRunning = false;
 
+  function resetState(): void {
+    if (revertTimer !== null) {
+      clearTimeout(revertTimer);
+      revertTimer = null;
+    }
+    btn.textContent = options.icon;
+    btn.classList.remove('action-btn--feedback');
+  }
+
   function showIcon(icon: string, addFeedbackClass?: boolean): void {
     if (icon !== options.icon) {
       btn.textContent = icon;
@@ -34,24 +43,22 @@ export function createActionButton(options: ActionButtonOptions): HTMLButtonElem
     }
   }
 
+  function handleResult(result: unknown): void {
+    if (typeof result === 'boolean' && !result) {
+      showIcon(options.errorIcon ?? options.icon, false);
+    } else if (options.feedbackIcon) {
+      showIcon(options.feedbackIcon, true);
+    }
+  }
+
   btn.addEventListener('click', async () => {
     if (isRunning) return;
     isRunning = true;
-
-    if (revertTimer !== null) {
-      clearTimeout(revertTimer);
-      revertTimer = null;
-    }
-    btn.textContent = options.icon;
-    btn.classList.remove('action-btn--feedback');
+    resetState();
 
     try {
       const result = await options.onClick();
-      if (typeof result === 'boolean' && !result) {
-        showIcon(options.errorIcon ?? options.icon, false);
-      } else if (options.feedbackIcon) {
-        showIcon(options.feedbackIcon, true);
-      }
+      handleResult(result);
     } catch {
       showIcon(options.errorIcon ?? options.icon, false);
     } finally {
