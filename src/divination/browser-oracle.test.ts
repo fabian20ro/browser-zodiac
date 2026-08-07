@@ -2377,6 +2377,100 @@ describe('detectMobile', () => {
     expect(profile.fingerprint).toContain('|light|morning|3|desktop');
   });
 
+  describe('getColorScheme dark mode detection', () => {
+    it('returns dark when prefers-color-scheme is dark', () => {
+      vi.stubGlobal('window', {
+        innerWidth: 1920,
+        innerHeight: 1080,
+        devicePixelRatio: 1,
+        matchMedia: vi.fn().mockReturnValue({
+          matches: true,
+        }),
+      });
+      const profile = readBrowserOracle();
+      const alignmentReading = profile.readings.find(r => r.key === 'soul_alignment');
+      expect(alignmentReading?.raw).toBe('dark');
+    });
+
+    it('returns light when prefers-color-scheme is not dark', () => {
+      vi.stubGlobal('window', {
+        innerWidth: 1920,
+        innerHeight: 1080,
+        devicePixelRatio: 1,
+        matchMedia: vi.fn().mockReturnValue({
+          matches: false,
+        }),
+      });
+      const profile = readBrowserOracle();
+      const alignmentReading = profile.readings.find(r => r.key === 'soul_alignment');
+      expect(alignmentReading?.raw).toBe('light');
+    });
+  });
+
+  describe('tactile_sensibility', () => {
+    it('returns numb when touchPoints is zero', () => {
+      vi.stubGlobal('navigator', {
+        userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+        language: 'en-US',
+        hardwareConcurrency: 8,
+        platform: 'MacIntel',
+        onLine: true,
+        maxTouchPoints: 0,
+        connection: { effectiveType: '4g' },
+      });
+      const profile = readBrowserOracle();
+      const tactileReading = profile.readings.find(r => r.key === 'tactile_sensibility');
+      expect(tactileReading?.raw).toBe('numb');
+    });
+
+    it('returns sensitive when touchPoints is greater than zero', () => {
+      vi.stubGlobal('navigator', {
+        userAgent: 'Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 Chrome Mobile Safari/537.36',
+        language: 'en-US',
+        hardwareConcurrency: 8,
+        platform: 'Android',
+        onLine: true,
+        maxTouchPoints: 5,
+        connection: { effectiveType: '4g' },
+      });
+      const profile = readBrowserOracle();
+      const tactileReading = profile.readings.find(r => r.key === 'tactile_sensibility');
+      expect(tactileReading?.raw).toBe('sensitive');
+    });
+  });
+
+  describe('cosmic_noise', () => {
+    it('returns zero for empty user agent string', () => {
+      vi.stubGlobal('navigator', {
+        userAgent: '',
+        language: 'en-US',
+        hardwareConcurrency: 8,
+        platform: 'MacIntel',
+        onLine: true,
+        maxTouchPoints: 0,
+        connection: { effectiveType: '4g' },
+      });
+      const profile = readBrowserOracle();
+      const noiseReading = profile.readings.find(r => r.key === 'cosmic_noise');
+      expect(noiseReading?.raw).toBe('0');
+    });
+
+    it('returns the length of a long user agent string', () => {
+      vi.stubGlobal('navigator', {
+        userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36 Firefox/120.0 Edge/91',
+        language: 'en-US',
+        hardwareConcurrency: 8,
+        platform: 'MacIntel',
+        onLine: true,
+        maxTouchPoints: 0,
+        connection: { effectiveType: '4g' },
+      });
+      const profile = readBrowserOracle();
+      const noiseReading = profile.readings.find(r => r.key === 'cosmic_noise');
+      expect(noiseReading?.raw).toBe('112');
+    });
+  });
+
   describe('getTimeOfDay boundary transitions', () => {
     it('returns deep_night at hours 0-5', () => {
       for (let h = 0; h < 6; h++) {
