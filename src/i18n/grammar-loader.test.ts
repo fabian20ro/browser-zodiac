@@ -246,6 +246,47 @@ unicorn`,
     warnSpy.mockRestore();
   });
 
+  it('tolerates multiple missing @from files in non-strict mode — one warn each', async () => {
+    // When several distinct @from URLs fail independently, safeFetchText must
+    // emit exactly one console.warn per failed URL and keep the loop running
+    // so that content from any surviving file still merges into grammar.
+    const fetchCalls: string[] = [];
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const fetch = vi.fn(async (url: string) => {
+      fetchCalls.push(url);
+      if (files[url]) {
+        return Promise.resolve({
+          ok: true,
+          text: () => Promise.resolve(files[url]),
+        } as Response);
+      }
+      return Promise.resolve({
+        ok: false,
+        status: 404,
+      } as Response);
+    }) as FetchFn;
+
+    const files: Record<string, string> = {
+      'http://test/data/en.txt': `@from x.txt import *\n@from y.txt import *\n\n=== food ===\ntoast`,
+    };
+
+    await loadGrammar('en', 'http://test/data/', fetch, false);
+
+    expect(fetchCalls).toEqual([
+      'http://test/data/en.txt',
+      'http://test/data/en/x.txt',
+      'http://test/data/en/y.txt',
+    ]);
+
+    expect(warnSpy).toHaveBeenCalledTimes(2);
+    for (const call of warnSpy.mock.calls) {
+      const msg = call[0] as string;
+      expect(msg).toMatch(/^Failed to load http:\/\/test\/data\/en\/(x|y)\.txt: 404$/);
+    }
+
+    warnSpy.mockRestore();
+  });
+
   it('throws when the main grammar file is missing', async () => {
     const fetch = mockFetch({});
     await expect(
