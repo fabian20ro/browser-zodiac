@@ -410,5 +410,17 @@ describe('createGrammarEngine', () => {
     it('throws when rule entry is null', () => {
       expect(() => validateGrammar({ word: [null as any] })).toThrow();
     });
+
+    it('passes silently when symbol value is null (not an array)', () => {
+      expect(() => validateGrammar({ word: null as any })).not.toThrow();
+    });
+
+    it('passes silently when symbol value is a string (not an array)', () => {
+      expect(() => validateGrammar({ word: 'literal' as any })).not.toThrow();
+    });
+
+    it('passes silently when symbol value is an object (not an array)', () => {
+      expect(() => validateGrammar({ word: { foo: 'bar' } as any })).not.toThrow();
+    });
   });
 });
