@@ -100,11 +100,43 @@ async function safeFetchText(
   return text;
 }
 
+/**
+ * Helper: merge parsed sections into a grammar accumulator.
+ * When `deduplicate` is true, entries already present for a symbol are skipped
+ * (first-seen order preserved). This prevents duplicate rows from accumulating
+ * when imported files define overlapping symbols with the main file or each other.
+ */
+function _mergeSections(
+  grammar: Grammar,
+  entriesBySymbol: Record<string, string[]>,
+  deduplicate: boolean,
+): void {
+  if (!deduplicate) {
+    for (const [symbol, entries] of Object.entries(entriesBySymbol)) {
+      if (!grammar[symbol]) grammar[symbol] = [];
+      grammar[symbol].push(...entries);
+    }
+    return;
+  }
+
+  const seen = new Set<string>();
+  for (const [symbol, entries] of Object.entries(entriesBySymbol)) {
+    if (!grammar[symbol]) grammar[symbol] = [];
+    for (const entry of entries) {
+      if (!seen.has(entry)) {
+        seen.add(entry);
+        grammar[symbol].push(entry);
+      }
+    }
+  }
+}
+
 export async function loadGrammar(
   localeId: string,
   basePath?: string,
   fetchFn: typeof fetch = fetch,
   strict: boolean = false,
+  deduplicate: boolean = false,
 ): Promise<Grammar> {
   const base = basePath ?? `${import.meta.env.BASE_URL}data/`;
   const mainUrl = `${base}${localeId}.txt`;
@@ -119,16 +151,8 @@ export async function loadGrammar(
 
   const grammar: Grammar = {};
 
-  // Helper: merge parsed sections into a grammar accumulator.
-  function _mergeSections(grammar: Grammar, entriesBySymbol: Record<string, string[]>): void {
-    for (const [symbol, entries] of Object.entries(entriesBySymbol)) {
-      if (!grammar[symbol]) grammar[symbol] = [];
-      grammar[symbol].push(...entries);
-    }
-  }
-
   // Initialize grammar from main file sections
-  _mergeSections(grammar, parsed.sections);
+  _mergeSections(grammar, parsed.sections, deduplicate);
 
   // Collect all imports recursively with deduplication to avoid cycles
   const visitedUrls = new Set<string>();
@@ -150,7 +174,7 @@ export async function loadGrammar(
     }
 
     // Merge sections from this imported file into the grammar
-    _mergeSections(grammar, parsedImport.sections);
+    _mergeSections(grammar, parsedImport.sections, deduplicate);
   }
 
   return grammar;
