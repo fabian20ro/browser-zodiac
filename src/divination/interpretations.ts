@@ -1,22 +1,10 @@
 export type InterpretationFn = (raw: string) => string;
 
-/**
- * Returns "a" or "an" based on the first character of raw.
- * Uses phonetic-class heuristic: vowels and characters with silent consonants → "an".
- */
 const VOWELS = 'aeiou';
 
-// Letters that are silent or vowel-like at word start: vowels, plus h before a vowel.
-function startsWithVowelSound(ch: string): boolean {
-  if (VOWELS.includes(ch)) return true;
-  // Silent-h rule: "h" followed by a vowel is pronounced as a vowel sound.
-  if (ch === 'h') return false; // must check next char in caller context
-  return false;
-}
-
 /**
  * Returns "a" or "an" based on the first character of raw.
- * Uses phonetic-class heuristic: vowels and characters with silent consonants → "an".
+ * Uses phonetic-class heuristic: vowels and silent-h+vowel → "an".
  */
 export function indefiniteArticle(raw: string): string {
   const trimmed = (raw || '').trim();
@@ -25,7 +13,7 @@ export function indefiniteArticle(raw: string): string {
   const second = trimmed.charAt(1).toLowerCase();
   // Silent-h rule: "h" followed by a vowel → treat as vowel sound.
   if (first === 'h' && VOWELS.includes(second)) return 'an';
-  return startsWithVowelSound(first) ? 'an' : 'a';
+  return VOWELS.includes(first) ? 'an' : 'a';
 }
 
 function article(raw: string, templateA: string, templateAn: string): string {
