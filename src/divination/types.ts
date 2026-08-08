@@ -76,3 +76,27 @@ const __drift_proof: _DriftProof = {
   unionSubset: true,
 };
 void __drift_proof; // keep linter happy
+
+// Runtime invariant: DIVINATION_READING_KEYS and readingInterpretations must be aligned in both directions.
+// Catches drift that the compile-time check above cannot detect — specifically when the interpretations
+// record (typed as Record<string, InterpretationFn>) gains stale keys or misses new ones.
+import { readingInterpretations } from './interpretations.ts';
+
+const _interpKeys = Object.keys(readingInterpretations) as string[];
+
+for (const k of DIVINATION_READING_KEYS) {
+  if (!(k in readingInterpretations)) {
+    throw new Error(
+      `Divination key "${String(k)}" missing from readingInterpretations registry.`,
+    );
+  }
+}
+
+for (const k of _interpKeys) {
+  const typedK = k as DivinationReadingKey;
+  if (!DIVINATION_READING_KEYS.includes(typedK)) {
+    throw new Error(
+      `readingInterpretations contains entry for unknown key "${k}" — not in DIVINATION_READING_KEYS.`,
+    );
+  }
+}
