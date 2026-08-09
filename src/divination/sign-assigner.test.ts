@@ -470,5 +470,15 @@ describe('sign-assigner', () => {
       const sign = assignRandomSign();
       expect(ZODIAC_SIGNS).toContain(sign);
     });
+
+    it('produces different results across consecutive calls — not constant', () => {
+      // The documented contract states each call is "fresh unpredictable";
+      // verifying this prevents regression to a constant seed or cached result.
+      const seen = new Set<string>();
+      for (let i = 0; i < 50; i++) {
+        seen.add(assignRandomSign());
+      }
+      expect(seen.size).toBeGreaterThan(1);
+    });
   });
 });
