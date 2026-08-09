@@ -430,6 +430,11 @@ describe('sign-assigner', () => {
       }
       expect(seen.size).toBe(ZODIAC_SIGNS.length);
     });
+
+    it('returns undefined for an unknown sign — not in ELEMENT_BY_SIGN', () => {
+      expect(getSignElement('unknown-sign' as any)).toBeUndefined();
+      expect(getSignElement('not-a-real-sign-xyz' as any)).toBeUndefined();
+    });
   });
 
   describe('assignRandomSign', () => {
