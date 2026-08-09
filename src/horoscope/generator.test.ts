@@ -491,6 +491,16 @@ describe('generateHoroscope', () => {
     expect(moods.every((m) => ['turbulent', 'balanced', 'radiant'].includes(m))).toBe(true);
   });
 
+  it('mood exactly matches the band derivation for every horoscope', () => {
+    const signs = Object.keys(ZODIAC_SYMBOLS) as ZodiacSign[];
+    for (const sign of signs) {
+      const h = generateHoroscope(sign, minimalLocale, minimalDivination, fixedDate);
+      const expectedMood: 'turbulent' | 'balanced' | 'radiant' =
+        h.luckyNumber <= 30 ? 'turbulent' : h.luckyNumber <= 70 ? 'balanced' : 'radiant';
+      expect(h.mood).toBe(expectedMood);
+    }
+  });
+
   it('unusual divination values (special chars) do not corrupt output shape', () => {
     const locale: LocalePack = {
       ...minimalLocale,
