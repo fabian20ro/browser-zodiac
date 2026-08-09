@@ -171,6 +171,24 @@ describe('sign-assigner', () => {
      }
     });
 
+    it.each([
+      [null, 'null', /Cannot read properties of null/],
+      [undefined, 'undefined', /Cannot read properties of undefined/],
+      [42, 'number', /getTime is not a function/],
+      ['not-a-date', 'string', /getTime is not a function/],
+    ])(
+      'throws TypeError for non-Date input (%s: %s)',
+      (input: any) => {
+        expect(() => assignDailySign('validation-test', input)).toThrow(TypeError);
+        try {
+          assignDailySign('validation-test', input);
+        } catch (err) {
+          expect(err).toBeInstanceOf(TypeError);
+          expect((err as TypeError).message).toMatch(/getTime is not a function|Cannot read properties of/);
+        }
+      }
+    );
+
     it('accepts out-of-range calendar dates by normalizing to the real local date (e.g., Feb 29 in non-leap year → March 1)', () => {
      const fingerprint = 'overflow-date-test';
      // In a non-leap year, JS Date constructor auto-normalizes month overflow:
