@@ -76,6 +76,8 @@ function handleInitError(container: HTMLElement): void {
     void initApp();
   });
 }
+
+
   let langId = detectLanguage();
   let consultation = 0;
   let signOverride: ZodiacSign | null = null;
