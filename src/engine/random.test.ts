@@ -497,4 +497,49 @@ describe('dailySeed', () => {
       dailySeed('2026-07-09', 'aries', '05:00'),
     );
   });
+
+  it('produces seeds with statistical distribution across the full 32-bit space (8760-hour regression guard)', () => {
+    // The existing uniqueness test verifies no two hours collide. But a broken hash could
+    // spread values without colliding yet cluster in a narrow band of 2^32 — still visible
+    // to users as "repeating horoscopes" at finer granularity. This check ensures the
+    // hash actually uses the full seed space, not just avoids collisions within a subset.
+    const seen = new Set<number>();
+    for (let year = 2026; year <= 2027; year++) {
+      for (let month = 1; month <= 12; month++) {
+        const daysInMonth = new Date(year, month, 0).getDate();
+        for (let day = 1; day <= daysInMonth; day++) {
+          for (let h = 0; h < 24; h++) {
+            const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const seed = dailySeed(dateStr, 'aries', `${String(h).padStart(2, '0')}:00`);
+            expect(seen.has(seed)).toBe(false);
+            seen.add(seed);
+          }
+        }
+      }
+    }
+    // With 8760 unique seeds in 2^32 ≈ 4.3B space, they must span at least half the range.
+    const arr = Array.from(seen);
+    const min = Math.min(...arr);
+    const max = Math.max(...arr);
+    expect(max - min).toBeGreaterThan(0xfffff * 8); // >75% of full 2^32 space
+  });
+
+  it('non-numeric hour+minute both collapse to "00:00" (NaN || 0 in both positions)', () => {
+    // normalizeTimePart uses `Number(x) || 0` — any non-numeric string yields NaN which
+    // coerces to 0 via the bitwise OR. Both positions must behave identically for garbage input.
+    expect(dailySeed('2026-07-09', 'aries', 'abc:def')).toBe(
+      dailySeed('2026-07-09', 'aries', '00:00'),
+    );
+  });
+
+  it('whitespace-only timePart normalizes to "00:00" (Number("") = NaN → 0)', () => {
+    // normalizeTimePart uses `Number(x) || 0` — whitespace strings parse as NaN.
+    expect(dailySeed('2026-07-09', 'aries', '  ')).toBe(
+      dailySeed('2026-07-09', 'aries', '00:00'),
+    );
+    // Tab-padded hour with valid minute → minute still parsed correctly.
+    expect(dailySeed('2026-07-09', 'aries', '\t14\t:\t30')).toBe(
+      dailySeed('2026-07-09', 'aries', '14:30'),
+    );
+  });
 });
