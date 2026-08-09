@@ -345,6 +345,11 @@ describe('sign-assigner', () => {
       expect(assignSigns([])).toEqual([]);
     });
 
+    it('returns an empty array when all entries are falsy (null, undefined, "")', () => {
+      const result = assignSigns([null, undefined, '']);
+      expect(result).toEqual([]);
+    });
+
     it('is deterministic', () => {
       const fingerprints = ['alice', 'bob'];
       const signs1 = assignSigns(fingerprints);
