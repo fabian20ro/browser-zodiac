@@ -64,14 +64,18 @@ async function initApp(): Promise<void> {
   try {
     await loadAllGrammars();
   } catch (error) {
+    handleInitError(container);
     console.error('Failed to load grammar files during startup', error);
-    container.innerHTML = ERROR_TEMPLATE;
-    const retryBtn = document.getElementById('retry-init');
-    retryBtn?.addEventListener('click', () => {
-      void initApp();
-    });
     return;
   }
+
+function handleInitError(container: HTMLElement): void {
+  container.innerHTML = ERROR_TEMPLATE;
+  const retryBtn = document.getElementById('retry-init');
+  retryBtn?.addEventListener('click', () => {
+    void initApp();
+  });
+}
   let langId = detectLanguage();
   let consultation = 0;
   let signOverride: ZodiacSign | null = null;
