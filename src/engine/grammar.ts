@@ -22,6 +22,16 @@ export function validateGrammar(grammar: Grammar): void {
           if (hashCount % 2 !== 0) {
             throw new Error(`Rule entry in symbol '${symbol}' at index ${i} contains unbalanced '#': must not include the grammar delimiter`);
           }
+          // Validate #...# references within rule entries
+          const expansionMatches = entry.match(EXPANSION_RE) || [];
+          for (const match of expansionMatches) {
+            const innerContent = match.slice(1, -1); // remove outer '#'
+            const parts = innerContent.split('.');
+            const refSymbol = parts[0];
+            if (!refSymbol || !/^[a-zA-Z_][a-zA-Z0-9_-]*$/.test(refSymbol)) {
+              throw new Error(`Rule entry in symbol '${symbol}' at index ${i} contains malformed symbol reference '#${refSymbol || ''}#': symbol name must match /^[a-zA-Z_][a-zA-Z0-9_-]*$/`);
+            }
+          }
         }
       }
     }
