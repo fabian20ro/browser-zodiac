@@ -520,5 +520,12 @@ describe('sign-assigner', () => {
       }
       expect(seen.size).toBeGreaterThan(1);
     });
+
+    it('throws TypeError when given null or undefined — no silent fallback on falsy input', () => {
+      // assignSign calls .normalize() on fingerprint with no guard; null/undefined must fail loudly.
+      for (const bad of [null, undefined]) {
+        expect(() => assignSign(bad)).toThrow(TypeError);
+      }
+    });
   });
 });

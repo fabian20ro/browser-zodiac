@@ -15,7 +15,24 @@ export interface Horoscope {
   warning: string;
   compatibility: string;
   date: string;
+  signElement: 'fire' | 'earth' | 'air' | 'water';
 }
+
+/** Standard tropical element assignment per zodiac sign. */
+const SIGN_ELEMENTS: Record<ZodiacSign, 'fire' | 'earth' | 'air' | 'water'> = {
+  aries: 'fire',
+  leo: 'fire',
+  sagittarius: 'fire',
+  taurus: 'earth',
+  virgo: 'earth',
+  capricorn: 'earth',
+  gemini: 'air',
+  libra: 'air',
+  aquarius: 'air',
+  cancer: 'water',
+  scorpio: 'water',
+  pisces: 'water',
+};
 
 /** Merge locale grammar with divination readings — signName symbol + reading keys as symbols. */
 function buildContextGrammar(
@@ -61,6 +78,8 @@ export function generateHoroscope(
   const luckyNumber = Math.floor(rng() * 99) + 1;
   const mood = luckyNumber <= 30 ? 'turbulent' : luckyNumber <= 70 ? 'balanced' : 'radiant';
 
+  const signElement = SIGN_ELEMENTS[sign];
+
   return {
     sign,
     signSymbol: ZODIAC_SYMBOLS[sign],
@@ -71,5 +90,6 @@ export function generateHoroscope(
     compatibility,
     luckyNumber,
     date: dateStr,
+    signElement,
   };
 }
