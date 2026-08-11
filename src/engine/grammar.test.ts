@@ -260,6 +260,12 @@ describe('createGrammarEngine', () => {
     });
 
     // NEW TESTS - uncovered edge cases
+
+    it('characterizes the validateGrammar / expand modifier-validation asymmetry', () => {
+      // validateGrammar only validates the symbol name in expansion references, not modifiers.
+      // expandOnce (used by engine.expand) validates both — confirming this is a deliberate boundary.
+      expect(() => validateGrammar({ word: ['hello #symbol.hello@world#'] })).not.toThrow();
+    });
     it('throws on modifier containing special characters (@)', () => {
       const engine = makeEngine({ word: ['hello'] });
       expect(() => engine.expand('#word.hello@world#')).toThrow(/malformed name 'hello@world'/);
