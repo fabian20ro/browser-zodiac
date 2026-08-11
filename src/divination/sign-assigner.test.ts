@@ -390,6 +390,8 @@ describe('sign-assigner', () => {
         expect(s).toBeTruthy();
         expect(ZODIAC_SIGNS).toContain(s);
       }
+      // Explicitly verify no empty string slipped through — catches regression if filter(Boolean) changes to filter(x => x !== null && x !== undefined).
+      expect(signs.every(s => s !== '')).toBe(true);
     });
 
     it('preserves positional correspondence after filtering', () => {
