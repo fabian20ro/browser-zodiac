@@ -65,6 +65,17 @@ export function parseEntriesFile(content: string): string[] {
  * All imported sections are merged into the main grammar. Files are
  * fetched in parallel for optimal performance.
  */
+/** Format a fetch/network error message prefixed with the URL. */
+function formatFetchError(url: string, err: unknown): string {
+  const msg = (err as Error).message ?? String(err);
+  return `Failed to load ${url}: ${msg}`;
+}
+
+/** Format an HTTP non-ok response message prefixed with the URL and status code. */
+function formatHttpError(url: string, status: number): string {
+  return `Failed to load ${url}: ${status}`;
+}
+
 /** Internal: fetch a URL and return its text content, or null on failure. */
 async function safeFetchText(
   url: string,
@@ -75,13 +86,13 @@ async function safeFetchText(
   try {
     res = await fetchFn(url);
   } catch (err) {
-    const errorMsg = `Failed to load ${url}: ${(err as Error).message}`;
+    const errorMsg = formatFetchError(url, err);
     if (strict) throw new Error(errorMsg);
     console.warn(errorMsg);
     return null;
   }
   if (!res.ok) {
-    const errorMsg = `Failed to load ${url}: ${res.status}`;
+    const errorMsg = formatHttpError(url, res.status);
     if (strict) throw new Error(errorMsg);
     console.warn(errorMsg);
     return null;
@@ -91,7 +102,7 @@ async function safeFetchText(
   try {
     text = await res.text();
   } catch (err) {
-    const errorMsg = `Failed to read ${url}: ${(err as Error).message}`;
+    const errorMsg = formatFetchError(url, err);
     if (strict) throw new Error(errorMsg);
     console.warn(errorMsg);
     return null;
