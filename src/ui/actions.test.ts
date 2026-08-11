@@ -572,4 +572,36 @@ describe('createActionButton', () => {
     expect(btn.textContent).toBe('✓');
     expect(btn.classList.contains('action-btn--feedback')).toBe(true);
   });
+
+  it('shows error icon when onClick throws synchronously', async () => {
+    const btn = createActionButton({
+      icon: '⧉',
+      errorIcon: '✕',
+      ariaLabel: 'Copy',
+      onClick: () => { throw new Error('sync boom'); },
+    });
+
+    btn.click();
+    await Promise.resolve();
+
+    expect(btn.textContent).toBe('✕');
+  });
+
+  it('reverts error icon after synchronous throw from onClick', async () => {
+    vi.useFakeTimers();
+    const btn = createActionButton({
+      icon: '⧉',
+      errorIcon: '✕',
+      ariaLabel: 'Copy',
+      onClick: () => { throw new Error('sync boom'); },
+    });
+
+    btn.click();
+    await Promise.resolve();
+    expect(btn.textContent).toBe('✕');
+
+    vi.advanceTimersByTime(1500);
+    expect(btn.textContent).toBe('⧉');
+    vi.useRealTimers();
+  });
 });
