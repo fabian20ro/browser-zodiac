@@ -403,6 +403,11 @@ describe('createGrammarEngine', () => {
       expect(() => validateGrammar(grammar)).not.toThrow();
     });
 
+    it('throws on rule entry with invalid symbol ref in expansion reference', () => {
+      expect(() => validateGrammar({ word: ['hello #123bad#'] })).toThrow(/malformed symbol reference/);
+      expect(() => validateGrammar({ word: ['text #.uppercase# more'] })).toThrow(/malformed symbol reference/);
+    });
+
     it('throws on an empty symbol name string', () => {
       expect(() => validateGrammar({ '': ['hello'] })).toThrow(/Invalid grammar symbol/);
     });
