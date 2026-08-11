@@ -229,6 +229,21 @@ describe('scheduleMidnightGmt resilience', () => {
     cancel2();
   });
 
+  it('should handle idempotent cancel() without throwing or leaking', () => {
+    // Exercises the production contract that cancel() clears activeHandle
+    // via clearTimeout and sets it to undefined (lines 67-70 in scheduler.ts).
+    // Calling cancel twice must be safe — no throw, no double-fire.
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+
+    const cancel = scheduleMidnightGmt(callback);
+
+    cancel(); // First cancel clears activeHandle and sets it to undefined.
+    expect(() => cancel()).not.toThrow(); // Second call must be a no-op.
+
+    vi.advanceTimersByTime(86400000);
+    expect(count).toBe(0);
+  });
+
   it('should suppress stale timers across a chain of three rapid replacements', () => {
     // Scenario: schedule → cancel → schedule → cancel → schedule.
     // Each cancel should clear its activeHandle, so no stale timer fires
