@@ -1,7 +1,8 @@
 import type { SeededRandom } from './types.ts';
 
-/** Mulberry32 — fast 32-bit seeded PRNG */
+/** Mulberry32 — fast 32-bit seeded PRNG. Returns a constant-zero RNG when the seed is NaN or ±Infinity, matching the sign-assigner fallback pattern for degenerate input. */
 export function mulberry32(seed: number): SeededRandom {
+  if (!Number.isFinite(seed)) return () => 0;
   let s = seed | 0;
   return () => {
     s = (s + 0x6d2b79f5) | 0;
