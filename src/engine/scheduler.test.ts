@@ -129,6 +129,47 @@ describe('msUntilNextMidnightGmt', () => {
     const expected = new Date('2027-01-01T00:00:00.000Z').getTime() - endOfYear.getTime();
     expect(msUntilNextMidnightGmt(endOfYear)).toBe(expected);
   });
+
+  it('returns correct ms at sub-second precision', () => {
+    // Contract: sub-millisecond values must not corrupt the next-midnight calculation.
+    const t = new Date('2026-01-01T23:59:59.999Z');
+    const expected = 1; // Next calendar-day midnight is exactly 1ms away from 23:59:59.999Z
+    expect(msUntilNextMidnightGmt(t)).toBe(expected);
+  });
+
+  it('returns correct ms at fractional-second precision', () => {
+    // Contract: sub-millisecond inputs must produce the exact same difference as
+    // getNextMidnightGmt, regardless of whether they fall near midnight or mid-day.
+    const t = new Date('2026-01-01T14:30:45.789Z');
+    const expected = new Date('2026-01-02T00:00:00.000Z').getTime() - t.getTime();
+    expect(msUntilNextMidnightGmt(t)).toBe(expected);
+  });
+
+  it('is timezone-independent (returns UTC-based result)', () => {
+    // Contract: msUntilNextMidnightGmt operates on UTC regardless of local tz — the same
+    // absolute instant must always yield identical ms-until-next-midnight values.
+    const t1 = new Date('2026-01-01T18:00:00.000Z');
+    const t2 = new Date('2026-01-01T13:00:00-05:00'); // same instant in different tz offset
+    expect(msUntilNextMidnightGmt(t1)).toBe(msUntilNextMidnightGmt(t2));
+  });
+
+  it('returns a positive value at any point before the next midnight', () => {
+    const dates = [
+      new Date('2026-01-01T00:00:00.001Z'),
+      new Date('2026-06-15T14:37:22.123Z'),
+      new Date('2026-12-31T23:59:59.999Z'),
+    ];
+    for (const d of dates) {
+      expect(msUntilNextMidnightGmt(d)).toBeGreaterThan(0);
+    }
+  });
+
+  it('does not mutate the input Date', () => {
+    const t = new Date('2026-01-01T12:00:00.000Z');
+    const originalTime = t.getTime();
+    msUntilNextMidnightGmt(t);
+    expect(t.getTime()).toBe(originalTime);
+  });
 });
 
 describe('scheduleMidnightGmt', () => {
