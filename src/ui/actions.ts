@@ -44,7 +44,8 @@ export function createActionButton(options: ActionButtonOptions): HTMLButtonElem
   }
 
   function handleResult(result: unknown): void {
-    if (typeof result === 'boolean' && !result) {
+    const isFailure = result instanceof Error || (typeof result === 'boolean' && !result);
+    if (isFailure) {
       showIcon(options.errorIcon ?? options.icon, false);
     } else if (options.feedbackIcon) {
       showIcon(options.feedbackIcon, true);
@@ -56,14 +57,15 @@ export function createActionButton(options: ActionButtonOptions): HTMLButtonElem
     isRunning = true;
     resetState();
 
+    let result: unknown;
     try {
-      const result = await options.onClick();
-      handleResult(result);
-    } catch {
-      showIcon(options.errorIcon ?? options.icon, false);
+      result = await options.onClick();
+    } catch (err) {
+      result = err instanceof Error ? err : new Error(String(err));
     } finally {
       isRunning = false;
     }
+    handleResult(result);
   });
   return btn;
 }
