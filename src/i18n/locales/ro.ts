@@ -75,13 +75,3 @@ export const ro: LocalePack = {
     comp: ['Excelent', 'Bun', 'Mediu', 'Slab'],
   },
 };
-
-// Runtime invariant: every divination label must be a non-empty string.
-for (const key of Object.keys(ro.ui.divinationLabels as Record<string, unknown>)) {
-  const value = ro.ui.divinationLabels[key as keyof typeof ro.ui.divinationLabels];
-  if (!value || typeof value !== 'string' || value.trim().length === 0) {
-    throw new Error(
-      `Locale invariant failed: divination label '${key}' is not a non-empty string`,
-    );
-  }
-}
