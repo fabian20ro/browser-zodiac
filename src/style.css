@@ -293,6 +293,8 @@ body::before {
 /* ---- Horoscope Card ---- */
 
 .horoscope-card {
+  position: relative;
+  overflow: hidden;
   border-color: var(--border-glow);
   box-shadow:
     0 0 30px rgba(200, 216, 207, 0.08),
