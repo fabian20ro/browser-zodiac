@@ -29,13 +29,14 @@ let isLoopRunning = false;
  * Returns a cancel function.
  * If called while a scheduler is already running, the previous one is cancelled.
  * The existing callback will complete, but its next scheduled iteration will be ignored if a new loop has started.
+ * @param options.immediate — when true and not already mid-loop, fire `callback` immediately on first call (before waiting for midnight). Default false.
  */
-export function scheduleMidnightGmt(callback: () => void): () => void {
+export function scheduleMidnightGmt(callback: () => void, options?: { immediate?: boolean }): () => void {
   if (activeHandle) {
     clearTimeout(activeHandle);
   }
   const loopId = ++activeLoopId;
-  let skipFirstTick = isLoopRunning;
+  let skipFirstTick = isLoopRunning || (options?.immediate && !isLoopRunning);
 
   function scheduleNext(): void {
     const delay = Math.max(msUntilNextMidnightGmt(new Date()), 1);
