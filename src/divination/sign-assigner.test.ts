@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { assignSign, assignDailySign, assignSignWithSymbol, assignSigns, assignRandomSign, getSignElement, assignSignWithElement } from './sign-assigner.ts';
+import { assignSign, assignDailySign, assignSignWithSymbol, assignSigns, assignRandomSign, getSignElement, assignSignWithElement, _assignFromHash } from './sign-assigner.ts';
 import { ZODIAC_SIGNS, ZODIAC_SYMBOLS } from '../horoscope/zodiac.ts';
 
 describe('sign-assigner', () => {
