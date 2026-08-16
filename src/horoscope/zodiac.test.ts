@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ZODIAC_SIGNS, ZODIAC_SYMBOLS, randomSign, getSignDisplayName, getSignByDate, isInRange, ZodiacSign } from './zodiac.ts';
+import { ZODIAC_SIGNS, ZODIAC_SYMBOLS, randomSign, getSignDisplayName, getSignByDate, isInRange, ZodiacSign, ZODIAC_BOUNDARIES } from './zodiac.ts';
 import { mulberry32 } from '../engine/random.ts';
 
 describe('ZODIAC_SIGNS', () => {
@@ -494,6 +494,36 @@ describe('isInRange', () => {
 
   it('edge: empty range (start > end in standard case)', () => {
     expect(isInRange(150, 300, 100)).toBe(false);   // start > end, neither branch matches
+  });
+});
+
+describe('ZodiacSign collection consistency', () => {
+  it('every sign has a boundary entry', () => {
+    for (const sign of ZODIAC_SIGNS) {
+      const found = ZODIAC_BOUNDARIES.find(b => b.sign === sign);
+      expect(found, `${sign} missing from boundaries`).toBeDefined();
+    }
+  });
+
+  it('every boundary maps to a valid zodiac sign', () => {
+    for (const b of ZODIAC_BOUNDARIES) {
+      expect(ZODIAC_SIGNS).toContain(b.sign);
+    }
+  });
+
+  it('exactly 12 boundaries, one per unique sign', () => {
+    const boundarySigns = ZODIAC_BOUNDARIES.map(b => b.sign);
+    expect(ZODIAC_BOUNDARIES).toHaveLength(12);
+    expect(new Set(boundarySigns).size).toBe(12);
+  });
+
+  it('sign, symbol, and boundary collections are mutually consistent', () => {
+    const symbolKeys = new Set(Object.keys(ZODIAC_SYMBOLS));
+    const boundarySigns = new Set(ZODIAC_BOUNDARIES.map(b => b.sign));
+    for (const sign of ZODIAC_SIGNS) {
+      expect(symbolKeys.has(sign), `${sign} missing symbol`).toBe(true);
+      expect(boundarySigns.has(sign), `${sign} missing boundary`).toBe(true);
+    }
   });
 });
 
