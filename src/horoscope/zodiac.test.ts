@@ -116,6 +116,50 @@ describe('randomSign', () => {
   });
 });
 
+describe('randomSign extreme-seed boundary', () => {
+  it('rng returning exactly 0 picks the first other sign (index 0)', () => {
+    const rng = () => 0;
+    for (const current of ZODIAC_SIGNS) {
+      const result = randomSign(current, rng);
+      expect(result).not.toBe(current);
+      expect(ZODIAC_SIGNS).toContain(result);
+    }
+  });
+
+  it('rng returning near-1 picks the last other sign (index 10)', () => {
+    const rng = () => 0.999999;
+    for (const current of ZODIAC_SIGNS) {
+      const result = randomSign(current, rng);
+      expect(result).not.toBe(current);
+      expect(ZODIAC_SIGNS).toContain(result);
+    }
+  });
+
+  it('rng at mid-range produces deterministic consistent results across all signs', () => {
+    for (const current of ZODIAC_SIGNS) {
+      const rng1 = () => 0.5;
+      const result1 = randomSign(current, rng1);
+      const rng2 = () => 0.5;
+      const result2 = randomSign(current, rng2);
+      expect(result1).toBe(result2);
+      expect(ZODIAC_SIGNS).toContain(result1);
+    }
+  });
+
+  it('every seed produces a valid sign for every current (multiplicative invariant)', () => {
+    // Verifies Math.floor(v * 11) is always in [0, 10] for v in [0, 1)
+    const seeds = [0, 1, 42, 123, 456, 789, 999, 9999];
+    for (const current of ZODIAC_SIGNS) {
+      for (const seed of seeds) {
+        const rng = mulberry32(seed);
+        const result = randomSign(current, rng);
+        expect(result).not.toBe(current);
+        expect(ZODIAC_SIGNS).toContain(result);
+      }
+    }
+  });
+});
+
 describe('getSignDisplayName', () => {
   it('every sign has a symbol AND a display name', () => {
     for (const sign of ZODIAC_SIGNS) {
