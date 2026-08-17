@@ -58,6 +58,11 @@ describe('getLocale', () => {
     expect(locale.id).toBe('ro');
   });
 
+  it('trims whitespace from locale ids before lookup', () => {
+    const locale = getLocale('  RO  ');
+    expect(locale.id).toBe('ro');
+  });
+
   it('falls back to English for unknown locale', () => {
     const locale = getLocale('xx');
     expect(locale.id).toBe('en');
