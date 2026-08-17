@@ -48,6 +48,7 @@ export function render(
   container.appendChild(wrapper);
 
   requestAnimationFrame(() => applyStaggerAnimations(wrapper));
+}
 
 function applyStaggerAnimations(wrapper: HTMLDivElement): void {
   const cards = wrapper.querySelectorAll('.card');
@@ -55,5 +56,4 @@ function applyStaggerAnimations(wrapper: HTMLDivElement): void {
     (card as HTMLElement).style.animationDelay = `${i * 0.15}s`;
     card.classList.add('card--visible');
   });
-}
 }

@@ -147,7 +147,6 @@ export async function loadGrammar(
   basePath?: string,
   fetchFn: typeof fetch = fetch,
   strict: boolean = false,
-  deduplicate: boolean = false,
 ): Promise<Grammar> {
   const base = basePath ?? `${import.meta.env.BASE_URL}data/`;
   const mainUrl = `${base}${localeId}.txt`;
@@ -162,8 +161,9 @@ export async function loadGrammar(
 
   const grammar: Grammar = {};
 
-  // Initialize grammar from main file sections
-  _mergeSections(grammar, parsed.sections, deduplicate);
+  // Initialize grammar from main file sections (deduplicate by default to prevent
+  // duplicate entries when imported files define overlapping symbols with each other)
+  _mergeSections(grammar, parsed.sections, true);
 
   // Collect all imports recursively with deduplication to avoid cycles
   const visitedUrls = new Set<string>();
@@ -184,8 +184,9 @@ export async function loadGrammar(
       importQueue.push(`${base}${localeId}/${nestedImport}`);
     }
 
-    // Merge sections from this imported file into the grammar
-    _mergeSections(grammar, parsedImport.sections, deduplicate);
+    // Merge sections from this imported file into the grammar — deduplicate to
+    // prevent doubled entries when multiple files define overlapping symbols.
+    _mergeSections(grammar, parsedImport.sections, true);
   }
 
   return grammar;

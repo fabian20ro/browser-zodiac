@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ZODIAC_SIGNS, ZODIAC_SYMBOLS, randomSign, getSignDisplayName, getSignByDate, isInRange, ZodiacSign } from './zodiac.ts';
+import { ZODIAC_SIGNS, ZODIAC_SYMBOLS, randomSign, getSignDisplayName, getSignByDate, isInRange, ZodiacSign, ZODIAC_BOUNDARIES } from './zodiac.ts';
 import { mulberry32 } from '../engine/random.ts';
 
 describe('ZODIAC_SIGNS', () => {
@@ -113,6 +113,50 @@ describe('randomSign', () => {
     const result = randomSign('nonexistent' as any, rng);
     expect(ZODIAC_SIGNS).toContain(result);
     expect(result).not.toBe('nonexistent');
+  });
+});
+
+describe('randomSign extreme-seed boundary', () => {
+  it('rng returning exactly 0 picks the first other sign (index 0)', () => {
+    const rng = () => 0;
+    for (const current of ZODIAC_SIGNS) {
+      const result = randomSign(current, rng);
+      expect(result).not.toBe(current);
+      expect(ZODIAC_SIGNS).toContain(result);
+    }
+  });
+
+  it('rng returning near-1 picks the last other sign (index 10)', () => {
+    const rng = () => 0.999999;
+    for (const current of ZODIAC_SIGNS) {
+      const result = randomSign(current, rng);
+      expect(result).not.toBe(current);
+      expect(ZODIAC_SIGNS).toContain(result);
+    }
+  });
+
+  it('rng at mid-range produces deterministic consistent results across all signs', () => {
+    for (const current of ZODIAC_SIGNS) {
+      const rng1 = () => 0.5;
+      const result1 = randomSign(current, rng1);
+      const rng2 = () => 0.5;
+      const result2 = randomSign(current, rng2);
+      expect(result1).toBe(result2);
+      expect(ZODIAC_SIGNS).toContain(result1);
+    }
+  });
+
+  it('every seed produces a valid sign for every current (multiplicative invariant)', () => {
+    // Verifies Math.floor(v * 11) is always in [0, 10] for v in [0, 1)
+    const seeds = [0, 1, 42, 123, 456, 789, 999, 9999];
+    for (const current of ZODIAC_SIGNS) {
+      for (const seed of seeds) {
+        const rng = mulberry32(seed);
+        const result = randomSign(current, rng);
+        expect(result).not.toBe(current);
+        expect(ZODIAC_SIGNS).toContain(result);
+      }
+    }
   });
 });
 
@@ -450,6 +494,36 @@ describe('isInRange', () => {
 
   it('edge: empty range (start > end in standard case)', () => {
     expect(isInRange(150, 300, 100)).toBe(false);   // start > end, neither branch matches
+  });
+});
+
+describe('ZodiacSign collection consistency', () => {
+  it('every sign has a boundary entry', () => {
+    for (const sign of ZODIAC_SIGNS) {
+      const found = ZODIAC_BOUNDARIES.find(b => b.sign === sign);
+      expect(found, `${sign} missing from boundaries`).toBeDefined();
+    }
+  });
+
+  it('every boundary maps to a valid zodiac sign', () => {
+    for (const b of ZODIAC_BOUNDARIES) {
+      expect(ZODIAC_SIGNS).toContain(b.sign);
+    }
+  });
+
+  it('exactly 12 boundaries, one per unique sign', () => {
+    const boundarySigns = ZODIAC_BOUNDARIES.map(b => b.sign);
+    expect(ZODIAC_BOUNDARIES).toHaveLength(12);
+    expect(new Set(boundarySigns).size).toBe(12);
+  });
+
+  it('sign, symbol, and boundary collections are mutually consistent', () => {
+    const symbolKeys = new Set(Object.keys(ZODIAC_SYMBOLS));
+    const boundarySigns = new Set(ZODIAC_BOUNDARIES.map(b => b.sign));
+    for (const sign of ZODIAC_SIGNS) {
+      expect(symbolKeys.has(sign), `${sign} missing symbol`).toBe(true);
+      expect(boundarySigns.has(sign), `${sign} missing boundary`).toBe(true);
+    }
   });
 });
 

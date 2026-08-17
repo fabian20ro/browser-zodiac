@@ -69,13 +69,13 @@ async function initApp(): Promise<void> {
     return;
   }
 
-function handleInitError(container: HTMLElement): void {
-  container.innerHTML = ERROR_TEMPLATE;
-  const retryBtn = document.getElementById('retry-init');
-  retryBtn?.addEventListener('click', () => {
-    void initApp();
-  });
-}
+  function handleInitError(container: HTMLElement): void {
+    container.innerHTML = ERROR_TEMPLATE;
+    const retryBtn = document.getElementById('retry-init');
+    retryBtn?.addEventListener('click', () => {
+      void initApp();
+    });
+  }
 
 
   let langId = detectLanguage();
