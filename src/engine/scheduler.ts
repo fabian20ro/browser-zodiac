@@ -36,15 +36,15 @@ export function scheduleMidnightGmt(callback: () => void, options?: { immediate?
     clearTimeout(activeHandle);
   }
   const loopId = ++activeLoopId;
-  let skipFirstTick = isLoopRunning || (options?.immediate && !isLoopRunning);
+  let shouldSkipFirstTick = isLoopRunning || options?.immediate;
 
   function scheduleNext(): void {
     const delay = Math.max(msUntilNextMidnightGmt(new Date()), 1);
     activeHandle = setTimeout(async () => {
       if (loopId !== activeLoopId) return;
 
-      if (skipFirstTick) {
-        skipFirstTick = false;
+      if (shouldSkipFirstTick) {
+        shouldSkipFirstTick = false;
         scheduleNext();
         return;
       }

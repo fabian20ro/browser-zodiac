@@ -181,12 +181,11 @@ export function createFooter(ui: UIStrings): HTMLElement {
   const gen = el('p', 'footer__generated', `✧ ${ui.generatedBy} ✧`);
   const disc = el('p', 'footer__disclaimer', ui.footer);
 
-  const badgeLink = document.createElement('a');
+  const badgeLink = el('a', 'footer__badge');
   badgeLink.href = 'https://github.com/fabian20ro/browser-zodiac';
-  badgeLink.className = 'footer__badge';
   badgeLink.target = '_blank';
   badgeLink.rel = 'noopener noreferrer';
-  const badgeImg = document.createElement('img');
+  const badgeImg = el('img') as HTMLImageElement;
   badgeImg.src =
     'https://github.com/fabian20ro/browser-zodiac/actions/workflows/deploy.yml/badge.svg';
   badgeImg.alt = 'Deploy to GitHub Pages';
