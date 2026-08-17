@@ -67,7 +67,9 @@ export function generateHoroscope(
     throw new Error(`Unrecognized zodiac sign key: ${String(sign)}`);
   }
 
-  const contextGrammar = buildContextGrammar(locale.grammar, signName, divination.readings, ZODIAC_SYMBOLS[sign]);
+  const signSymbol = ZODIAC_SYMBOLS[sign];
+
+  const contextGrammar = buildContextGrammar(locale.grammar, signName, divination.readings, signSymbol);
 
   const engine = createGrammarEngine(contextGrammar, rng);
 
@@ -82,7 +84,7 @@ export function generateHoroscope(
 
   return {
     sign,
-    signSymbol: ZODIAC_SYMBOLS[sign],
+    signSymbol,
     text,
     warning,
     mood,
