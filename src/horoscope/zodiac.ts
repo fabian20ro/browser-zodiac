@@ -25,7 +25,7 @@ export const ZODIAC_SIGNS: ZodiacSign[] = [
   'capricorn',
   'aquarius',
   'pisces',
-];
+] as const;
 
 import type { SeededRandom } from '../engine/types.ts';
 
