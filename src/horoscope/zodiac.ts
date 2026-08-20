@@ -75,6 +75,29 @@ export const ZODIAC_BOUNDARIES: SignBoundary[] = [
   { month: 2, day: 19, sign: 'pisces' },
 ];
 
+export interface SignDateRange {
+  startMonth: number;
+  startDay: number;
+  endMonth: number;
+  endDay: number;
+}
+
+/** Returns the date range (inclusive start, exclusive end) for a given zodiac sign. */
+export function getSignDateRange(sign: ZodiacSign): SignDateRange | null {
+  const idx = ZODIAC_BOUNDARIES.findIndex((b) => b.sign === sign);
+  if (idx < 0 || !ZODIAC_BOUNDARIES[idx + 1]) {
+    return null;
+  }
+  const start = ZODIAC_BOUNDARIES[idx];
+  const end = ZODIAC_BOUNDARIES[idx + 1];
+  return {
+    startMonth: start.month,
+    startDay: start.day,
+    endMonth: end.month,
+    endDay: end.day,
+  };
+}
+
 /** Encode a date as a single integer for comparison (year-agnostic) */
 function encodeDate(month: number, day: number): number {
   return month * 100 + day;
