@@ -126,6 +126,11 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#a.uppercase#')).toBe('#a.uppercase#');
     });
 
+    it('does not expand when maxDepth is 0 even for non-recursive rules', () => {
+      const engine = makeEngine({ greeting: ['hello'] }, 42, 0);
+      expect(engine.expand('#greeting#')).toBe('#greeting#');
+    });
+
     it('handles unquote with mixed quotes', () => {
       const engine = makeEngine({ word: ['"hello\''] }, 42);
       expect(engine.expand('#word.unquote#')).toBe('hello');
