@@ -36,7 +36,7 @@ export function scheduleMidnightGmt(callback: () => void, options?: { immediate?
     clearTimeout(activeHandle);
   }
   const loopId = ++activeLoopId;
-  let shouldSkipFirstTick = isLoopRunning || options?.immediate;
+  let shouldSkipFirstTick = !options?.immediate && isLoopRunning;
 
   function scheduleNext(): void {
     const delay = Math.max(msUntilNextMidnightGmt(new Date()), 1);
