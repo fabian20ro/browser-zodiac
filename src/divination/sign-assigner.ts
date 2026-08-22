@@ -20,6 +20,9 @@ function _assignFromHash(hash: number, length: number): ZodiacSign {
 }
 
 export function assignSign(fingerprint: string): ZodiacSign {
+  if (typeof fingerprint !== 'string') {
+    throw new TypeError('assignSign requires a string fingerprint');
+  }
   const normalized = fingerprint.normalize().toLowerCase();
   const hash = hashString(normalized);
   return _assignFromHash(hash, ZODIAC_SIGNS.length);
