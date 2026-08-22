@@ -121,6 +121,18 @@ describe('mulberry32', () => {
     // With 2^53 distinct double values in [0,1), duplicates among 10k are vanishingly rare.
     expect(seen.size).toBe(10_000); // no duplicates expected from a proper PRNG
   });
+
+  it('returns constant zero for degenerate seeds (NaN, ±Infinity)', () => {
+    // JSDoc contract: mulberry32 returns a constant-zero RNG when the seed is NaN or ±Infinity.
+    // This guards against regressions that would remove the !Number.isFinite guard.
+    const nanRng = mulberry32(NaN);
+    const posInfRng = mulberry32(Infinity);
+    const negInfRng = mulberry32(-Infinity);
+    for (const rng of [nanRng, posInfRng, negInfRng]) {
+      expect(rng()).toBe(0);
+      expect(rng()).toBe(0); // constant — must return exactly 0 every call
+    }
+  });
 });
 
 describe('hashString', () => {
