@@ -66,12 +66,7 @@ export function validateLocalePack(pack: LocalePack): { ok: true } | { ok: false
   }
 
   // signNames must map every ZodiacSign key to a non-empty string.
-  const knownSigns = [
-    'aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo',
-    'libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'pisces',
-  ] as const;
-
-  for (const sign of knownSigns) {
+  for (const sign of ZODIAC_SIGNS) {
     if (!(sign in ui.signNames)) {
       errors.push(`UIStrings.signNames missing key "${sign}"`);
     } else if (!ui.signNames[sign] || typeof ui.signNames[sign] !== 'string') {
