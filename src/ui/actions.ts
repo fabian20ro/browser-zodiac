@@ -18,6 +18,12 @@ export function createActionButton(options: ActionButtonOptions): HTMLButtonElem
   let revertTimer: ReturnType<typeof setTimeout> | null = null;
   let isRunning = false;
 
+  function setBusy(busy: boolean): void {
+    btn.disabled = busy;
+    btn.style.pointerEvents = busy ? 'none' : '';
+    btn.style.opacity = busy ? '0.6' : '';
+  }
+
   function resetState(): void {
     if (revertTimer !== null) {
       clearTimeout(revertTimer);
@@ -56,6 +62,7 @@ export function createActionButton(options: ActionButtonOptions): HTMLButtonElem
     if (isRunning) return;
     isRunning = true;
     resetState();
+    setBusy(true);
 
     let result: unknown;
     try {
@@ -64,6 +71,7 @@ export function createActionButton(options: ActionButtonOptions): HTMLButtonElem
       result = err instanceof Error ? err : new Error(String(err));
     } finally {
       isRunning = false;
+      setBusy(false);
     }
     handleResult(result);
   });
