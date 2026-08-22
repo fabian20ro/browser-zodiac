@@ -12,7 +12,7 @@ export interface ModifierEntry {
 export const DEFAULT_MODIFIERS: ModifierEntry[] = [
   { name: 'capitalize',   fn: (s) => s.charAt(0).toUpperCase() + s.slice(1) },
   { name: 'uppercase',    fn: (s) => s.toUpperCase() },
-  { name: 'sentencecase', fn: (s) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() },
+  { name: 'sentencecase', fn: (s) => s.trim().toLowerCase() },
   { name: 'lowercase',    fn: (s) => s.toLowerCase() },
   { name: 'shout',        fn: (s) => `${s.toUpperCase()}!` },
   { name: 'trim',         fn: (s) => s.trim() },

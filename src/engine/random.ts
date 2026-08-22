@@ -21,20 +21,15 @@ export function hashString(str: string): number {
   return hash >>> 0;
 }
 
-/** Normalize a time-part to zero-padded HH:MM. Handles "9" → "09", "14:3" → "14:03".
- * Rejects seconds precision — treats 'HH:MM:SS' as 'HH:MM'. */
-function normalizeTimePart(timePart: string | undefined): string {
-  if (!timePart) return '';
-  const parts = timePart.split(':');
-  const h = Number(parts[0]) || 0;
-  const m = Number(parts[1]) || 0;
-  if (h < 0 || h > 23) return '';
-  if (m < 0 || m > 59) return '';
-  return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-}
-
 export function dailySeed(dateStr: string, salt: string, timePart?: string): number {
-  const normalized = normalizeTimePart(timePart);
-  const withTime = normalized ? dateStr + ':' + normalized : dateStr;
+  let withTime = dateStr;
+  if (timePart) {
+    const parts = timePart.split(':');
+    const h = Number(parts[0]) || 0;
+    const m = Number(parts[1]) || 0;
+    if (!(h < 0 || h > 23) && !(m < 0 || m > 59)) {
+      withTime += ':' + `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+    }
+  }
   return hashString(withTime + ':' + salt);
 }
