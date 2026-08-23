@@ -82,8 +82,6 @@ void __drift_proof; // keep linter happy
 // record (typed as Record<string, InterpretationFn>) gains stale keys or misses new ones.
 import { readingInterpretations } from './interpretations.ts';
 
-const _interpKeys = Object.keys(readingInterpretations) as string[];
-
 for (const k of DIVINATION_READING_KEYS) {
   if (!(k in readingInterpretations)) {
     throw new Error(
@@ -92,7 +90,7 @@ for (const k of DIVINATION_READING_KEYS) {
   }
 }
 
-for (const k of _interpKeys) {
+for (const k of Object.keys(readingInterpretations)) {
   const typedK = k as DivinationReadingKey;
   if (!DIVINATION_READING_KEYS.includes(typedK)) {
     throw new Error(
