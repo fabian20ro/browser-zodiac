@@ -3,6 +3,7 @@ export interface ActionButtonOptions {
   feedbackIcon?: string;
   errorIcon?: string;
   ariaLabel: string;
+  /** Duration in milliseconds before the icon reverts to its default. Must be positive; zero/negative values are ignored (no revert). Defaults to 1500ms when omitted. */
   durationMs?: number;
   onClick: () => void | Promise<boolean>;
 }
