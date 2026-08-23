@@ -130,12 +130,12 @@ function _mergeSections(
     return;
   }
 
-  const seen = new Set<string>();
   for (const [symbol, entries] of Object.entries(entriesBySymbol)) {
     if (!grammar[symbol]) grammar[symbol] = [];
+    const seenForSymbol = new Set<string>(grammar[symbol]);
     for (const entry of entries) {
-      if (!seen.has(entry)) {
-        seen.add(entry);
+      if (!seenForSymbol.has(entry)) {
+        seenForSymbol.add(entry);
         grammar[symbol].push(entry);
       }
     }
