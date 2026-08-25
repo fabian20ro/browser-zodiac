@@ -98,15 +98,16 @@ for (const key of Object.keys(en.ui.divinationLabels as Record<string, unknown>)
   }
 }
 
-// Runtime invariant: every grammar data array must have at least one entry. Catches empty arrays added without corresponding template updates.
+// Runtime invariant: every grammar array (templates and data) must have at least one non-empty string entry. Catches empty arrays added without corresponding template updates.
 // Each value name corresponds 1:1 with its grammar data array (e.g. 'chaos' → en.grammar.chaos).
 const GRAMMAR_PLACEHOLDERS: string[] = ['chaos', 'color', 'comp'];
+const GRAMMAR_TEMPLATES: string[] = ['origin', 'warning', 'luckyColor', 'compatibility'];
 
-for (const placeholder of GRAMMAR_PLACEHOLDERS) {
-  const dataArray = en.grammar[placeholder as keyof typeof en.grammar] as string[] | undefined;
+for (const symbol of [...GRAMMAR_PLACEHOLDERS, ...GRAMMAR_TEMPLATES]) {
+  const dataArray = en.grammar[symbol as keyof typeof en.grammar] as string[] | undefined;
   if (!dataArray || !Array.isArray(dataArray) || dataArray.length === 0) {
     throw new Error(
-      `Locale invariant failed: grammar array '${placeholder}' is missing or empty`,
+      `Locale invariant failed: grammar array '${symbol}' is missing or empty`,
     );
   }
 
@@ -115,7 +116,7 @@ for (const placeholder of GRAMMAR_PLACEHOLDERS) {
     const item = dataArray[i];
     if (!item || typeof item !== 'string' || item.trim().length === 0) {
       throw new Error(
-        `Locale invariant failed: grammar data entry #${i} for '${placeholder}' is empty`,
+        `Locale invariant failed: grammar data entry #${i} for '${symbol}' is empty`,
       );
     }
   }
