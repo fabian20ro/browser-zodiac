@@ -217,6 +217,18 @@ describe('createTopBar', () => {
     expect(languageButton.textContent).toBe('\u{1F1EC}\u{1F1E7}'); // 🇬🇧 (otherLocale is 'en' since it's first non-'xx')
   });
 
+  it('falls back to otherLocale.name when the target locale has no flag entry', () => {
+    const targetless = [
+      { id: 'en', name: 'English', ui: minimalUi, grammar: {} },
+      { id: 'xx', name: 'X-lingo', ui: minimalUi, grammar: {} },
+    ];
+    const bar = createTopBar(targetless, 'en', minimalUi, () => {}, true, () => {});
+    const languageButton = bar.querySelector('.top-bar__btn') as HTMLElement;
+    // otherLocale 'xx' not in LANG_FLAGS → its name renders instead of a flag (arrow separator kept)
+    expect(languageButton.textContent).toBe('\u{1F1EC}\u{1F1E7} → X-lingo'); // 🇬🇧 → X-lingo
+    expect(languageButton.getAttribute('aria-label')).toBe('Switch to X-lingo');
+  });
+
   it('calls onThemeToggle when the theme button is clicked', () => {
     const onThemeToggle = vi.fn();
     const bar = createTopBar(locales, 'en', minimalUi, () => {}, true, onThemeToggle);
