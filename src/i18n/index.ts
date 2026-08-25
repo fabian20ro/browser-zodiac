@@ -52,8 +52,7 @@ export function detectLanguage(): string {
   }
   if (typeof navigator !== 'undefined' && navigator.language) {
     const browserLang = normalizeLocaleId(navigator.language).slice(0, 2);
-    const candidate = registry.has(browserLang) ? browserLang : 'en';
-    if (registry.has(candidate)) return candidate;
+    if (registry.has(browserLang)) return browserLang;
   }
   return 'en';
 }
