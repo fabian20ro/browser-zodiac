@@ -40,7 +40,11 @@ export function validateGrammar(grammar: Grammar): void {
 
 export function createGrammarEngine(grammar: Grammar, rng: SeededRandom, options: { maxDepth?: number } = {}) {
   validateGrammar(grammar);
-  const maxDepth = options.maxDepth ?? MAX_DEPTH;
+  const requested = options.maxDepth;
+  const maxDepth =
+    typeof requested === 'number' && Number.isFinite(requested) && requested >= 0
+      ? requested
+      : MAX_DEPTH;
   const modifiers: Record<string, Modifier> = {};
 
   function pickWeighted(options: string[]): string {
