@@ -71,10 +71,15 @@ export function assignSigns(fingerprints: string[]): ZodiacSign[] {
 
 /**
  * Assigns a random zodiac sign using the seeded PRNG.
- * Each invocation produces a fresh unpredictable result, but within a single call it is deterministic
- * (same code path → same Mulberry32 state). Useful for "random reading" features and testing.
+ * Without a seed, each invocation produces a fresh unpredictable result.
+ * With a numeric seed, the same seed always yields the same sign, making
+ * "random readings" reproducible (e.g. shareable by seed). Useful for
+ * "random reading" features and testing.
  */
-export function assignRandomSign(): ZodiacSign {
-  const rng = mulberry32(Math.floor(Math.random() * 0x80000000));
+export function assignRandomSign(seed?: number): ZodiacSign {
+  if (seed !== undefined && !Number.isFinite(seed)) {
+    throw new TypeError('assignRandomSign requires a finite numeric seed');
+  }
+  const rng = mulberry32(Math.floor(seed ?? Math.random() * 0x80000000));
   return _assignFromHash(rng() * ZODIAC_SIGNS.length | 0, ZODIAC_SIGNS.length);
 }
