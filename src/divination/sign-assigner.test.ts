@@ -528,4 +528,49 @@ describe('sign-assigner', () => {
       }
     });
   });
+
+  describe('assignSign input contract', () => {
+    it('throws a TypeError with a specific message for every non-string fingerprint', () => {
+      for (const bad of [null, undefined, 42, {}, true, ['fp']] as any[]) {
+        expect(() => assignSign(bad)).toThrow(TypeError);
+        try {
+          assignSign(bad);
+        } catch (err) {
+          expect(err).toBeInstanceOf(TypeError);
+          expect((err as TypeError).message).toBe('assignSign requires a string fingerprint');
+        }
+      }
+    });
+  });
+
+  describe('assignRandomSign seed contract', () => {
+    it('throws a TypeError with a specific message for non-finite numeric seeds', () => {
+      for (const bad of [NaN, Infinity, -Infinity]) {
+        expect(() => assignRandomSign(bad)).toThrow(TypeError);
+        try {
+          assignRandomSign(bad);
+        } catch (err) {
+          expect(err).toBeInstanceOf(TypeError);
+          expect((err as TypeError).message).toBe('assignRandomSign requires a finite numeric seed');
+        }
+      }
+    });
+
+    it('is reproducible with a numeric seed — same seed always yields the same sign', () => {
+      for (const seed of [0, 1, 42, 123456789, -7, 0x80000000]) {
+        const s1 = assignRandomSign(seed);
+        const s2 = assignRandomSign(seed);
+        expect(s1).toBe(s2);
+        expect(ZODIAC_SIGNS).toContain(s1);
+      }
+    });
+
+    it('yields varying signs across distinct seeds — no constant fallback', () => {
+      const seen = new Set<string>();
+      for (let i = 0; i < 24; i++) {
+        seen.add(assignRandomSign(i));
+      }
+      expect(seen.size).toBeGreaterThan(3);
+    });
+  });
 });
