@@ -75,3 +75,37 @@ export const ro: LocalePack = {
     comp: ['Excelent', 'Bun', 'Mediu', 'Slab'],
   },
 };
+
+// Runtime invariant: every divination label must be a non-empty string.
+for (const key of Object.keys(ro.ui.divinationLabels as Record<string, unknown>)) {
+  const value = ro.ui.divinationLabels[key as keyof typeof ro.ui.divinationLabels];
+  if (!value || typeof value !== 'string' || value.trim().length === 0) {
+    throw new Error(
+      `Locale invariant failed: divination label '${key}' is not a non-empty string`,
+    );
+  }
+}
+
+// Runtime invariant: every grammar array (templates and data) must have at least one non-empty string entry.
+// Each value name corresponds 1:1 with its grammar data array (e.g. 'chaos' → ro.grammar.chaos).
+const GRAMMAR_PLACEHOLDERS: string[] = ['chaos', 'color', 'comp'];
+const GRAMMAR_TEMPLATES: string[] = ['origin', 'warning', 'luckyColor', 'compatibility'];
+
+for (const symbol of [...GRAMMAR_PLACEHOLDERS, ...GRAMMAR_TEMPLATES]) {
+  const dataArray = ro.grammar[symbol as keyof typeof ro.grammar] as string[] | undefined;
+  if (!dataArray || !Array.isArray(dataArray) || dataArray.length === 0) {
+    throw new Error(
+      `Locale invariant failed: grammar array '${symbol}' is missing or empty`,
+    );
+  }
+
+  // Verify each data entry is non-empty.
+  for (let i = 0; i < dataArray.length; i++) {
+    const item = dataArray[i];
+    if (!item || typeof item !== 'string' || item.trim().length === 0) {
+      throw new Error(
+        `Locale invariant failed: grammar data entry #${i} for '${symbol}' is empty`,
+      );
+    }
+  }
+}
