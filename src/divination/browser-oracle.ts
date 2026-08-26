@@ -13,8 +13,10 @@ function detectBrowser(ua: string): string {
   return 'Unknown';
 }
 
-function detectOS(ua: string): string {
+function detectOS(ua: string, maxTouchPoints: number = 0): string {
   if (ua.includes('iPhone') || ua.includes('iPad') || ua.includes('iPod')) return 'iOS';
+  // iOS 13+ iPad Safari presents a macOS user agent; touch capability is the tell.
+  if (ua.includes('Macintosh') && maxTouchPoints > 1) return 'iOS';
   if (ua.includes('Windows')) return 'Windows';
   if (ua.includes('Mac OS')) return 'macOS';
   if (ua.includes('Android')) return 'Android';
