@@ -30,7 +30,10 @@ export async function loadAllGrammars(): Promise<void> {
 }
 
 export function getLocale(id: string): LocalePack {
-  const normalizedId = normalizeLocaleId(id);
+  // Accept BCP-47 tags such as "ro-RO" / "en-US" and resolve them to the
+  // primary language subtag, mirroring detectLanguage, so regional variants
+  // map to their base locale instead of silently falling back to English.
+  const normalizedId = normalizeLocaleId(id).split('-')[0];
   const base = registry.get(normalizedId) ?? en;
   const grammar = grammars.get(normalizedId) ?? base.grammar;
   return { ...base, grammar };
