@@ -45,7 +45,6 @@ export function createGrammarEngine(grammar: Grammar, rng: SeededRandom, options
     typeof requested === 'number' && Number.isFinite(requested) && requested >= 0
       ? requested
       : MAX_DEPTH;
-  const modifiers: Record<string, Modifier> = {};
 
   function pickWeighted(options: string[]): string {
     const entries: { text: string; weight: number }[] = options.map((opt) => {
@@ -140,7 +139,7 @@ export function createGrammarEngine(grammar: Grammar, rng: SeededRandom, options
     creepify: (s) => `\u{1F480} ${s}`, // 👻 emoji prefix for horror theme
   };
 
-  Object.assign(modifiers, MODIFIERS);
+  const modifiers: Record<string, Modifier> = { ...MODIFIERS };
 
   function addModifier(name: string, fn: Modifier) {
     modifiers[name] = fn;
