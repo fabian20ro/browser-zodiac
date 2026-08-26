@@ -332,6 +332,15 @@ describe('generateHoroscope', () => {
     expect(Number.isInteger(h.luckyNumber)).toBe(true);
   });
 
+  it('prefers the localDateStr argument over the date argument when both are given', () => {
+    const h = generateHoroscope('aries', minimalLocale, minimalDivination, fixedDate, 0, '2026-01-31');
+    expect(h.date).toBe('2026-01-31');
+    const fromString = generateHoroscope('aries', minimalLocale, minimalDivination, fixedDate, 0, '2026-01-31');
+    expect(h).toEqual(fromString);
+    const fromDateOnly = generateHoroscope('aries', minimalLocale, minimalDivination, fixedDate, 0);
+    expect(h.luckyNumber).not.toBe(fromDateOnly.luckyNumber);
+  });
+
   it('passes plain literal text through unchanged when no symbols are referenced', () => {
     const locale: LocalePack = {
       ...minimalLocale,
