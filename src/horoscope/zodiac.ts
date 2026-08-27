@@ -85,11 +85,12 @@ export interface SignDateRange {
 /** Returns the date range (inclusive start, exclusive end) for a given zodiac sign. */
 export function getSignDateRange(sign: ZodiacSign): SignDateRange | null {
   const idx = ZODIAC_BOUNDARIES.findIndex((b) => b.sign === sign);
-  if (idx < 0 || !ZODIAC_BOUNDARIES[idx + 1]) {
+  if (idx < 0) {
     return null;
   }
   const start = ZODIAC_BOUNDARIES[idx];
-  const end = ZODIAC_BOUNDARIES[idx + 1];
+  // Boundaries are circular: the last sign (pisces) wraps to the first (aries).
+  const end = ZODIAC_BOUNDARIES[(idx + 1) % ZODIAC_BOUNDARIES.length];
   return {
     startMonth: start.month,
     startDay: start.day,
