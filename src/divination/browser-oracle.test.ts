@@ -328,6 +328,25 @@ describe('readBrowserOracle', () => {
     expect(osReading?.raw).toBe('iOS');
   });
 
+  it('reports macOS (not iOS) for iPadOS 13+ Safari macOS UA in the public API', () => {
+    // Characterization: readBrowserOracle calls detectOS(ua) without the
+    // navigator.maxTouchPoints tell, so an iPad presenting a macOS user agent
+    // is classified as macOS/desktop by the public oracle today.
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Safari/605.1.15',
+      language: 'en-US',
+      hardwareConcurrency: 4,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 5,
+      connection: { effectiveType: 'wifi' },
+    });
+    const profile = readBrowserOracle();
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+    expect(osReading?.raw).toBe('macOS');
+    expect(profile.fingerprint).toContain('|desktop');
+  });
+
   it('detects Firefox on iOS via FxiOS', () => {
     vi.stubGlobal('navigator', {
       userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/94.0 Mobile/15E148',
