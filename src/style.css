@@ -506,6 +506,16 @@ body::before {
   .horoscope-card::before {
     animation: none;
   }
+
+  .card--visible {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .sign-card__randomize:hover {
+    animation: none;
+  }
 }
 
 @keyframes shimmer {
