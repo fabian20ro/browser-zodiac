@@ -40,6 +40,12 @@ export const ro: LocalePack = {
       aquarius: 'Vărsător',
       pisces: 'Pești',
     },
+    signElement: {
+      fire: 'Foc',
+      earth: 'Pământ',
+      air: 'Aer',
+      water: 'Apă',
+    },
     divinationLabels: {
       spirit_browser: 'Browserul spirit',
       elemental_os: 'Sistemul elemental',
