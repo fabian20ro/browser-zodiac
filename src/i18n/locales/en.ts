@@ -52,6 +52,12 @@ export const en: LocalePack = {
       aquarius: 'Aquarius',
       pisces: 'Pisces',
     },
+    signElement: {
+      fire: 'Fire',
+      earth: 'Earth',
+      air: 'Air',
+      water: 'Water',
+    },
     divinationLabels: {
       spirit_browser: 'Spirit Browser',
       elemental_os: 'Elemental OS',

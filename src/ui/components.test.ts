@@ -39,6 +39,12 @@ const minimalUi: UIStrings = {
     virgo: 'V', libra: 'Li', scorpio: 'Sc', sagittarius: 'Sa',
     capricorn: 'Ca', aquarius: 'Aq', pisces: 'P',
   },
+  signElement: {
+    fire: 'Fire',
+    earth: 'Earth',
+    air: 'Air',
+    water: 'Water',
+  },
   divinationLabels: {},
 };
 

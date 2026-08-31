@@ -27,6 +27,13 @@ const LANG_FLAGS: Record<string, string> = {
   ro: '\u{1F1F7}\u{1F1F4}',
 };
 
+const ELEMENT_ICONS: Record<Horoscope['signElement'], string> = {
+  fire: '\u{1F525}',
+  earth: '\u{1F30D}',
+  air: '\u{1F32C}\uFE0F',
+  water: '\u{1F4A7}',
+};
+
 export function createTopBar(
   locales: LocalePack[],
   currentLangId: string,
@@ -79,11 +86,16 @@ export function createSignCard(
   const nameRow = el('div', 'sign-card__name-row');
   const symbol = el('span', 'sign-card__symbol', `${horoscope.signSymbol}\uFE0E`);
   const name = el('span', 'sign-card__name', ui.signNames[horoscope.sign]);
+  const elementBadge = el(
+    'span',
+    'sign-card__element-badge',
+    `${ELEMENT_ICONS[horoscope.signElement]} ${ui.signElement[horoscope.signElement]}`,
+  );
   const diceBtn = el('button', 'sign-card__randomize', '\u{1F3B2}');
   diceBtn.type = 'button';
   diceBtn.setAttribute('aria-label', ui.randomizeSign);
   diceBtn.addEventListener('click', onRandomize);
-  nameRow.append(symbol, name, diceBtn);
+  nameRow.append(symbol, name, elementBadge, diceBtn);
 
   card.append(label, nameRow);
   return card;

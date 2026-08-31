@@ -4,6 +4,8 @@ import { ZODIAC_SIGNS } from '../horoscope/zodiac.ts';
 import type { DivinationReadingKey } from '../divination/types.ts';
 import { DIVINATION_READING_KEYS } from '../divination/types.ts';
 
+export type AstroElement = 'fire' | 'earth' | 'air' | 'water';
+
 export interface UIStrings {
   title: string;
   subtitle: string;
@@ -27,6 +29,7 @@ export interface UIStrings {
   generatedBy: string;
   footer: string;
   signNames: Record<ZodiacSign, string>;
+  signElement: Record<AstroElement, string>;
   divinationLabels: Record<DivinationReadingKey, string>;
 }
 
