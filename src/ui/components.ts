@@ -173,6 +173,14 @@ export function createDivinationPanel(
   list.classList.add('divination-card__list--collapsed');
   toggle.setAttribute('aria-controls', list.id);
 
+  const copyFingerprintBtn = createActionButton({
+    icon: '\u29C9',
+    feedbackIcon: '\u2713',
+    ariaLabel: 'Copy fingerprint',
+    onClick: () => copyToClipboard(divination.fingerprint),
+  });
+  heading.appendChild(copyFingerprintBtn);
+
   for (const reading of divination.readings) {
     const label = ui.divinationLabels[reading.key] ?? reading.key;
     appendDetailRow(list, label, reading.raw);
