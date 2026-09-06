@@ -281,6 +281,15 @@ describe('createGrammarEngine', () => {
       expect(() => engine.expand('#word.123bad#')).toThrow(/malformed name '123bad'/);
     });
 
+    it('silently ignores unknown well-formed modifiers', () => {
+      // applyModifiers skips names that pass expandOnce's regex validation
+      // but have no registered function: text passes through unchanged and
+      // subsequent modifiers still apply.
+      const engine = makeEngine({ word: ['hello'] });
+      expect(engine.expand('#word.bogus#')).toBe('hello');
+      expect(engine.expand('#word.bogus.uppercase#')).toBe('HELLO');
+    });
+
     it('returns [?symbol] when grammar symbol value is non-array (null)', () => {
       const engine = makeEngine({ word: null as any });
       expect(engine.expand('#word#')).toBe('[?word]');
