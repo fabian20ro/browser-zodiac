@@ -561,4 +561,40 @@ describe('scheduleMidnightGmt resilience', () => {
     cancelA();
     cancelB();
   });
+
+  it('should not suppress the first iteration when a mid-loop replacement uses { immediate: true }', async () => {
+    // Exercises the options.immediate branch (scheduler.ts:39): when a
+    // replacement arrives while isLoopRunning=true, immediate:true leaves
+    // shouldSkipFirstTick=false, so the replacement's first scheduled tick
+    // invokes the callback instead of skipping it. The default (no options)
+    // behavior is the counterpart pinned by "should not leak if called during
+    // an async callback", which asserts the first tick IS suppressed.
+    const asyncCallback = async () => {
+      count++;
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    };
+
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+    const cancel1 = scheduleMidnightGmt(asyncCallback);
+
+    // First tick fires at midnight; callback is mid-await, isLoopRunning=true.
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(count).toBe(1);
+
+    // Replace mid-loop with immediate:true.
+    const cancel2 = scheduleMidnightGmt(asyncCallback, { immediate: true });
+
+    // Flush the original callback's remaining await; its loop is superseded
+    // (loopId mismatch) and must not reschedule.
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(count).toBe(1);
+
+    // Replacement's first tick fires normally because immediate:true
+    // suppressed the would-be skip — the key observable difference from the
+    // default options, where the same scenario keeps count at 1.
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(count).toBe(2);
+
+    cancel2();
+  });
 });
