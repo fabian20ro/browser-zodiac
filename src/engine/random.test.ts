@@ -358,6 +358,19 @@ describe('dailySeed', () => {
     );
   });
 
+  it('single-part timePart (no colon) parses as bare hour with zero minute', () => {
+    // '14'.split(':') → ['14'] — the missing minute part is Number(undefined) → NaN
+    // → 0, so a bare hour string normalizes to the same seed as the explicit '14:00'.
+    expect(dailySeed('2026-07-09', 'aries', '14')).toBe(
+      dailySeed('2026-07-09', 'aries', '14:00'),
+    );
+    // A valid bare hour must still differ from the no-timePart (date-only) seed,
+    // i.e. it is retained as a valid time rather than falling back to date-only.
+    expect(dailySeed('2026-07-09', 'aries', '5')).not.toBe(
+      dailySeed('2026-07-09', 'aries'),
+    );
+  });
+
   it('different semantic times still produce distinct seeds', () => {
     expect(dailySeed('2026-07-09', 'taurus', '14:30')).not.toBe(
       dailySeed('2026-07-09', 'taurus', '08:00')
