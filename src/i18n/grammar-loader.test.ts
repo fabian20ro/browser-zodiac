@@ -330,6 +330,20 @@ unicorn`,
     expect(uniqueUrls).toEqual(fetchCalls);
   });
 
+  it('deduplicates overlapping entries when main and imported files share a symbol', async () => {
+    // _mergeSections runs with deduplicate=true for the main file and for each
+    // imported file: entries already present for a symbol are skipped, so a
+    // shared symbol accumulates each entry once, in first-seen order (main
+    // file first, then imports in queue order).
+    const fetch = mockFetch({
+      'http://test/data/en.txt': `@from extra.txt import *\n\n=== creature ===\nunicorn\nsparkle`,
+      'http://test/data/en/extra.txt': `=== creature ===\nunicorn\ndragon`,
+    });
+
+    const grammar = await loadGrammar('en', 'http://test/data/', fetch);
+    expect(grammar.creature).toEqual(['unicorn', 'sparkle', 'dragon']);
+  });
+
   it('throws on non-200 @from response in strict mode with URL', async () => {
     const fetch = mockFetch({
       'http://test/data/en.txt': `@from bad.txt import *`,
