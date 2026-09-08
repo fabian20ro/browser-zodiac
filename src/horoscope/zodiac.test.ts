@@ -497,6 +497,36 @@ describe('isInRange', () => {
   });
 });
 
+describe('getSignDateRange', () => {
+  it('returns inclusive start and exclusive end for canonical signs', () => {
+    expect(getSignDateRange('aries')).toEqual({ startMonth: 3, startDay: 21, endMonth: 4, endDay: 20 });
+    expect(getSignDateRange('taurus')).toEqual({ startMonth: 4, startDay: 20, endMonth: 5, endDay: 21 });
+    expect(getSignDateRange('leo')).toEqual({ startMonth: 7, startDay: 23, endMonth: 8, endDay: 23 });
+    expect(getSignDateRange('capricorn')).toEqual({ startMonth: 12, startDay: 22, endMonth: 1, endDay: 20 });
+  });
+
+  it('wraps circularly: the end of each sign is the start of the next sign', () => {
+    for (let i = 0; i < ZODIAC_BOUNDARIES.length; i++) {
+      const b = ZODIAC_BOUNDARIES[i];
+      const next = ZODIAC_BOUNDARIES[(i + 1) % ZODIAC_BOUNDARIES.length];
+      const range = getSignDateRange(b.sign);
+      expect(range, `${b.sign} range`).not.toBeNull();
+      expect(range!.startMonth, `${b.sign} start month`).toBe(b.month);
+      expect(range!.startDay, `${b.sign} start day`).toBe(b.day);
+      expect(range!.endMonth, `${b.sign} end month`).toBe(next.month);
+      expect(range!.endDay, `${b.sign} end day`).toBe(next.day);
+    }
+  });
+
+  it('pisces wraps the year boundary to aries', () => {
+    expect(getSignDateRange('pisces')).toEqual({ startMonth: 2, startDay: 19, endMonth: 3, endDay: 21 });
+  });
+
+  it('returns null for a sign with no boundary entry', () => {
+    expect(getSignDateRange('nonexistent' as any)).toBeNull();
+  });
+});
+
 describe('ZodiacSign collection consistency', () => {
   it('every sign has a boundary entry', () => {
     for (const sign of ZODIAC_SIGNS) {
