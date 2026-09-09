@@ -597,4 +597,34 @@ describe('scheduleMidnightGmt resilience', () => {
 
     cancel2();
   });
+
+  it('a stale cancel from a replaced loop clears the replacement pending tick', async () => {
+    // Observable contract (scheduler.ts:67-73): the returned cancel function
+    // clears the shared activeHandle without checking loopId — cancel is not
+    // scoped to the loop that created it. After loop B replaces loop A,
+    // calling A's stale cancel() must also clear B's pending midnight handle,
+    // so B never fires. No existing test exercises this cross-loop effect;
+    // replacement tests only call stale cancels after their final assertion.
+    let aCalls = 0;
+    let bCalls = 0;
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+
+    const cancelA = scheduleMidnightGmt(() => { aCalls++; });
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(aCalls).toBe(1); // A fires at first midnight and reschedules
+
+    // B replaces A: A's pending handle is cleared, B schedules its own next midnight.
+    const cancelB = scheduleMidnightGmt(() => { bCalls++; });
+
+    // Stale cancel from A — production clears B's shared activeHandle.
+    cancelA();
+
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(bCalls).toBe(0); // B's pending tick was cleared; nothing fires
+
+    // Cancelling B afterwards must remain a safe no-op with no late fire.
+    expect(() => cancelB()).not.toThrow();
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(bCalls).toBe(0);
+  });
 });

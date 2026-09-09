@@ -63,6 +63,19 @@ describe('mulberry32', () => {
     }
   });
 
+  it('aliases seeds differing by 2^32 (ToInt32 normalization gives a 2^32-period seed space)', () => {
+    // `let s = seed | 0` (ToInt32) maps seed, seed + 2^32 and seed - 2^32 to the
+    // same 32-bit state, so the three RNGs must emit bit-identical sequences.
+    const base = mulberry32(42);
+    const plusEpoch = mulberry32(42 + 2 ** 32);
+    const minusEpoch = mulberry32(42 - 2 ** 32);
+    for (let i = 0; i < 100; i++) {
+      const v = base();
+      expect(plusEpoch()).toBe(v);
+      expect(minusEpoch()).toBe(v);
+    }
+  });
+
   it('negative seeds are deterministic', () => {
     const rng1 = mulberry32(-42);
     const rng2 = mulberry32(-42);

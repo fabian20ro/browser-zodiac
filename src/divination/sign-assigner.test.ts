@@ -589,5 +589,14 @@ describe('sign-assigner', () => {
       }
       expect(seen.size).toBeGreaterThan(3);
     });
+
+    it('floors a fractional numeric seed — same sign as its floor (Math.floor, not truncation)', () => {
+      // Production seeds the PRNG with Math.floor(seed): fractional and
+      // negative-fractional seeds must hash identically to their floor.
+      expect(assignRandomSign(1.9)).toBe(assignRandomSign(1));
+      expect(assignRandomSign(1234567.42)).toBe(assignRandomSign(1234567));
+      expect(assignRandomSign(-7.9)).toBe(assignRandomSign(-8));
+      expect(ZODIAC_SIGNS).toContain(assignRandomSign(1.9));
+    });
   });
 });
