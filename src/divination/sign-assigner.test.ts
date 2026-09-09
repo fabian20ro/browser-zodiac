@@ -541,6 +541,23 @@ describe('sign-assigner', () => {
         }
       }
     });
+
+    it('assignSignWithSymbol and assignSignWithElement propagate the string-fingerprint TypeError', () => {
+      for (const bad of [null, undefined, 42] as any[]) {
+        expect(() => assignSignWithSymbol(bad)).toThrow(TypeError);
+        expect(() => assignSignWithElement(bad)).toThrow(TypeError);
+        try {
+          assignSignWithSymbol(bad);
+        } catch (err) {
+          expect((err as TypeError).message).toBe('assignSign requires a string fingerprint');
+        }
+        try {
+          assignSignWithElement(bad);
+        } catch (err) {
+          expect((err as TypeError).message).toBe('assignSign requires a string fingerprint');
+        }
+      }
+    });
   });
 
   describe('assignRandomSign seed contract', () => {
