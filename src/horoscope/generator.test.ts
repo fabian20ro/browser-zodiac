@@ -223,6 +223,19 @@ describe('generateHoroscope', () => {
     },
   );
 
+  it('assigns the standard tropical element to every sign', () => {
+    const expectedElement: Record<string, 'fire' | 'earth' | 'air' | 'water'> = {
+      aries: 'fire', leo: 'fire', sagittarius: 'fire',
+      taurus: 'earth', virgo: 'earth', capricorn: 'earth',
+      gemini: 'air', libra: 'air', aquarius: 'air',
+      cancer: 'water', scorpio: 'water', pisces: 'water',
+    };
+    for (const sign of Object.keys(ZODIAC_SYMBOLS) as ZodiacSign[]) {
+      const h = generateHoroscope(sign, minimalLocale, minimalDivination, fixedDate);
+      expect(h.signElement).toBe(expectedElement[sign]);
+    }
+  });
+
   it('uses only the date portion (day-level) when deriving seeds', () => {
     const hDay = generateHoroscope('aries', minimalLocale, minimalDivination, fixedDate);
     const hMidnight = generateHoroscope('aries', minimalLocale, minimalDivination, new Date('2026-03-03T00:00:00Z'));
