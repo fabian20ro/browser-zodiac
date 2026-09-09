@@ -131,6 +131,23 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#greeting#')).toBe('#greeting#');
     });
 
+    it('applies the default maxDepth of 10 when the option is missing or invalid', () => {
+      // Chain s11 → s10 → … → s0 ('plain'): needs 11 expansion levels.
+      const grammar: Record<string, string[]> = {};
+      for (let n = 11; n >= 1; n--) grammar[`s${n}`] = [`#s${n - 1}#`];
+      grammar.s0 = ['plain'];
+
+      // Explicit maxDepth 10 pins the boundary: depth 10 stops before s1 expands.
+      expect(makeEngine(grammar, 42, 10).expand('#s11#')).toBe('#s1#');
+      // Omitted option defaults to the same MAX_DEPTH.
+      expect(makeEngine(grammar).expand('#s11#')).toBe('#s1#');
+      // Negative / non-finite options also fall back to MAX_DEPTH.
+      expect(makeEngine(grammar, 42, -1).expand('#s11#')).toBe('#s1#');
+      expect(makeEngine(grammar, 42, Number.NaN).expand('#s1#'.replace('s1', 's11'))).toBe('#s1#');
+      // 11 expands one level further — proves the default is exactly 10, not 11.
+      expect(makeEngine(grammar, 42, 11).expand('#s11#')).toBe('#s0#');
+    });
+
     it('handles unquote with mixed quotes', () => {
       const engine = makeEngine({ word: ['"hello\''] }, 42);
       expect(engine.expand('#word.unquote#')).toBe('hello');
