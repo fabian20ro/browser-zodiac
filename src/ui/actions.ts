@@ -1,7 +1,11 @@
 export interface ActionButtonOptions {
   icon: string;
   feedbackIcon?: string;
+  /** Optional text label shown on success instead of feedbackIcon, e.g. 'Copied!'. Omit to keep icon-only feedback. */
+  feedbackText?: string;
   errorIcon?: string;
+  /** Optional text label shown on failure instead of errorIcon. Omit to keep icon-only feedback. */
+  errorText?: string;
   ariaLabel: string;
   /** Duration in milliseconds before the icon reverts to its default. Must be positive; zero/negative values are ignored (no revert). Defaults to 1500ms when omitted. */
   durationMs?: number;
@@ -53,9 +57,12 @@ export function createActionButton(options: ActionButtonOptions): HTMLButtonElem
   function handleResult(result: unknown): void {
     const isFailure = result instanceof Error || (typeof result === 'boolean' && !result);
     if (isFailure) {
-      showIcon(options.errorIcon ?? options.icon, false);
-    } else if (options.feedbackIcon) {
-      showIcon(options.feedbackIcon, true);
+      showIcon(options.errorText ?? options.errorIcon ?? options.icon, false);
+    } else {
+      const successText = options.feedbackText ?? options.feedbackIcon;
+      if (successText) {
+        showIcon(successText, true);
+      }
     }
   }
 
