@@ -384,6 +384,28 @@ describe('scheduleMidnightGmt', () => {
     expect(callback).toHaveBeenCalledTimes(2);
   });
 
+  it('{ immediate: true } on an idle scheduler waits for midnight and fires exactly once', async () => {
+    // Observable contract (scheduler.ts:39): when no loop is running,
+    // options.immediate only influences shouldSkipFirstTick, which is false
+    // regardless of the option — passing { immediate: true } must NOT invoke
+    // the callback synchronously at schedule time, and the first scheduled
+    // tick must fire exactly once (no early tick, no double-fire). The
+    // mid-loop { immediate: true } case is covered by the resilience tests;
+    // this pins the idle-scheduler input combination.
+    const callback = vi.fn();
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+    const cancel = scheduleMidnightGmt(callback, { immediate: true });
+
+    // No synchronous invocation — scheduling alone must not run the callback.
+    expect(callback).not.toHaveBeenCalled();
+
+    // First scheduled midnight: exactly one invocation (no extra early tick).
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(callback).toHaveBeenCalledTimes(1);
+
+    cancel();
+  });
+
   it('fires after ~24h when scheduled exactly at midnight', async () => {
     const callback = vi.fn();
     // At exact midnight, getNextMidnightGmt returns next-day midnight (86400000ms away).
