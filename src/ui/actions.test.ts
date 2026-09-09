@@ -630,4 +630,92 @@ describe('createActionButton', () => {
     expect(btn.textContent).toBe('⧉');
     vi.useRealTimers();
   });
+
+  it('shows feedbackText in textContent on success when provided', async () => {
+    vi.useFakeTimers();
+    const btn = createActionButton({
+      icon: '⧉',
+      feedbackText: 'Copied!',
+      ariaLabel: 'Copy',
+      onClick: () => {},
+    });
+
+    btn.click();
+    await Promise.resolve();
+    expect(btn.textContent).toBe('Copied!');
+    expect(btn.classList.contains('action-btn--feedback')).toBe(true);
+    vi.useRealTimers();
+  });
+
+  it('reverts feedbackText to the default icon after durationMs', async () => {
+    vi.useFakeTimers();
+    const btn = createActionButton({
+      icon: '⧉',
+      feedbackText: 'Copied!',
+      ariaLabel: 'Copy',
+      onClick: () => {},
+    });
+
+    btn.click();
+    await Promise.resolve();
+    expect(btn.textContent).toBe('Copied!');
+
+    vi.advanceTimersByTime(1499);
+    expect(btn.textContent).toBe('Copied!');
+
+    vi.advanceTimersByTime(1);
+    expect(btn.textContent).toBe('⧉');
+    expect(btn.classList.contains('action-btn--feedback')).toBe(false);
+    vi.useRealTimers();
+  });
+
+  it('shows errorText in textContent on failure when provided', async () => {
+    vi.useFakeTimers();
+    const btn = createActionButton({
+      icon: '⧉',
+      feedbackText: 'Copied!',
+      errorText: 'Failed!',
+      ariaLabel: 'Copy',
+      onClick: () => Promise.reject(new Error('boom')),
+    });
+
+    btn.click();
+    await Promise.resolve();
+    expect(btn.textContent).toBe('Failed!');
+    expect(btn.classList.contains('action-btn--feedback')).toBe(false);
+
+    vi.advanceTimersByTime(1500);
+    expect(btn.textContent).toBe('⧉');
+    vi.useRealTimers();
+  });
+
+  it('keeps icon-only textContent transitions when feedbackText and errorText are omitted', async () => {
+    vi.useFakeTimers();
+    let attempt = 0;
+    const onClick = vi.fn(async (): Promise<boolean> => {
+      attempt += 1;
+      if (attempt === 1) return true;
+      throw new Error('boom');
+    });
+    const btn = createActionButton({
+      icon: '⧉',
+      feedbackIcon: '✓',
+      errorIcon: '✕',
+      ariaLabel: 'Copy',
+      onClick,
+    });
+
+    btn.click();
+    await Promise.resolve();
+    expect(btn.textContent).toBe('✓');
+    vi.advanceTimersByTime(1500);
+    expect(btn.textContent).toBe('⧉');
+
+    btn.click();
+    await Promise.resolve();
+    expect(btn.textContent).toBe('✕');
+    vi.advanceTimersByTime(1500);
+    expect(btn.textContent).toBe('⧉');
+    vi.useRealTimers();
+  });
 });
