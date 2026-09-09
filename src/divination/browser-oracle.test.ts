@@ -1601,6 +1601,25 @@ describe('readBrowserOracle', () => {
     expect(fingerprintParts[4]).toBe('America/New_York');
   });
 
+  it('falls back to Void timezone when Intl resolvedOptions has no timeZone', () => {
+    // readBrowserOracle: `Intl.DateTimeFormat().resolvedOptions().timeZone || 'Void'`
+    // — when the environment exposes no resolvable timezone, the oracle must
+    // record the 'Void' sentinel rather than 'undefined' in reading and fingerprint.
+    vi.stubGlobal('Intl', {
+      DateTimeFormat: vi.fn().mockImplementation(() => ({
+        resolvedOptions: () => ({}),
+      })),
+    });
+    const profile = readBrowserOracle();
+    const tzReading = profile.readings.find(r => r.key === 'cosmic_timezone');
+    expect(tzReading?.raw).toBe('Void');
+    expect(tzReading?.interpretation).toBeTruthy();
+
+    // Fingerprint field [4] carries the same sentinel
+    const fingerprintParts = profile.fingerprint.split('|');
+    expect(fingerprintParts[4]).toBe('Void');
+  });
+
   it('classifies hour 5 as deep_night (boundary <6)', () => {
     vi.stubGlobal('navigator', {
       userAgent: 'Mozilla/5.0',
