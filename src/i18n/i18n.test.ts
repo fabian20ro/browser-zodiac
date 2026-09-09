@@ -115,6 +115,13 @@ describe('getLocale', () => {
     expect(Object.keys(unknown.grammar as Record<string, unknown>).length).toBeGreaterThan(0);
   });
 
+  it('resolves BCP-47 regional tags to their base locale', () => {
+    // "ro-RO" must map to the Romanian pack, not silently fall back to English.
+    const locale = getLocale('ro-RO');
+    expect(locale.id).toBe('ro');
+    expect(locale.name).toBe('Română');
+  });
+
   it('getLocale does not mutate the source locale pack', () => {
     const before = getAvailableLocales().find((l) => l.id === 'en');
     // Snapshot structural state

@@ -338,6 +338,32 @@ describe('createActionButton', () => {
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
+  it('disables the button while onClick is pending and re-enables after it settles', async () => {
+    vi.useFakeTimers();
+    let resolveFirst!: (value: boolean) => void;
+    const pending = new Promise<boolean>(resolve => { resolveFirst = resolve; });
+
+    const btn = createActionButton({
+      icon: '⧉',
+      feedbackIcon: '✓',
+      ariaLabel: 'Copy',
+      onClick: () => pending,
+    });
+
+    btn.click();
+    await Promise.resolve();
+    expect(btn.disabled).toBe(true);
+    expect(btn.style.pointerEvents).toBe('none');
+    expect(btn.style.opacity).toBe('0.6');
+
+    resolveFirst!(true);
+    await Promise.resolve();
+    expect(btn.disabled).toBe(false);
+    expect(btn.style.pointerEvents).toBe('');
+    expect(btn.style.opacity).toBe('');
+    vi.useRealTimers();
+  });
+
   it('shows feedback icon when async result is undefined and feedbackIcon is set', async () => {
     vi.useFakeTimers();
     const btn = createActionButton({
