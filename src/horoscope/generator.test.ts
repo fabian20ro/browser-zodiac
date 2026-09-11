@@ -208,7 +208,7 @@ describe('generateHoroscope', () => {
     (sign) => {
       const h = generateHoroscope(sign, minimalLocale, minimalDivination, fixedDate);
       expect(h.sign).toBe(sign);
-      expect(h.signSymbol).toBeDefined();
+      expect(h.signSymbol).toBe(ZODIAC_SYMBOLS[sign]);
       expect(typeof h.text).toBe('string');
       expect(h.text.length).toBeGreaterThan(0);
       expect(typeof h.warning).toBe('string');
