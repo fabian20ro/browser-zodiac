@@ -34,6 +34,16 @@ describe('getNextMidnightGmt', () => {
     expect(getNextMidnightGmt(now)).toEqual(expected);
   });
 
+  it('returns next-day midnight when input is the leap day itself', () => {
+    // Distinct from the Feb 28 → Feb 29 case above: the input here IS the leap
+    // day. In a leap year Feb 29 exists, so +1 day must roll over to Mar 1 —
+    // never a non-existent Feb 30. Pins the setUTCDate(+1) rollover off the
+    // last day of a short month in a leap year.
+    const now = new Date('2024-02-29T12:00:00.000Z');
+    const expected = new Date('2024-03-01T00:00:00.000Z');
+    expect(getNextMidnightGmt(now)).toEqual(expected);
+  });
+
   it('returns a fresh Date (does not mutate input)', () => {
     const now = new Date('2026-01-01T12:00:00.000Z');
     const original = now.getTime();

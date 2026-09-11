@@ -330,6 +330,38 @@ unicorn`,
     expect(uniqueUrls).toEqual(fetchCalls);
   });
 
+  it('fetches each imported file once when @from directives repeat', async () => {
+    // visitedUrls must skip already-fetched import URLs: a.txt is listed twice
+    // in the main file and again inside b.txt, yet fetched exactly once; the
+    // queue keeps first-seen order (a before b) and merged entries stay
+    // single.
+    const fetchCalls: string[] = [];
+    const files: Record<string, string> = {
+      'http://test/data/en.txt': `@from a.txt import *\n@from a.txt import *\n@from b.txt import *`,
+      'http://test/data/en/a.txt': `=== creature ===\nunicorn`,
+      'http://test/data/en/b.txt': `=== food ===\ntoast\n@from a.txt import *`,
+    };
+    const fetch = vi.fn(async (url: string) => {
+      fetchCalls.push(url);
+      if (files[url]) {
+        return Promise.resolve({
+          ok: true,
+          text: () => Promise.resolve(files[url]),
+        } as Response);
+      }
+      return Promise.resolve({ ok: false, status: 404 } as Response);
+    }) as FetchFn;
+
+    const grammar = await loadGrammar('en', 'http://test/data/', fetch);
+    expect(fetchCalls).toEqual([
+      'http://test/data/en.txt',
+      'http://test/data/en/a.txt',
+      'http://test/data/en/b.txt',
+    ]);
+    expect(grammar.creature).toEqual(['unicorn']);
+    expect(grammar.food).toEqual(['toast']);
+  });
+
   it('deduplicates overlapping entries when main and imported files share a symbol', async () => {
     // _mergeSections runs with deduplicate=true for the main file and for each
     // imported file: entries already present for a symbol are skipped, so a

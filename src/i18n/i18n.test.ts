@@ -343,6 +343,18 @@ describe('persistLanguage', () => {
     expect(window.localStorage.getItem('horror-scope-lang')).toBeNull();
   });
 
+  it('rejects BCP-47 regional tags and preserves the previously stored language', () => {
+    // persistLanguage validates against registry ids (primary subtags only),
+    // unlike getLocale which resolves regional tags. A rejected regional tag
+    // must not write, overwrite, or disturb the stored language.
+    persistLanguage('en');
+
+    persistLanguage('ro-RO');
+
+    expect(window.localStorage.getItem('horror-scope-lang')).toBe('en');
+    expect(detectLanguage()).toBe('en');
+  });
+
   it('overwrites previously stored language with new value', () => {
     persistLanguage('ro');
     expect(window.localStorage.getItem('horror-scope-lang')).toBe('ro');

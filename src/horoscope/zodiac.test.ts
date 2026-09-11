@@ -126,6 +126,18 @@ describe('randomSign extreme-seed boundary', () => {
     }
   });
 
+  it('rng=0 selects the exact first candidate sign for every current sign', () => {
+    // rng()=0 → index 0 of "all signs except current": aries→taurus, everything else→aries
+    const expectedFirst: Record<ZodiacSign, ZodiacSign> = {
+      aries: 'taurus', taurus: 'aries', gemini: 'aries', cancer: 'aries',
+      leo: 'aries', virgo: 'aries', libra: 'aries', scorpio: 'aries',
+      sagittarius: 'aries', capricorn: 'aries', aquarius: 'aries', pisces: 'aries',
+    };
+    for (const sign of ZODIAC_SIGNS) {
+      expect(randomSign(sign, () => 0), `${sign} with rng=0`).toBe(expectedFirst[sign]);
+    }
+  });
+
   it('rng returning near-1 picks the last other sign (index 10)', () => {
     const rng = () => 0.999999;
     for (const current of ZODIAC_SIGNS) {
