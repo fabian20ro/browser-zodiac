@@ -261,6 +261,23 @@ describe('readBrowserOracle', () => {
     expect(luckReading?.raw).toBe('ominous');
   });
 
+  it('returns harmonious cosmic_resonance and auspicious cosmic_luck when online', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const resonanceReading = profile.readings.find(r => r.key === 'cosmic_resonance');
+    const luckReading = profile.readings.find(r => r.key === 'cosmic_luck');
+    expect(resonanceReading?.raw).toBe('harmonious');
+    expect(luckReading?.raw).toBe('auspicious');
+  });
+
   it('includes cosmic_focus in readings', () => {
     const profile = readBrowserOracle();
     const focusReading = profile.readings.find(r => r.key === 'cosmic_focus');
