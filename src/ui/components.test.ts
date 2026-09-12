@@ -62,6 +62,7 @@ const minimalHoroscope: Horoscope = {
   warning: 'Beware of pigeons.',
   compatibility: 'Leo',
   date: '2026-03-03',
+  signElement: 'fire',
 };
 
 describe('createRegenerateButton', () => {
@@ -123,6 +124,18 @@ describe('createSignCard', () => {
     expect(nameRow).not.toBeNull();
     const name = nameRow!.querySelector('.sign-card__name');
     expect(name!.textContent).toBe('A');
+  });
+
+  it('displays the sign symbol with variation selector and the element badge', () => {
+    const card = createSignCard(minimalHoroscope, minimalUi, () => {});
+
+    const symbol = card.querySelector('.sign-card__symbol') as HTMLElement;
+    expect(symbol).not.toBeNull();
+    expect(symbol.textContent).toBe('♈\uFE0E');
+
+    const badge = card.querySelector('.sign-card__element-badge') as HTMLElement;
+    expect(badge).not.toBeNull();
+    expect(badge.textContent).toBe('\u{1F525} Fire');
   });
 });
 

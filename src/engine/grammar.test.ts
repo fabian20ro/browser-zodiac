@@ -43,6 +43,13 @@ describe('createGrammarEngine', () => {
       expect(results.has('d')).toBe(true);
     });
 
+    it('splits weight at the last ~~ and preserves embedded separators in text', () => {
+      const engine = makeEngine({ item: ['ab~~cd~~5', 'plain~~0'] });
+      for (let i = 0; i < 50; i++) {
+        expect(engine.expand('#item#')).toBe('ab~~cd');
+      }
+    });
+
     it('returns the first item if total weight is zero', () => {
       const engine = makeEngine({ item: ['a~~0', 'b~~0'] });
       expect(engine.expand('#item#')).toBe('a');

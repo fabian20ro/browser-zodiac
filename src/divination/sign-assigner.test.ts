@@ -573,6 +573,21 @@ describe('sign-assigner', () => {
       }
     });
 
+    it('throws the same TypeError for non-numeric seed types — guard is type-level, not just finite-numeric', () => {
+      // Number.isFinite returns false for non-number types (string, boolean, object, array),
+      // so a seeded caller passing a string/boolean/object seed must fail loudly with the
+      // exact same message, not silently fall through to the unseeded PRNG path.
+      for (const bad of ['42', '1.5', true, {}, ['42']] as any[]) {
+        expect(() => assignRandomSign(bad)).toThrow(TypeError);
+        try {
+          assignRandomSign(bad);
+        } catch (err) {
+          expect(err).toBeInstanceOf(TypeError);
+          expect((err as TypeError).message).toBe('assignRandomSign requires a finite numeric seed');
+        }
+      }
+    });
+
     it('is reproducible with a numeric seed — same seed always yields the same sign', () => {
       for (const seed of [0, 1, 42, 123456789, -7, 0x80000000]) {
         const s1 = assignRandomSign(seed);
