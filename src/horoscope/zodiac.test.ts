@@ -262,6 +262,15 @@ describe('getSignByDate', () => {
     expect(getSignByDate(NaN, 15)).toBeNull();
   });
 
+  it('returns null for negative integer month and day (range rejection, not integer rejection)', () => {
+    // Negative values pass Number.isInteger, so rejection comes from the
+    // month < 1 / day < 1 range checks, a branch no other test exercises.
+    expect(getSignByDate(-1, 15)).toBeNull();
+    expect(getSignByDate(-5, 31)).toBeNull();
+    expect(getSignByDate(6, -1)).toBeNull();
+    expect(getSignByDate(2, -15)).toBeNull();
+  });
+
   it('covers all 12 signs across a full year', () => {
     const signSet = new Set<string>();
 
