@@ -109,6 +109,22 @@ describe('readBrowserOracle', () => {
     expect(profile.fingerprint).toContain('|desktop');
   });
 
+  it('detects iPad Safari (Macintosh UA with touch) as iOS mobile', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Safari/605.1.15',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 5,
+      connection: { effectiveType: '4g' },
+    });
+    const profile = readBrowserOracle();
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+    expect(osReading?.raw).toBe('iOS');
+    expect(profile.fingerprint.endsWith('|mobile')).toBe(true);
+  });
+
   it('detects Android as mobile', () => {
     vi.stubGlobal('navigator', {
       userAgent: 'Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 Chrome Mobile Safari/537.36',
@@ -363,10 +379,9 @@ describe('readBrowserOracle', () => {
     expect(osReading?.raw).toBe('iOS');
   });
 
-  it('reports macOS (not iOS) for iPadOS 13+ Safari macOS UA in the public API', () => {
-    // Characterization: readBrowserOracle calls detectOS(ua) without the
-    // navigator.maxTouchPoints tell, so an iPad presenting a macOS user agent
-    // is classified as macOS/desktop by the public oracle today.
+  it('reports iOS (not macOS) for iPadOS 13+ Safari macOS UA in the public API', () => {
+    // iPad presenting a macOS user agent: navigator.maxTouchPoints is the tell,
+    // so the public oracle classifies it as iOS/mobile.
     vi.stubGlobal('navigator', {
       userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Safari/605.1.15',
       language: 'en-US',
@@ -378,8 +393,8 @@ describe('readBrowserOracle', () => {
     });
     const profile = readBrowserOracle();
     const osReading = profile.readings.find(r => r.key === 'elemental_os');
-    expect(osReading?.raw).toBe('macOS');
-    expect(profile.fingerprint).toContain('|desktop');
+    expect(osReading?.raw).toBe('iOS');
+    expect(profile.fingerprint).toContain('|mobile');
   });
 
   it('detects Firefox on iOS via FxiOS', () => {
