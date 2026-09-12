@@ -68,6 +68,19 @@ describe('getNextMidnightGmt', () => {
     expect(result.getUTCMinutes()).toBe(0);
   });
 
+  it('returns a strictly-future midnight within 24h when called with no argument', () => {
+    // The no-argument tests above only assert zeroed hour/minute fields — a
+    // regression returning today's midnight would pass them. Pins the +1 day
+    // semantic (scheduler.ts:10) at the instant level for the default
+    // `new Date()` path: the result must be the NEXT midnight strictly after
+    // the call instant, never more than a full day ahead.
+    const before = Date.now();
+    const result = getNextMidnightGmt();
+    const after = Date.now();
+    expect(result.getTime()).toBeGreaterThan(before);
+    expect(result.getTime()).toBeLessThanOrEqual(after + 86400000);
+  });
+
   it('returns a Date with zero minutes, seconds, and milliseconds', () => {
     // Observable contract: the next GMT midnight must be an exact boundary — no
     // sub-hour drift from implementation changes (e.g. using setUTCHours vs
