@@ -627,4 +627,47 @@ describe('scheduleMidnightGmt resilience', () => {
     await vi.advanceTimersByTimeAsync(86400000);
     expect(bCalls).toBe(0);
   });
+
+  it('cancel() during an in-flight async callback leaves the loop to reschedule after completion', async () => {
+    // Observable contract (scheduler.ts:67-73 vs :57-62, :38): the cancel
+    // function clears activeHandle and isLoopRunning but does NOT bump
+    // activeLoopId, whereas a replacement scheduleMidnightGmt call does. So
+    // when cancel() is invoked while the loop's own async callback is still
+    // awaiting — with no replacement in between — the in-flight finally still
+    // sees loopId === activeLoopId and reschedules: the loop resumes at the
+    // next midnight. No existing test covers this direct-cancel-mid-await
+    // input: "cancel() from within its own async callback" pins the
+    // replacement variant (loopId bumped, nothing fires), and "safe to cancel
+    // after the callback has already fired" pins the completed variant.
+    let resolveTask!: () => void;
+    const task = new Promise<void>(r => { resolveTask = r; });
+    const inFlightCallback = async () => {
+      count++;
+      await task;
+    };
+
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+    const cancel = scheduleMidnightGmt(inFlightCallback);
+
+    // First tick fires at midnight; the callback is mid-await.
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(count).toBe(1);
+
+    // Direct cancel while the callback is still awaiting — no replacement.
+    cancel();
+
+    // Resolve the in-flight callback — its finally reschedules because
+    // loopId === activeLoopId (cancel did not bump activeLoopId).
+    resolveTask();
+    await vi.advanceTimersByTimeAsync(1);
+
+    // The loop resumes: second invocation at the next midnight.
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(count).toBe(2);
+
+    // A second cancel (now between ticks) stops the loop for good.
+    cancel();
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(count).toBe(2);
+  });
 });
