@@ -371,6 +371,18 @@ describe('dailySeed', () => {
     );
   });
 
+  it('pins the exact seed composition: hashString(dateStr + [:"HH:MM"] + ":" + salt)', () => {
+    // All other dailySeed tests use relative equal/unequal assertions, which would
+    // still pass if the composition changed (separator, argument order, or
+    // normalization) — silently re-seeding every user's horoscope. These pin the
+    // exact hashed string per random.ts:24-35 so any composition regression fails.
+    expect(dailySeed('2026-03-03', 'aries')).toBe(hashString('2026-03-03:aries'));
+    // timePart is zero-padded to HH:MM and inserted between date and salt
+    expect(dailySeed('2026-03-03', 'aries', '9:15')).toBe(
+      hashString('2026-03-03:09:15:aries'),
+    );
+  });
+
   it('single-part timePart (no colon) parses as bare hour with zero minute', () => {
     // '14'.split(':') → ['14'] — the missing minute part is Number(undefined) → NaN
     // → 0, so a bare hour string normalizes to the same seed as the explicit '14:00'.
