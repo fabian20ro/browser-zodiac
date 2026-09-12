@@ -311,6 +311,27 @@ describe('generateHoroscope', () => {
     expect(h.text).toBe('THE STARS CONSPIRE IN SILENCE');
   });
 
+  it('divination readings override the injected signName/signSymbol grammar symbols, not the output fields', () => {
+    const locale: LocalePack = {
+      ...minimalLocale,
+      grammar: {
+        ...minimalLocale.grammar,
+        origin: ['#signName# says #signSymbol#'],
+      },
+    };
+    const divinationWithSymbolCollision: DivinationProfile = {
+      readings: [
+        { key: 'signName' as any, raw: 'THE HOLLOW ONE', interpretation: '' },
+        { key: 'signSymbol' as any, raw: '☠', interpretation: '' },
+      ],
+      fingerprint: 'symbol-collision-fp',
+    };
+    const h = generateHoroscope('aries', locale, divinationWithSymbolCollision, fixedDate);
+    expect(h.text).toBe('THE HOLLOW ONE says ☠');
+    // The horoscope field still comes from ZODIAC_SYMBOLS, not the grammar override.
+    expect(h.signSymbol).toBe(ZODIAC_SYMBOLS.aries);
+  });
+
   it('throws on unrecognized zodiac sign key in every locale that lacks the symbol', () => {
     const emptySignsLocale: LocalePack = { ...minimalLocale, ui: { ...minimalLocale.ui, signNames: {} } };
     expect(() => generateHoroscope('bogus' as ZodiacSign, emptySignsLocale, minimalDivination, fixedDate)).toThrow(
