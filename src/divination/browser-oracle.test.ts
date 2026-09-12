@@ -214,6 +214,24 @@ describe('readBrowserOracle', () => {
     expect(latencyReading?.raw).toBe('unknown');
   });
 
+  it('reports rtt 0 as "0" cosmic_latency rather than falling back to unknown', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: {
+        effectiveType: 'wifi',
+        rtt: 0,
+      },
+    });
+    const profile = readBrowserOracle();
+    const latencyReading = profile.readings.find(r => r.key === 'cosmic_latency');
+    expect(latencyReading?.raw).toBe('0');
+  });
+
   it('returns correct connectivity status for offline mode', () => {
     vi.stubGlobal('navigator', {
       userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36',
