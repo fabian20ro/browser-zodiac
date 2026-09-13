@@ -628,6 +628,49 @@ describe('scheduleMidnightGmt resilience', () => {
     expect(bCalls).toBe(0);
   });
 
+  it('an explicit { immediate: false } mid-loop replacement skips the first iteration, matching the default', async () => {
+    // Exercises the options.immediate branch (scheduler.ts:39) with an
+    // explicit false. Existing tests pin the same mid-loop replacement with
+    // no options (the default) and with { immediate: true }; the
+    // explicit-false input is only covered implicitly. Observable
+    // contract: while isLoopRunning=true, immediate:false leaves
+    // shouldSkipFirstTick=true, so the replacement's first scheduled tick
+    // is suppressed — behavior identical to the no-options case, and
+    // distinct from { immediate: true }, whose counterpart test above
+    // asserts the first tick fires.
+    const asyncCallback = async () => {
+      count++;
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    };
+
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+    const cancel1 = scheduleMidnightGmt(asyncCallback);
+
+    // First tick fires at midnight; callback is mid-await, isLoopRunning=true.
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(count).toBe(1);
+
+    // Replace mid-loop with an explicit immediate:false.
+    const cancel2 = scheduleMidnightGmt(asyncCallback, { immediate: false });
+
+    // Flush the original callback's remaining await; its loop is superseded
+    // (loopId mismatch) and must not reschedule.
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(count).toBe(1);
+
+    // Replacement's first tick is suppressed because explicit immediate:false
+    // keeps shouldSkipFirstTick=true — same observable outcome as the
+    // default-options replacement.
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(count).toBe(1);
+
+    // Next midnight the replacement fires normally.
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(count).toBe(2);
+
+    cancel2();
+  });
+
   it('cancel() during an in-flight async callback leaves the loop to reschedule after completion', async () => {
     // Observable contract (scheduler.ts:67-73 vs :57-62, :38): the cancel
     // function clears activeHandle and isLoopRunning but does NOT bump
