@@ -172,6 +172,25 @@ describe('createHoroscopeCard', () => {
     expect(text?.textContent).toBe('You will find a mysterious sock.');
   });
 
+  it('opens the Google AI URL with noopener when the interpret button is clicked', async () => {
+    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+    const aiBtn = (
+      createHoroscopeCard(minimalHoroscope, minimalUi)
+        .querySelectorAll('.action-btn')[1] as HTMLButtonElement
+    );
+    aiBtn.click();
+    await vi.waitFor(() => {
+      expect(openSpy).toHaveBeenCalledWith(
+        'https://www.google.com/search?udm=50&q=interpret%20this%3A%20You%20will%20find%20a%20mysterious%20sock.',
+        '_blank',
+        'noopener',
+      );
+    });
+    expect(aiBtn.textContent).toBe('→');
+    expect(aiBtn.disabled).toBe(false);
+    openSpy.mockRestore();
+  });
+
   it('renders all four detail rows with correct labels and values', () => {
     const card = createHoroscopeCard(minimalHoroscope, minimalUi);
     const details = card.querySelector('.horoscope-card__details');

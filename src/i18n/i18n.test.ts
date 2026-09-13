@@ -236,6 +236,17 @@ describe('detectLanguage', () => {
     expect(detectLanguage()).toBe('ro');
   });
 
+  it('ignores stored BCP-47 regional tags (unlike getLocale) and falls back to browser language', () => {
+    // detectLanguage validates stored ids against primary subtags only; a
+    // stored regional tag like "ro-RO" must not be resolved the way getLocale
+    // does. With an unregistered browser language, the only valid outcome is
+    // the English fallback, proving the stored tag was not accepted.
+    window.localStorage.setItem('horror-scope-lang', 'ro-RO');
+    setNavigatorProperty('language', 'de-DE');
+
+    expect(detectLanguage()).toBe('en');
+  });
+
   it('falls through to browser language when localStorage throws (privacy-mode simulation)', () => {
     // Simulate Safari private mode / blocked localStorage: getItem throws.
     const originalGetItem = localStorageStub.getItem.bind(localStorageStub);

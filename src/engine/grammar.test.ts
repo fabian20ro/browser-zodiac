@@ -105,6 +105,14 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.shrug#')).toBe('hello ¯\\\\_(ツ)_/¯');
     });
 
+    it('allows custom modifiers to shadow built-in names per engine instance', () => {
+      const engine = makeEngine({ word: ['hello'] });
+      engine.addModifier('uppercase', (s) => `${s}!!`);
+      // Override takes effect for this engine only.
+      expect(engine.expand('#word.uppercase#')).toBe('hello!!');
+      expect(makeEngine({ word: ['hello'] }).expand('#word.uppercase#')).toBe('HELLO');
+    });
+
     it('applies bang modifier', () => {
       const engine = makeEngine({ word: ['hello'] });
       expect(engine.expand('#word.bang#')).toBe('hello!');

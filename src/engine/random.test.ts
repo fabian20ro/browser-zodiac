@@ -471,6 +471,11 @@ describe('dailySeed', () => {
 
     const negativeHour = dailySeed('2026-07-09', 'aries', '-1:00');
     expect(negativeHour).toBe(withoutTime);
+
+    // Rejection must be atomic: an out-of-range hour falls back to date-only even
+    // when the minute is a valid non-zero value (no field-wise retention or clamp).
+    expect(dailySeed('2026-07-09', 'aries', '25:30')).toBe(withoutTime);
+    expect(dailySeed('2026-07-09', 'aries', '-1:15')).toBe(withoutTime);
   });
 
   it('rejects out-of-range minute and falls back to date-only seed', () => {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { assignSign, assignDailySign, assignSignWithSymbol, assignSigns, assignRandomSign, getSignElement, assignSignWithElement, _assignFromHash } from './sign-assigner.ts';
+import { assignSign, assignDailySign, assignSignWithSymbol, assignSigns, assignRandomSign, getSignElement, assignSignWithElement } from './sign-assigner.ts';
 import { ZODIAC_SIGNS, ZODIAC_SYMBOLS } from '../horoscope/zodiac.ts';
 
 describe('sign-assigner', () => {
@@ -470,6 +470,18 @@ describe('sign-assigner', () => {
       const sign = assignSign('');
       expect(sign).toBeDefined();
       expect(ZODIAC_SIGNS).toContain(sign);
+    });
+
+    it('is reproducible across independent calls — the same seed always yields the same sign', () => {
+      // The documented contract ("the same seed always yields the same sign") must hold
+      // across separate invocations, not just within a single loop pass. An in-loop s1/s2
+      // comparison (see the 'is reproducible' test above) cannot catch a seed that
+      // silently falls through to the unseeded PRNG path; calling the function twice
+      // independently does.
+      for (const seed of [42, 123456789, 0x80000000]) {
+        expect(assignRandomSign(seed)).toBe(assignRandomSign(seed));
+        expect(ZODIAC_SIGNS).toContain(assignRandomSign(seed));
+      }
     });
 
     it('maps all 12 possible indices including index 0 — verify via assignRandomSign distribution', () => {
