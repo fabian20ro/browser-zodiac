@@ -544,6 +544,26 @@ describe('generateHoroscope', () => {
     }
   });
 
+  it('mood boundaries are exact — luckyNumber 30 is turbulent and 70 is balanced', () => {
+    const signs = Object.keys(ZODIAC_SYMBOLS) as ZodiacSign[];
+    let hit30: string | undefined;
+    let hit70: string | undefined;
+    for (const sign of signs) {
+      for (let day = 0; day < 365; day++) {
+        const d = new Date(Date.UTC(2026, 0, 1 + day));
+        const h = generateHoroscope(sign, minimalLocale, minimalDivination, d);
+        const expectedMood: string =
+          h.luckyNumber <= 30 ? 'turbulent' : h.luckyNumber <= 70 ? 'balanced' : 'radiant';
+        expect(h.mood).toBe(expectedMood);
+        if (h.luckyNumber === 30) hit30 = h.mood;
+        if (h.luckyNumber === 70) hit70 = h.mood;
+      }
+    }
+    // The scanned window must actually reach both boundaries — a vacuous pass is a bug.
+    expect(hit30).toBe('turbulent');
+    expect(hit70).toBe('balanced');
+  });
+
   it('unusual divination values (special chars) do not corrupt output shape', () => {
     const locale: LocalePack = {
       ...minimalLocale,
