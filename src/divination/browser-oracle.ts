@@ -48,7 +48,8 @@ export { detectMobile };
 export function readBrowserOracle(): DivinationProfile {
   const ua = navigator?.userAgent || '';
   const browser = detectBrowser(ua);
-  const os = detectOS(ua);
+  const touchPoints = navigator?.maxTouchPoints || 0;
+  const os = detectOS(ua, touchPoints);
   const screenRes = `${screen?.width || 0}x${screen?.height || 0}`;
   const lang = (navigator?.language || '').trim();
   const colorScheme = getColorScheme();
@@ -59,7 +60,6 @@ export function readBrowserOracle(): DivinationProfile {
   const online = navigator?.onLine ?? false;
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Void';
   const windowSize = `${window?.innerWidth || 0}x${window?.innerHeight || 0}`;
-  const touchPoints = navigator?.maxTouchPoints || 0;
   const navConn = navigator && (navigator as any).connection;
   const networkSpeed = navConn?.effectiveType || 'unknown';
   const devicePixelRatio = window?.devicePixelRatio || 1;

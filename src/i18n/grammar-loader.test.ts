@@ -246,6 +246,34 @@ unicorn`,
     warnSpy.mockRestore();
   });
 
+  it('tolerates network errors on @from files in non-strict mode — warns with the thrown message', async () => {
+    // The catch branch of safeFetchText (fetch rejecting before a Response
+    // exists) formats the thrown Error's message instead of an HTTP status.
+    // In non-strict mode it must warn once with that message and still merge
+    // surviving sections — distinct from the 404 path, which warns ': 404'.
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const fetch = vi.fn((url: string) => {
+      if (url === 'http://test/data/en.txt') {
+        return Promise.resolve({
+          ok: true,
+          text: () =>
+            Promise.resolve(`@from ghost.txt import *\n\n=== food ===\ntoast`),
+        } as Response);
+      }
+      return Promise.reject(new Error('Network request failed'));
+    }) as FetchFn;
+
+    const grammar = await loadGrammar('en', 'http://test/data/', fetch, false);
+
+    expect(grammar.food).toEqual(['toast']);
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+    expect(warnSpy).toHaveBeenCalledWith(
+      'Failed to load http://test/data/en/ghost.txt: Network request failed',
+    );
+
+    warnSpy.mockRestore();
+  });
+
   it('tolerates multiple missing @from files in non-strict mode — one warn each', async () => {
     // When several distinct @from URLs fail independently, safeFetchText must
     // emit exactly one console.warn per failed URL and keep the loop running
