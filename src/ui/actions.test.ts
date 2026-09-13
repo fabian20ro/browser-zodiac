@@ -718,4 +718,39 @@ describe('createActionButton', () => {
     expect(btn.textContent).toBe('⧉');
     vi.useRealTimers();
   });
+
+  it('prefers text labels over icons when both are provided', async () => {
+    vi.useFakeTimers();
+    let attempt = 0;
+    const onClick = vi.fn(async (): Promise<boolean> => {
+      attempt += 1;
+      if (attempt === 1) return true;
+      return false;
+    });
+    const btn = createActionButton({
+      icon: '⧉',
+      feedbackText: 'Copied!',
+      feedbackIcon: '✓',
+      errorText: 'Failed!',
+      errorIcon: '✕',
+      ariaLabel: 'Copy',
+      onClick,
+    });
+
+    btn.click();
+    await Promise.resolve();
+    expect(btn.textContent).toBe('Copied!');
+    expect(btn.classList.contains('action-btn--feedback')).toBe(true);
+    vi.advanceTimersByTime(1500);
+    expect(btn.textContent).toBe('⧉');
+    expect(btn.classList.contains('action-btn--feedback')).toBe(false);
+
+    btn.click();
+    await Promise.resolve();
+    expect(btn.textContent).toBe('Failed!');
+    expect(btn.classList.contains('action-btn--feedback')).toBe(false);
+    vi.advanceTimersByTime(1500);
+    expect(btn.textContent).toBe('⧉');
+    vi.useRealTimers();
+  });
 });
