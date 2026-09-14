@@ -157,6 +157,16 @@ describe('hashString', () => {
     expect(hashString('hello')).not.toBe(hashString('world'));
   });
 
+  it('pins the exact djb2 values for fixed inputs', () => {
+    // The relative tests above still pass if the hash algorithm itself
+    // changes (e.g. 5381 → 5380, *33 → *31, or dropped |0 wrapping) as long
+    // as outputs differ. Pinning exact 32-bit unsigned results for fixed
+    // inputs fails on any change to the djb2 initial value, multiplier, or
+    // unsigned-32-bit final normalization.
+    expect(hashString('hello')).toBe(261238937);
+    expect(hashString('hello-world')).toBe(1403312366);
+  });
+
   it('returns an unsigned 32-bit integer', () => {
     const hash = hashString('test');
     expect(hash).toBeGreaterThanOrEqual(0);
