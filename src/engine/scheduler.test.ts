@@ -319,6 +319,32 @@ describe('scheduleMidnightGmt', () => {
     expect(callCount).toBe(2);
   });
 
+  it('logs an error and reschedules when an async callback rejects', async () => {
+    // Observable contract: an async callback that throws produces a rejected
+    // promise — the same catch in scheduler.ts must log it and still
+    // reschedule. Distinct from the synchronous-throw case above, where the
+    // error surfaces directly instead of through promise rejection.
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    let callCount = 0;
+    const rejectingCallback = async () => {
+      if (++callCount === 1) throw new Error('Async failure');
+    };
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+    const cancel = scheduleMidnightGmt(rejectingCallback);
+
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(callCount).toBe(1);
+    expect(consoleSpy).toHaveBeenCalledWith("Error in scheduler callback:", expect.any(Error));
+
+    // Scheduler must have recovered and fired again at the next midnight.
+    vi.setSystemTime(new Date('2026-01-02T23:59:59.000Z'));
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(callCount).toBe(2);
+
+    cancel();
+    consoleSpy.mockRestore();
+  });
+
   it('a new scheduler cancels the previous one', async () => {
     const firstCallback = vi.fn();
     const secondCallback = vi.fn();
