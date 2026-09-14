@@ -340,6 +340,15 @@ describe('persistLanguage', () => {
     expect(window.localStorage.getItem('horror-scope-lang')).toBe('ro');
   });
 
+  it('trims whitespace from locale ids before writing to localStorage', () => {
+    // Whitespace-padded ids are not registered; the stored value must be the
+    // trimmed + lowercased form, proving normalization happens before the
+    // registry check and the write.
+    persistLanguage('  RO  ');
+
+    expect(window.localStorage.getItem('horror-scope-lang')).toBe('ro');
+  });
+
   it('handles invalid input gracefully', () => {
     // Test that persistLanguage doesn't crash with various inputs
     const testCases = ['', 'en', 'EN', '  en  ', 'ro-RO'];

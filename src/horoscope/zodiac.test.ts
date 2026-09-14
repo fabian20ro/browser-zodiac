@@ -464,6 +464,18 @@ describe('getSignByDate', () => {
       expect(getSignByDate(prevM!, prevD!), `day before ${m}/${d} should map to previous sign`).not.toBe(currentSign);
     }
   });
+
+  it('last day of each sign range maps to the previous sign (exclusive end)', () => {
+    // Ranges are inclusive-start / exclusive-end, so the day before a sign's
+    // start boundary is the final day of the previous sign's period — no sign
+    // may ever be returned on the boundary day that ends its own range.
+    for (let i = 0; i < ZODIAC_BOUNDARIES.length; i++) {
+      const b = ZODIAC_BOUNDARIES[i];
+      const prevSign = ZODIAC_BOUNDARIES[(i + ZODIAC_BOUNDARIES.length - 1) % ZODIAC_BOUNDARIES.length].sign;
+      const prevDate = new Date(2024, b.month - 1, b.day - 1);
+      expect(getSignByDate(prevDate.getMonth() + 1, prevDate.getDate()), `day before ${b.month}/${b.day} (${b.sign} start)`).toBe(prevSign);
+    }
+  });
 });
 
 describe('isInRange', () => {

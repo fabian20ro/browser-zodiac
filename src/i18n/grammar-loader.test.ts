@@ -340,6 +340,32 @@ unicorn`,
     ).rejects.toThrow(/Failed to load http:\/\/test\/data\/en\.txt/);
   });
 
+  it('throws with the URL when the response body read fails in strict mode', async () => {
+    // safeFetchText has three failure paths: fetch rejecting, a non-ok
+    // response, and res.text() rejecting after headers arrived (e.g. a
+    // stream that aborts mid-body). The third path must be surfaced as a
+    // URL-prefixed error in strict mode, distinct from the ': 404' status
+    // message and the raw fetch-rejection message.
+    const fetch = vi.fn((url: string) => {
+      if (url === 'http://test/data/en.txt') {
+        return Promise.resolve({
+          ok: true,
+          text: () => Promise.resolve(`@from bad.txt import *`),
+        } as Response);
+      }
+      return Promise.resolve({
+        ok: true,
+        text: () => Promise.reject(new Error('body stream aborted')),
+      } as Response);
+    }) as FetchFn;
+
+    await expect(
+      loadGrammar('en', 'http://test/data/', fetch, true),
+    ).rejects.toThrow(
+      'Failed to load http://test/data/en/bad.txt: body stream aborted',
+    );
+  });
+
   it('deduplicates fetch calls when multiple @from point to the same file', async () => {
     const fetchCalls: string[] = [];
     const fetch = vi.fn(async (url: string) => {
