@@ -443,6 +443,40 @@ describe('scheduleMidnightGmt resilience', () => {
     cancel();
   });
 
+  it('should log the raw thrown value and recover when a callback throws a non-Error value', async () => {
+    // Existing recovery tests pin Error instances only. The catch in
+    // scheduler.ts (lines 55-56) logs whatever the callback throws — the
+    // observable contract is that a non-Error thrown value (here a string)
+    // is reported verbatim and the loop still reschedules. A regression
+    // filtering on instanceof Error would silently drop such failures.
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    let failureCount = 0;
+    const nonErrorFailingCallback = () => {
+      count++;
+      if (failureCount === 0) {
+        failureCount++;
+        throw 'non-error failure';
+      }
+    };
+
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+    const cancel = scheduleMidnightGmt(nonErrorFailingCallback);
+
+    await vi.advanceTimersByTimeAsync(1000);
+    // First iteration: string thrown — must not escape the scheduler, and
+    // the log must carry the raw value, not a wrapped Error.
+    expect(count).toBe(1);
+    expect(consoleSpy).toHaveBeenCalledWith('Error in scheduler callback:', 'non-error failure');
+
+    await vi.advanceTimersByTimeAsync(86400000);
+    // Second iteration: callback succeeds — loop recovered from the
+    // non-Error failure path.
+    expect(count).toBe(2);
+
+    cancel();
+    consoleSpy.mockRestore();
+  });
+
   it('should keep rescheduling through consecutive callback failures without leaking', async () => {
     let failureCount = 0;
     const alwaysFailingCallback = () => {
