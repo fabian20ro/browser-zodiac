@@ -214,6 +214,20 @@ describe('sign-assigner', () => {
      expect(signA).toBe(signB);
     });
 
+    it('composes the local calendar day as "fingerprint:YYYY-MM-DD" with zero padding — identical to assignSign on the composed string', () => {
+     const fingerprint = 'daily-format-test';
+     // Local-midnight construction is timezone-independent: getFullYear/getMonth/getDate
+     // always report the local calendar day, so the composed string is exactly
+     // "fingerprint:YYYY-MM-DD". The zero-padding test above only compares two
+     // constructions of the same date; this pins the actual composed format string.
+     expect(assignDailySign(fingerprint, new Date(2024, 5, 15))).toBe(
+       assignSign(`${fingerprint}:2024-06-15`)
+     );
+     expect(assignDailySign(fingerprint, new Date(2024, 0, 5))).toBe(
+       assignSign(`${fingerprint}:2024-01-05`)
+     );
+    });
+
     it('returns different signs for different dates with the same fingerprint', () => {
      const fingerprint = 'daily-test-fingerprint';
      const seenDays: string[] = [];

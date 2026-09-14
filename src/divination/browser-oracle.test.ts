@@ -397,6 +397,25 @@ describe('readBrowserOracle', () => {
     expect(profile.fingerprint).toContain('|mobile');
   });
 
+  it('reports macOS (not iOS) for a desktop Mac UA with no touch capability', () => {
+    // iPadOS 13+ Safari spoofs a macOS UA, so a Macintosh UA only counts as
+    // iOS when maxTouchPoints > 1. A true desktop Mac (zero touch points)
+    // must stay macOS/desktop regardless of the UA keyword overlap.
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Safari/605.1.15',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: 'wifi' },
+    });
+    const profile = readBrowserOracle();
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+    expect(osReading?.raw).toBe('macOS');
+    expect(profile.fingerprint.endsWith('|desktop')).toBe(true);
+  });
+
   it('detects Firefox on iOS via FxiOS', () => {
     vi.stubGlobal('navigator', {
       userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/94.0 Mobile/15E148',

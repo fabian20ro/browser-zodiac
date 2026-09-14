@@ -147,6 +147,20 @@ describe('randomSign extreme-seed boundary', () => {
     }
   });
 
+  it('rng=0.999999 selects the exact last candidate sign (index 10) for every current sign', () => {
+    // rng()=0.999999 → floor(0.999999 * 11) = 10 → last of "all signs except current"
+    // in ZODIAC_SIGNS order: pisces for every sign except pisces itself,
+    // which falls back to aquarius (its predecessor in the candidate list).
+    const expectedLast: Record<ZodiacSign, ZodiacSign> = {
+      aries: 'pisces', taurus: 'pisces', gemini: 'pisces', cancer: 'pisces',
+      leo: 'pisces', virgo: 'pisces', libra: 'pisces', scorpio: 'pisces',
+      sagittarius: 'pisces', capricorn: 'pisces', aquarius: 'pisces', pisces: 'aquarius',
+    };
+    for (const sign of ZODIAC_SIGNS) {
+      expect(randomSign(sign, () => 0.999999), `${sign} with rng=0.999999`).toBe(expectedLast[sign]);
+    }
+  });
+
   it('rng at mid-range produces deterministic consistent results across all signs', () => {
     for (const current of ZODIAC_SIGNS) {
       const rng1 = () => 0.5;
