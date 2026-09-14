@@ -455,6 +455,32 @@ describe('scheduleMidnightGmt', () => {
     cancel();
   });
 
+  it('an explicit { immediate: false } on an idle scheduler fires on the first tick, matching the default', async () => {
+    // Counterpart to the { immediate: true } idle test above, pinning the
+    // idle × explicit-false cell of the options matrix — otherwise only
+    // covered implicitly by the no-options tests. At setup time
+    // isLoopRunning=false, so the explicit false still leaves
+    // shouldSkipFirstTick=false: no synchronous invocation, one fire per
+    // midnight thereafter — identical to the default input.
+    const callback = vi.fn();
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+    const cancel = scheduleMidnightGmt(callback, { immediate: false });
+
+    // No synchronous invocation — explicit false must not invoke early.
+    expect(callback).not.toHaveBeenCalled();
+
+    // First scheduled midnight: fires exactly once.
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(callback).toHaveBeenCalledTimes(1);
+
+    // Loop continues — second midnight fires normally.
+    vi.setSystemTime(new Date('2026-01-02T23:59:59.000Z'));
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(callback).toHaveBeenCalledTimes(2);
+
+    cancel();
+  });
+
   it('fires after ~24h when scheduled exactly at midnight', async () => {
     const callback = vi.fn();
     // At exact midnight, getNextMidnightGmt returns next-day midnight (86400000ms away).
