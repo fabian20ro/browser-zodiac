@@ -62,6 +62,12 @@ describe('generateHoroscope', () => {
     expect(h.date).toBe('2026-03-03');
   });
 
+  it('lucky number is deterministic — same seed stream produces the same value', () => {
+    const h1 = generateHoroscope('aries', minimalLocale, minimalDivination, fixedDate);
+    const h2 = generateHoroscope('aries', minimalLocale, minimalDivination, fixedDate);
+    expect(h1.luckyNumber).toBe(h2.luckyNumber);
+  });
+
   it('lucky number is between 1 and 99', () => {
     for (const sign of ['aries', 'leo', 'pisces'] as const) {
       const h = generateHoroscope(sign, minimalLocale, minimalDivination, fixedDate);
