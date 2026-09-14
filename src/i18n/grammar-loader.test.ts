@@ -210,6 +210,24 @@ unicorn`,
     expect(grammar.creature).toEqual(['unicorn']);
   });
 
+  it('defaults basePath to BASE_URL data/ when omitted', async () => {
+    // src/i18n/index.ts calls loadGrammar(id) without a base path, so the
+    // production caller relies on the ${import.meta.env.BASE_URL}data/
+    // fallback for both the main file URL and the locale subdirectory used
+    // for @from imports. Expected URLs derive from BASE_URL itself rather
+    // than a pinned value.
+    const base = `${import.meta.env.BASE_URL}data/`;
+    const fetch = mockFetch({
+      [`${base}en.txt`]: `@from creatures.txt import *`,
+      [`${base}en/creatures.txt`]: `=== creature ===\nunicorn`,
+    });
+
+    const grammar = await loadGrammar('en', undefined, fetch);
+    expect(grammar.creature).toEqual(['unicorn']);
+    expect(fetch).toHaveBeenCalledWith(`${base}en.txt`);
+    expect(fetch).toHaveBeenCalledWith(`${base}en/creatures.txt`);
+  });
+
   it('resolves @from import directives', async () => {
     const fetch = mockFetch({
       'http://test/data/en.txt': `@from creatures.txt import *`,
