@@ -137,6 +137,13 @@ describe('createSignCard', () => {
     expect(badge).not.toBeNull();
     expect(badge.textContent).toBe('\u{1F525} Fire');
   });
+
+  it('displays the yourSign label above the name row', () => {
+    const card = createSignCard(minimalHoroscope, minimalUi, () => {});
+    const label = card.querySelector('.sign-card__label');
+    expect(label).not.toBeNull();
+    expect(label!.textContent).toBe('Y');
+  });
 });
 
 describe('createHoroscopeCard', () => {
