@@ -43,6 +43,21 @@ describe('createGrammarEngine', () => {
       expect(results.has('d')).toBe(true);
     });
 
+    it('biases selection toward the higher weighted option', () => {
+      const engine = makeEngine({ item: ['a~~10', 'b~~1'] });
+      let aCount = 0;
+      let bCount = 0;
+      for (let i = 0; i < 200; i++) {
+        if (engine.expand('#item#') === 'a') aCount++;
+        else bCount++;
+      }
+      // Both weighted options must be reachable (deterministic seed 42).
+      expect(bCount).toBeGreaterThan(0);
+      // Weight 10 must dominate weight 1; a uniform or inverted pick would
+      // yield bCount near 100 or aCount <= bCount, both of which fail here.
+      expect(aCount).toBeGreaterThan(3 * bCount);
+    });
+
     it('splits weight at the last ~~ and preserves embedded separators in text', () => {
       const engine = makeEngine({ item: ['ab~~cd~~5', 'plain~~0'] });
       for (let i = 0; i < 50; i++) {
