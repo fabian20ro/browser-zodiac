@@ -159,6 +159,19 @@ describe('sign-assigner', () => {
      );
     });
 
+    it('silently stringifies non-string fingerprints via template coercion — unlike assignSign, no TypeError', () => {
+     // assignSign guards with typeof and throws TypeError, but assignDailySign
+     // interpolates the fingerprint into a template literal — String(null) /
+     // String(undefined) — so non-string fingerprints hash as 'null' /
+     // 'undefined' instead of throwing. Pin this asymmetry: adding a type
+     // guard to assignDailySign later is an intentional behavior change.
+     const date = new Date(2024, 5, 15);
+     expect(() => assignDailySign(null as any, date)).not.toThrow();
+     expect(() => assignDailySign(undefined as any, date)).not.toThrow();
+     expect(assignDailySign(null as any, date)).toBe(assignSign('null:2024-06-15'));
+     expect(assignDailySign(undefined as any, date)).toBe(assignSign('undefined:2024-06-15'));
+    });
+
     it('throws a TypeError with a specific message when given an InvalidDate (e.g., new Date(NaN))', () => {
      const fingerprint = 'invalid-date-test';
      const invalidDate = new Date(NaN);
