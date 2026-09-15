@@ -416,6 +416,24 @@ describe('readBrowserOracle', () => {
     expect(profile.fingerprint.endsWith('|desktop')).toBe(true);
   });
 
+  it('classifies a Macintosh UA with exactly one touch point as macOS, not iOS', () => {
+    // The touch-based iPad heuristic requires maxTouchPoints > 1, so a
+    // Macintosh UA with exactly one touch point must stay macOS/desktop.
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Safari/605.1.15',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 1,
+      connection: { effectiveType: 'wifi' },
+    });
+    const profile = readBrowserOracle();
+    const osReading = profile.readings.find(r => r.key === 'elemental_os');
+    expect(osReading?.raw).toBe('macOS');
+    expect(profile.fingerprint.endsWith('|desktop')).toBe(true);
+  });
+
   it('detects Firefox on iOS via FxiOS', () => {
     vi.stubGlobal('navigator', {
       userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/94.0 Mobile/15E148',
