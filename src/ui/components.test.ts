@@ -144,6 +144,22 @@ describe('createSignCard', () => {
     expect(label).not.toBeNull();
     expect(label!.textContent).toBe('Y');
   });
+
+  it('renders the element icon matching the sign element for all four elements', () => {
+    const cases: Array<[Horoscope['signElement'], string]> = [
+      ['fire', '\u{1F525} Fire'],
+      ['earth', '\u{1F30D} Earth'],
+      ['air', '\u{1F32C}\uFE0F Air'],
+      ['water', '\u{1F4A7} Water'],
+    ];
+    for (const [signElement, expected] of cases) {
+      const horoscope = { ...minimalHoroscope, signElement };
+      const card = createSignCard(horoscope, minimalUi, () => {});
+      const badge = card.querySelector('.sign-card__element-badge') as HTMLElement;
+      expect(badge).not.toBeNull();
+      expect(badge.textContent).toBe(expected);
+    }
+  });
 });
 
 describe('createHoroscopeCard', () => {

@@ -120,6 +120,10 @@ describe('getLocale', () => {
     const locale = getLocale('ro-RO');
     expect(locale.id).toBe('ro');
     expect(locale.name).toBe('Română');
+    // Grammar resolution must also use the primary subtag: without
+    // loadAllGrammars, the regional tag falls back to the ro pack's embedded
+    // grammar, not the English one.
+    expect(locale.grammar).toBe(getLocale('ro').grammar);
   });
 
   it('getLocale does not mutate the source locale pack', () => {

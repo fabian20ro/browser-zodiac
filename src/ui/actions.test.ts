@@ -770,4 +770,37 @@ describe('createActionButton', () => {
     expect(btn.textContent).toBe('⧉');
     vi.useRealTimers();
   });
+
+  it('reverts immediately for zero or negative durationMs instead of holding', async () => {
+    vi.useFakeTimers();
+    const zero = createActionButton({
+      icon: '⧉',
+      feedbackIcon: '✓',
+      ariaLabel: 'Copy',
+      durationMs: 0,
+      onClick: () => {},
+    });
+    const negative = createActionButton({
+      icon: '⧉',
+      feedbackIcon: '✓',
+      ariaLabel: 'Copy',
+      durationMs: -5,
+      onClick: () => {},
+    });
+
+    zero.click();
+    negative.click();
+    await Promise.resolve();
+
+    expect(zero.textContent).toBe('✓');
+    expect(negative.textContent).toBe('✓');
+
+    vi.advanceTimersByTime(0);
+
+    expect(zero.textContent).toBe('⧉');
+    expect(zero.classList.contains('action-btn--feedback')).toBe(false);
+    expect(negative.textContent).toBe('⧉');
+    expect(negative.classList.contains('action-btn--feedback')).toBe(false);
+    vi.useRealTimers();
+  });
 });
