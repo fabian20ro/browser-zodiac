@@ -31,6 +31,13 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#missing#')).toBe('[?missing]');
     });
 
+    it('drops modifiers and reports only the symbol name for missing symbols', () => {
+      const engine = makeEngine({});
+      // Unknown well-formed modifiers must not error; the placeholder names
+      // the symbol only, so #missing.bang# collapses to [?missing].
+      expect(engine.expand('#missing.bang#')).toBe('[?missing]');
+    });
+
     it('handles multiple items with mixed valid and invalid weights', () => {
       const engine = makeEngine({ item: ['a~~10', 'b~~invalid', 'c~~-1', 'd'] });
       const results = new Set<string>();
