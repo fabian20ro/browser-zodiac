@@ -488,6 +488,17 @@ describe('dailySeed', () => {
     expect(dailySeed('2026-07-09', 'aries', '-1:15')).toBe(withoutTime);
   });
 
+  it('rejects out-of-range bare-hour timePart (no colon) and falls back to date-only seed', () => {
+    // Single-part timePart like '25' splits to ['25'] — the existing rejection tests
+    // only cover two-part inputs ('25:00'), so a regression that skipped the hour
+    // range check when parts[1] is undefined would silently produce a distinct
+    // ('25:00') seed instead of falling back to date-only.
+    const withoutTime = dailySeed('2026-07-09', 'aries');
+    expect(dailySeed('2026-07-09', 'aries', '25')).toBe(withoutTime);
+    expect(dailySeed('2026-07-09', 'aries', '99')).toBe(withoutTime);
+    expect(dailySeed('2026-07-09', 'aries', '-1')).toBe(withoutTime);
+  });
+
   it('rejects out-of-range minute and falls back to date-only seed', () => {
     const invalidMinute = dailySeed('2026-07-09', 'aries', '14:60');
     const withoutTime = dailySeed('2026-07-09', 'aries');
