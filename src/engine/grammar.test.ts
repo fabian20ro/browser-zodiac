@@ -325,6 +325,15 @@ describe('createGrammarEngine', () => {
       // expandOnce (used by engine.expand) validates both — confirming this is a deliberate boundary.
       expect(() => validateGrammar({ word: ['hello #symbol.hello@world#'] })).not.toThrow();
     });
+
+    it('passes a valid-symbol / malformed-modifier reference in validateGrammar', () => {
+      // The asymmetry above was proven with a reference whose symbol part was also
+      // irrelevant; this pins the boundary precisely: when the symbol is well-formed,
+      // validateGrammar silently ignores a malformed modifier — unlike expand, which
+      // throws 'malformed name' for the same reference (tested separately).
+      expect(() => validateGrammar({ word: ['#word.@@#'] })).not.toThrow();
+    });
+
     it('throws on modifier containing special characters (@)', () => {
       const engine = makeEngine({ word: ['hello'] });
       expect(() => engine.expand('#word.hello@world#')).toThrow(/malformed name 'hello@world'/);
