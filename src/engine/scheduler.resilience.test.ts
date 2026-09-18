@@ -747,4 +747,35 @@ describe('scheduleMidnightGmt resilience', () => {
     await vi.advanceTimersByTimeAsync(86400000);
     expect(count).toBe(2);
   });
+
+  it('does not fire immediately on a fresh first call with { immediate: true }', async () => {
+    // The doc comment (scheduler.ts:32) claims immediate:true "fire callback
+    // immediately on first call (before waiting for midnight)" when not already
+    // mid-loop, but the implementation uses `immediate` only to compute
+    // shouldSkipFirstTick = !immediate && isLoopRunning (scheduler.ts:39). On a
+    // fresh first call isLoopRunning is false, so shouldSkipFirstTick is false
+    // regardless of `immediate` — the callback always waits for the first
+    // midnight. Pin that observable contract: with { immediate: true } on a
+    // clean start, the callback has NOT fired before the first midnight and
+    // fires exactly once at it. This is the fresh-start branch of the option;
+    // the existing { immediate: true } test (above) covers only the mid-loop
+    // replacement branch, where immediate:true does make the first tick fire.
+    const immediateCallback = () => {
+      count++;
+    };
+
+    vi.setSystemTime(new Date('2026-01-01T12:00:00.000Z'));
+    const cancel = scheduleMidnightGmt(immediateCallback, { immediate: true });
+
+    // No fire before the first midnight — immediate:true does not invoke the
+    // callback on the first call when the loop is not already running.
+    await vi.advanceTimersByTimeAsync(1);
+    expect(count).toBe(0);
+
+    // First midnight (12h later): the callback fires exactly once.
+    await vi.advanceTimersByTimeAsync(12 * 3600 * 1000);
+    expect(count).toBe(1);
+
+    cancel();
+  });
 });
