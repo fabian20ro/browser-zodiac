@@ -595,4 +595,33 @@ describe('generateHoroscope', () => {
     expect(h.compatibility).toBe('alone');
     expect(Number.isInteger(h.luckyNumber)).toBe(true);
   });
+
+  const divinationForMood = (mood: string): DivinationProfile => ({
+    readings: [
+      { key: 'spirit_browser', raw: 'Chrome', interpretation: '' },
+      { key: 'cosmic_mood', raw: mood, interpretation: '' },
+    ],
+    fingerprint: `mood-fp-${mood}`,
+  });
+
+  it('prepends a time-of-day specific opening phrase derived from the cosmic_mood reading', () => {
+    const hNight = generateHoroscope('aries', minimalLocale, divinationForMood('deep_night'), fixedDate);
+    const hMorning = generateHoroscope('aries', minimalLocale, divinationForMood('morning'), fixedDate);
+    expect(hNight.text.startsWith('In the hush of deep night: ')).toBe(true);
+    expect(hMorning.text.startsWith('As the morning light spills: ')).toBe(true);
+  });
+
+  it('deep_night produces a different leading segment than morning', () => {
+    const hNight = generateHoroscope('aries', minimalLocale, divinationForMood('deep_night'), fixedDate);
+    const hMorning = generateHoroscope('aries', minimalLocale, divinationForMood('morning'), fixedDate);
+    expect(hNight.text.split(': ')[0]).not.toBe(hMorning.text.split(': ')[0]);
+  });
+
+  it('each of the five timeOfDay values produces a unique leading segment', () => {
+    const moods = ['deep_night', 'morning', 'afternoon', 'evening', 'night'] as const;
+    const leadings = moods.map((m) =>
+      generateHoroscope('aries', minimalLocale, divinationForMood(m), fixedDate).text.split(': ')[0],
+    );
+    expect(new Set(leadings).size).toBe(5);
+  });
 });

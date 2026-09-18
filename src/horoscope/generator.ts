@@ -18,6 +18,15 @@ export interface Horoscope {
   signElement: 'fire' | 'earth' | 'air' | 'water';
 }
 
+/** Time-of-day specific cosmic opening phrases — one distinct leading segment per value. */
+const TIME_OF_DAY_OPENINGS: Record<string, string> = {
+  deep_night: 'In the hush of deep night',
+  morning: 'As the morning light spills',
+  afternoon: 'Under the high afternoon sun',
+  evening: 'As the evening shadows lengthen',
+  night: 'Beneath the watchful night sky',
+};
+
 /** Standard tropical element assignment per zodiac sign. */
 const SIGN_ELEMENTS: Record<ZodiacSign, 'fire' | 'earth' | 'air' | 'water'> = {
   aries: 'fire',
@@ -73,7 +82,11 @@ export function generateHoroscope(
 
   const engine = createGrammarEngine(contextGrammar, rng);
 
-  const text = engine.expand('#origin#');
+  const moodReading = divination.readings.find((r) => r.key === 'cosmic_mood');
+  const timeOfDayOpening = moodReading ? TIME_OF_DAY_OPENINGS[moodReading.raw] : undefined;
+
+  const originText = engine.expand('#origin#');
+  const text = timeOfDayOpening ? `${timeOfDayOpening}: ${originText}` : originText;
   const warning = engine.expand('#warning#');
   const luckyColor = engine.expand('#luckyColor#');
   const compatibility = engine.expand('#compatibility#');
