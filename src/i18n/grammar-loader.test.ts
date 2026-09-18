@@ -384,6 +384,40 @@ unicorn`,
     );
   });
 
+  it('tolerates @from files whose body read fails in non-strict mode — warns with the thrown message', async () => {
+    // safeFetchText's third failure path: a successful Response arrives
+    // (headers ok) but res.text() rejects (stream aborted mid-body). In
+    // non-strict mode it must warn once with the URL-prefixed message and
+    // keep the loop running — distinct from the fetch-rejection path
+    // (line 267) because here a Response was received before the body
+    // stream failed, and from the strict path (above) because it warns
+    // rather than throws. Surviving sections still merge into grammar.
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const fetch = vi.fn((url: string) => {
+      if (url === 'http://test/data/en.txt') {
+        return Promise.resolve({
+          ok: true,
+          text: () =>
+            Promise.resolve(`@from ghost.txt import *\n\n=== food ===\ntoast`),
+        } as Response);
+      }
+      return Promise.resolve({
+        ok: true,
+        text: () => Promise.reject(new Error('body stream aborted')),
+      } as Response);
+    }) as FetchFn;
+
+    const grammar = await loadGrammar('en', 'http://test/data/', fetch, false);
+
+    expect(grammar.food).toEqual(['toast']);
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+    expect(warnSpy).toHaveBeenCalledWith(
+      'Failed to load http://test/data/en/ghost.txt: body stream aborted',
+    );
+
+    warnSpy.mockRestore();
+  });
+
   it('deduplicates fetch calls when multiple @from point to the same file', async () => {
     const fetchCalls: string[] = [];
     const fetch = vi.fn(async (url: string) => {
