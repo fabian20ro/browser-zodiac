@@ -644,6 +644,18 @@ describe('sign-assigner', () => {
       expect(seen.size).toBeGreaterThan(3);
     });
 
+    it('treats undefined as the no-seed sentinel (unseeded path, no throw) but throws TypeError for null', () => {
+      // assignRandomSign's guard is `seed !== undefined && !Number.isFinite(seed)`:
+      // undefined is the explicit "no seed" marker and falls through to the unseeded
+      // Math.random() PRNG path (no throw, valid sign), while null is a distinct invalid
+      // seed — Number.isFinite(null) is false — so it must throw TypeError. The existing
+      // non-finite / non-numeric guard tests cover NaN/Infinity/object types but not this
+      // undefined-vs-null sentinel distinction.
+      expect(() => assignRandomSign(undefined)).not.toThrow();
+      expect(ZODIAC_SIGNS).toContain(assignRandomSign(undefined));
+      expect(() => assignRandomSign(null as any)).toThrow(TypeError);
+    });
+
     it('floors a fractional numeric seed — same sign as its floor (Math.floor, not truncation)', () => {
       // Production seeds the PRNG with Math.floor(seed): fractional and
       // negative-fractional seeds must hash identically to their floor.
