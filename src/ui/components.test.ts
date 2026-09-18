@@ -442,6 +442,31 @@ describe('createDivinationPanel', () => {
     expect(panel.tagName).toBe('SECTION');
     expect(panel.className).toBe('card divination-card');
   });
+
+  it('copies the fingerprint to the clipboard when the copy button is clicked', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    const originalClipboard = Object.getOwnPropertyDescriptor(navigator, 'clipboard');
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText },
+      configurable: true,
+    });
+    try {
+      const panel = createDivinationPanel({ readings: [], fingerprint: 'fp-123' }, minimalUi);
+      const copyBtn = panel.querySelector('.action-btn') as HTMLButtonElement;
+      expect(copyBtn).not.toBeNull();
+      expect(copyBtn.getAttribute('aria-label')).toBe('Copy fingerprint');
+      copyBtn.click();
+      await vi.waitFor(() => {
+        expect(writeText).toHaveBeenCalledWith('fp-123');
+      });
+    } finally {
+      if (originalClipboard) {
+        Object.defineProperty(navigator, 'clipboard', originalClipboard);
+      } else {
+        delete (navigator as unknown as { clipboard?: unknown }).clipboard;
+      }
+    }
+  });
 });
 
 describe('createHeader', () => {
