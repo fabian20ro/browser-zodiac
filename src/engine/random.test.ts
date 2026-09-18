@@ -329,6 +329,17 @@ describe('dailySeed', () => {
     expect(withTime).toBe(withoutTime);
   });
 
+  it('out-of-range timePart falls back to the date-only seed', () => {
+    // random.ts:30 rejects an hour outside 0..23 or minute outside 0..59,
+    // skipping the `:HH:MM` insertion so the seed degenerates to the
+    // no-timePart composition. No existing test exercises this branch —
+    // the 24-hour guard only iterates 0..23.
+    const base = dailySeed('2026-07-09', 'aries');
+    expect(dailySeed('2026-07-09', 'aries', '24:00')).toBe(base); // h > 23
+    expect(dailySeed('2026-07-09', 'aries', '09:60')).toBe(base); // m > 59
+    expect(dailySeed('2026-07-09', 'aries', '99:99')).toBe(base); // both invalid
+  });
+
   it('whitespace-padded timePart normalizes correctly via Number() trim', () => {
     // normalizeTimePart uses Number(x) || 0 — JS Number trims whitespace, so
     // " 09:15 " and "\t14:30\n" parse identically to their trimmed equivalents.
