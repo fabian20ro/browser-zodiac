@@ -17,6 +17,11 @@ describe('buildGoogleAIUrl', () => {
     const url = buildGoogleAIUrl('');
     expect(url).toBe('https://www.google.com/search?udm=50&q=');
   });
+
+  it('encodes URL param-separator characters so the q= value cannot break out', () => {
+    const url = buildGoogleAIUrl('a&b=c');
+    expect(url).toBe('https://www.google.com/search?udm=50&q=a%26b%3Dc');
+  });
 });
 
 describe('copyToClipboard', () => {
