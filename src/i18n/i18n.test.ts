@@ -1,11 +1,29 @@
 // @vitest-environment jsdom
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import type { Grammar } from '../engine/types.ts';
 import {
   getLocale,
   getAvailableLocales,
   detectLanguage,
   persistLanguage,
+  loadAllGrammars,
 } from './index.ts';
+import { loadGrammar } from './grammar-loader.ts';
+
+// loadAllGrammars reaches the module-private `grammars` map through
+// loadGrammar; mock it so the test is deterministic and needs no network.
+// The mock is global for this file, but loadAllGrammars is only invoked in the
+// describe block below, so the existing getLocale fallback tests (which never
+// call it) still see an empty map and the embedded grammar.
+vi.mock('./grammar-loader.ts', async () => {
+  const actual = await vi.importActual<typeof import('./grammar-loader.ts')>(
+    './grammar-loader.ts',
+  );
+  return {
+    ...actual,
+    loadGrammar: vi.fn(async (id: string) => ({ [`loaded:${id}`]: [id] })),
+  };
+});
 
 const originalLanguage = navigator.language;
 
@@ -407,6 +425,22 @@ describe('persistLanguage', () => {
   });
 });
 
-// Note: loadAllGrammars tests removed - they require network/file access
-// which isn't available in jsdom. The getLocale fallback behavior is
-// already tested implicitly by other tests that use unregistered locales.
+describe('loadAllGrammars', () => {
+  it('loads grammar data for every registered locale and serves it via getLocale', async () => {
+    vi.mocked(loadGrammar).mockClear();
+
+    await loadAllGrammars();
+
+    // One loadGrammar call per registered locale, keyed by primary subtag.
+    expect(loadGrammar).toHaveBeenCalledTimes(2);
+    expect(loadGrammar).toHaveBeenCalledWith('en');
+    expect(loadGrammar).toHaveBeenCalledWith('ro');
+
+    // The loaded grammar (not the embedded default) is what getLocale now
+    // serves: distinct per-locale marker symbols prove the loaded data won.
+    const enLoaded = getLocale('en').grammar as Record<string, string[]>;
+    const roLoaded = getLocale('ro').grammar as Record<string, string[]>;
+    expect(enLoaded['loaded:en']).toEqual(['en']);
+    expect(roLoaded['loaded:ro']).toEqual(['ro']);
+  });
+});
