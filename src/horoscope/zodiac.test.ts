@@ -172,6 +172,22 @@ describe('randomSign extreme-seed boundary', () => {
     }
   });
 
+  it('rng at exactly 0.5 resolves to the median other sign (failure-specific)', () => {
+    // rng=0.5 → Math.floor(0.5 * 11) = 5 → 6th of the 11 signs except current.
+    // The existing mid-range test only checks self-consistency + membership, so an
+    // off-by-one in the index would still pass it. Pinning the exact median sign
+    // is the missing failure-specific assertion: a sign in the first half of the
+    // zodiac order resolves to libra, a sign in the second half resolves to virgo.
+    const expectedMid: Record<ZodiacSign, ZodiacSign> = {
+      aries: 'libra', taurus: 'libra', gemini: 'libra', cancer: 'libra',
+      leo: 'libra', virgo: 'libra', libra: 'virgo', scorpio: 'virgo',
+      sagittarius: 'virgo', capricorn: 'virgo', aquarius: 'virgo', pisces: 'virgo',
+    };
+    for (const sign of ZODIAC_SIGNS) {
+      expect(randomSign(sign, () => 0.5), `${sign} with rng=0.5`).toBe(expectedMid[sign]);
+    }
+  });
+
   it('every seed produces a valid sign for every current (multiplicative invariant)', () => {
     // Verifies Math.floor(v * 11) is always in [0, 10] for v in [0, 1)
     const seeds = [0, 1, 42, 123, 456, 789, 999, 9999];
