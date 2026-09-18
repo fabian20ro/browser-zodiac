@@ -99,6 +99,19 @@ describe('msUntilNextMidnightGmt', () => {
     expect(ms).toBeGreaterThan(86_390_000);
     expect(ms).toBeLessThan(86_400_000);
   });
+
+  it('returns exactly one full day when now is exactly at midnight UTC', () => {
+    // Boundary of the pure function (scheduler.ts:2-5): at the exact day
+    // boundary the next GMT midnight is precisely 24h ahead. Existing
+    // assertions in this block only pin ranges (>0, >=1, >86390000) at
+    // off-boundary inputs (14:30, 23:59:59.001, 00:00:01) — none asserts the
+    // exact value at the boundary itself. This pins 86_400_000 so an
+    // off-by-one-day or a same-day-midnight regression at the exact boundary
+    // is caught directly (distinct from the timer-based scheduler test that
+    // only observes the fire offset, not the pure return value).
+    const now = new Date('2026-01-01T00:00:00.000Z');
+    expect(msUntilNextMidnightGmt(now)).toBe(86_400_000);
+  });
 });
 
 describe('scheduleMidnightGmt resilience', () => {
