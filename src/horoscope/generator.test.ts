@@ -1,10 +1,13 @@
 import { describe, it, expect } from 'vitest';
+import { ro } from '../i18n/locales/ro.ts';
+import { en } from '../i18n/locales/en.ts';
 import { generateHoroscope } from './generator.ts';
 import { ZODIAC_SYMBOLS } from './zodiac.ts';
 import type { LocalePack } from '../i18n/types.ts';
 import type { DivinationProfile } from '../divination/browser-oracle.ts';
 
 const minimalLocale: LocalePack = {
+  timeOfDayOpenings: en.timeOfDayOpenings,
   id: 'test',
   name: 'Test',
   ui: {
@@ -602,6 +605,20 @@ describe('generateHoroscope', () => {
       { key: 'cosmic_mood', raw: mood, interpretation: '' },
     ],
     fingerprint: `mood-fp-${mood}`,
+  });
+
+  it.each([
+    ['deep_night', 'În liniștea nopții adânci'],
+    ['morning', 'În lumina dimineții'],
+    ['afternoon', 'Sub soarele după-amiezii'],
+    ['evening', 'Pe măsură ce umbrele serii se lungesc'],
+    ['night', 'Sub cerul înstelat al nopții'],
+  ])('localizes %s even when a downloaded grammar replaces bundled rules', (mood, opening) => {
+    const downloaded = { ...ro, grammar: minimalLocale.grammar };
+    const h = generateHoroscope('aries', downloaded, divinationForMood(mood), fixedDate);
+    expect(h.text).toBe(`${opening}: Your fate is sealed`);
+    expect(generateHoroscope('aries', en, divinationForMood(mood), fixedDate).text)
+      .not.toContain(opening);
   });
 
   it('prepends a time-of-day specific opening phrase derived from the cosmic_mood reading', () => {

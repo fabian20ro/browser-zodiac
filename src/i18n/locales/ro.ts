@@ -1,6 +1,13 @@
 import type { LocalePack } from '../types.ts';
 
 export const ro: LocalePack = {
+  timeOfDayOpenings: {
+    deep_night: 'În liniștea nopții adânci',
+    morning: 'În lumina dimineții',
+    afternoon: 'Sub soarele după-amiezii',
+    evening: 'Pe măsură ce umbrele serii se lungesc',
+    night: 'Sub cerul înstelat al nopții',
+  },
   id: 'ro',
   name: 'Română',
   ui: {
