@@ -624,4 +624,9 @@ describe('generateHoroscope', () => {
     );
     expect(new Set(leadings).size).toBe(5);
   });
+
+  it('falls back to unprefixed origin text for an unrecognized cosmic_mood value', () => {
+    const h = generateHoroscope('aries', minimalLocale, divinationForMood('witching_hour'), fixedDate);
+    expect(h.text).toBe('Your fate is sealed');
+  });
 });

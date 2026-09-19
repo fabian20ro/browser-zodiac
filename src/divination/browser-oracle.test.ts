@@ -835,6 +835,20 @@ describe('readBrowserOracle', () => {
       const profile = readBrowserOracle();
       expect(profile.readings.find(r => r.key === 'spirit_browser')?.raw).toBe('Brave');
     });
+
+    it('prioritises Edge over Opera when both keywords appear in UA', () => {
+      vi.stubGlobal('navigator', {
+        userAgent: `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Edg/118.0 OPR/100.0`,
+        language: 'en-US',
+        hardwareConcurrency: 8,
+        platform: 'Windows NT 10.0; Win64; x64',
+        onLine: true,
+        maxTouchPoints: 0,
+        connection: { effectiveType: '4g' },
+      });
+      const profile = readBrowserOracle();
+      expect(profile.readings.find(r => r.key === 'spirit_browser')?.raw).toBe('Edge');
+    });
   });
 
   it('handles empty user agent', () => {
