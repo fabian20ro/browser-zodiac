@@ -38,6 +38,7 @@ export interface LocalePack {
   name: string;
   ui: UIStrings;
   grammar: Grammar;
+  timeOfDayOpenings?: Record<string, string>;
 }
 
 /** Runtime check that a locale pack satisfies the UIStrings contract.

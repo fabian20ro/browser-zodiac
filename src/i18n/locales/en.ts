@@ -13,6 +13,13 @@ for (const sign of ZODIAC_SIGNS) {
 }
 
 export const en: LocalePack = {
+  timeOfDayOpenings: {
+    deep_night: 'In the hush of deep night',
+    morning: 'As the morning light spills',
+    afternoon: 'Under the high afternoon sun',
+    evening: 'As the evening shadows lengthen',
+    night: 'Beneath the watchful night sky',
+  },
   id: 'en',
   name: 'English',
   ui: {
