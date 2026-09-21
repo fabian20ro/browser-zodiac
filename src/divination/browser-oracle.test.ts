@@ -983,6 +983,24 @@ describe('readBrowserOracle', () => {
     expect(profile.readings.find(r => r.key === 'cosmic_focus')?.raw).toBe('unknown');
   });
 
+  it('reports deviceMemory 0 as "0" cosmic_focus rather than collapsing to unknown', () => {
+    // A falsy 0 is a legitimate value (browsers report 0 when unbounded).
+    // Production stringifies before the fallback, so raw must be "0" and a
+    // numeric falsy check must never degrade it to "unknown".
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
+      language: 'en-US',
+      hardwareConcurrency: 8,
+      platform: 'MacIntel',
+      onLine: true,
+      maxTouchPoints: 0,
+      connection: { effectiveType: '4g' },
+      deviceMemory: 0,
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'cosmic_focus')?.raw).toBe('0');
+  });
+
   it('returns devicePixelRatio of 1 when absent from window', () => {
     vi.stubGlobal('window', {
       innerWidth: 1920,
