@@ -653,6 +653,23 @@ describe('createActionButton', () => {
     vi.useRealTimers();
   });
 
+  it('re-enables the button after a synchronous throw clears the busy state', async () => {
+    const btn = createActionButton({
+      icon: '⧉',
+      errorIcon: '✕',
+      ariaLabel: 'Copy',
+      onClick: () => { throw new Error('sync boom'); },
+    });
+
+    btn.click();
+    await Promise.resolve();
+
+    expect(btn.textContent).toBe('✕');
+    expect(btn.disabled).toBe(false);
+    expect(btn.style.pointerEvents).toBe('');
+    expect(btn.style.opacity).toBe('');
+  });
+
   it('shows feedbackText in textContent on success when provided', async () => {
     vi.useFakeTimers();
     const btn = createActionButton({
