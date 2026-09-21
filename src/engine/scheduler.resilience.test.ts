@@ -761,6 +761,59 @@ describe('scheduleMidnightGmt resilience', () => {
     expect(count).toBe(2);
   });
 
+  it('a replacement scheduled after an in-flight cancel fires on its first tick (cancel resets the skip flag)', async () => {
+    // Observable contract (scheduler.ts:67-73 vs :39): the cancel function
+    // sets isLoopRunning = false without bumping activeLoopId. When a
+    // replacement scheduleMidnightGmt call arrives after such a cancel —
+    // while the original loop's async callback is still in flight —
+    // shouldSkipFirstTick is computed against the cancelled (false) state,
+    // so the replacement's first scheduled tick fires instead of being
+    // suppressed. No existing test pins this interaction:
+    // "cancel() during an in-flight async callback" pins the no-replacement
+    // variant (the loop reschedules itself), and the mid-loop replacement
+    // tests pin the no-cancel variant (first tick suppressed).
+    let originalCalls = 0;
+    let replacementCalls = 0;
+    let resolveTask!: () => void;
+    const task = new Promise<void>(r => { resolveTask = r; });
+
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+    const cancel = scheduleMidnightGmt(async () => {
+      originalCalls++;
+      await task;
+    });
+
+    // First tick fires at midnight; the original callback is mid-await.
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(originalCalls).toBe(1);
+
+    // Cancel while in flight — resets isLoopRunning without bumping the loop id.
+    cancel();
+
+    // Replacement arrives against the cancelled (false) running state.
+    const cancelReplacement = scheduleMidnightGmt(() => {
+      replacementCalls++;
+    });
+
+    // Resolve the in-flight callback; its finally must not reschedule
+    // (loopId mismatch after the replacement) and must not double-fire.
+    resolveTask();
+    await vi.advanceTimersByTimeAsync(1);
+    expect(originalCalls).toBe(1);
+
+    // The replacement's first tick fires — the skip flag was reset by cancel().
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(replacementCalls).toBe(1);
+
+    // The loop continues normally on the following midnight.
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(replacementCalls).toBe(2);
+
+    cancelReplacement();
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(replacementCalls).toBe(2);
+  });
+
   it('does not fire immediately on a fresh first call with { immediate: true }', async () => {
     // The doc comment (scheduler.ts:32) claims immediate:true "fire callback
     // immediately on first call (before waiting for midnight)" when not already
