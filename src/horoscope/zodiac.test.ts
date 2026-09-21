@@ -161,6 +161,23 @@ describe('randomSign extreme-seed boundary', () => {
     }
   });
 
+  it('a non-finite seed degenerates to a constant-zero rng and picks the first other sign', () => {
+    // mulberry32 guards non-finite seeds with a () => 0 rng, but the existing
+    // seeded tests only use finite seeds, so this degenerate path is untested:
+    // NaN/±Infinity must resolve deterministically to index 0 of the 11
+    // candidates (aries→taurus, every other sign→aries).
+    const expectedFirst: Record<ZodiacSign, ZodiacSign> = {
+      aries: 'taurus', taurus: 'aries', gemini: 'aries', cancer: 'aries',
+      leo: 'aries', virgo: 'aries', libra: 'aries', scorpio: 'aries',
+      sagittarius: 'aries', capricorn: 'aries', aquarius: 'aries', pisces: 'aries',
+    };
+    for (const seed of [NaN, Infinity, -Infinity]) {
+      for (const sign of ZODIAC_SIGNS) {
+        expect(randomSign(sign, mulberry32(seed)), `${sign} with seed ${String(seed)}`).toBe(expectedFirst[sign]);
+      }
+    }
+  });
+
   it('rng at mid-range produces deterministic consistent results across all signs', () => {
     for (const current of ZODIAC_SIGNS) {
       const rng1 = () => 0.5;
