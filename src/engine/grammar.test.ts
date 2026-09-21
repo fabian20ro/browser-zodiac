@@ -298,6 +298,9 @@ describe('createGrammarEngine', () => {
     it('returns [?symbol] for an existing but empty rule array', () => {
       const engine = makeEngine({ word: [] });
       expect(engine.expand('#word#')).toBe('[?word]');
+      // The empty-rules branch returns the bare placeholder before modifiers
+      // run, so #word.bang# must collapse to [?word] — not [?word]!.
+      expect(engine.expand('#word.bang#')).toBe('[?word]');
     });
 
     it('throws on rule entries containing the grammar delimiter #', () => {
