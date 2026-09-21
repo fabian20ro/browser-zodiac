@@ -443,4 +443,23 @@ describe('loadAllGrammars', () => {
     expect(enLoaded['loaded:en']).toEqual(['en']);
     expect(roLoaded['loaded:ro']).toEqual(['ro']);
   });
+
+  it('rejects when a grammar load fails instead of swallowing the error', async () => {
+    // loadAllGrammars awaits Promise.all with no catch; a failed loader must
+    // surface to the caller (the app bootstrap) rather than resolve silently
+    // over partial data.
+    vi.mocked(loadGrammar).mockImplementation(
+      async () => {
+        throw new Error('grammar fetch failed');
+      },
+    );
+    try {
+      await expect(loadAllGrammars()).rejects.toThrow('grammar fetch failed');
+    } finally {
+      // Restore the vi.mock factory implementation for any later tests.
+      vi.mocked(loadGrammar).mockImplementation(
+        async (id: string) => ({ [`loaded:${id}`]: [id] }),
+      );
+    }
+  });
 });
