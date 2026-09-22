@@ -241,6 +241,23 @@ describe('sign-assigner', () => {
      );
     });
 
+    it('composes sub-1000-year dates with an unpadded year field — month and day stay zero-padded', () => {
+     // The production code pads month/day with padStart(2, '0') but writes the
+     // year with bare String(year), so years below 1000 keep their natural
+     // width (no leading zeros). The test above only pins 4-digit years; this
+     // pins the composed string for a short year — adding year padding later
+     // is an intentional behavior change.
+     const fingerprint = 'year-width-test';
+     // new Date(999, 11, 31) → year 999, month 12, day 31 → composed "999-12-31"
+     expect(assignDailySign(fingerprint, new Date(999, 11, 31))).toBe(
+       assignSign(`${fingerprint}:999-12-31`)
+     );
+     // Single-digit month/day still zero-padded even with a short year → "100-01-05"
+     expect(assignDailySign(fingerprint, new Date(100, 0, 5))).toBe(
+       assignSign(`${fingerprint}:100-01-05`)
+     );
+    });
+
     it('returns different signs for different dates with the same fingerprint', () => {
      const fingerprint = 'daily-test-fingerprint';
      const seenDays: string[] = [];

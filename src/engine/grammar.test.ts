@@ -38,6 +38,14 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#missing.bang#')).toBe('[?missing]');
     });
 
+    it('embeds the [?symbol] placeholder when a missing reference is inside a nested rule', () => {
+      // The missing-symbol branch fires during the recursive expansion of the
+      // chosen rule text, not only for top-level template references:
+      // surrounding literal text must survive, yielding an embedded placeholder.
+      const engine = makeEngine({ a: ['pre #missing# post'] });
+      expect(engine.expand('#a#')).toBe('pre [?missing] post');
+    });
+
     it('handles multiple items with mixed valid and invalid weights', () => {
       const engine = makeEngine({ item: ['a~~10', 'b~~invalid', 'c~~-1', 'd'] });
       const results = new Set<string>();
@@ -298,6 +306,9 @@ describe('createGrammarEngine', () => {
     it('returns [?symbol] for an existing but empty rule array', () => {
       const engine = makeEngine({ word: [] });
       expect(engine.expand('#word#')).toBe('[?word]');
+      // The empty-rules branch returns the bare placeholder before modifiers
+      // run, so #word.bang# must collapse to [?word] — not [?word]!.
+      expect(engine.expand('#word.bang#')).toBe('[?word]');
     });
 
     it('throws on rule entries containing the grammar delimiter #', () => {

@@ -242,6 +242,36 @@ describe('createHoroscopeCard', () => {
     }
   });
 
+  it('keeps the copy icon without feedback styling when the clipboard write fails', async () => {
+    const writeText = vi.fn().mockRejectedValue(new Error('clipboard denied'));
+    const originalClipboard = Object.getOwnPropertyDescriptor(navigator, 'clipboard');
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText },
+      configurable: true,
+    });
+    try {
+      const copyBtn = (
+        createHoroscopeCard(minimalHoroscope, minimalUi)
+          .querySelectorAll('.action-btn')[0] as HTMLButtonElement
+      );
+      copyBtn.click();
+      await vi.waitFor(() => {
+        expect(writeText).toHaveBeenCalledWith('You will find a mysterious sock.');
+      });
+      await vi.waitFor(() => {
+        expect(copyBtn.disabled).toBe(false);
+      });
+      expect(copyBtn.textContent).toBe('\u29C9');
+      expect(copyBtn.classList.contains('action-btn--feedback')).toBe(false);
+    } finally {
+      if (originalClipboard) {
+        Object.defineProperty(navigator, 'clipboard', originalClipboard);
+      } else {
+        delete (navigator as unknown as { clipboard?: unknown }).clipboard;
+      }
+    }
+  });
+
   it('renders all four detail rows with correct labels and values', () => {
     const card = createHoroscopeCard(minimalHoroscope, minimalUi);
     const details = card.querySelector('.horoscope-card__details');

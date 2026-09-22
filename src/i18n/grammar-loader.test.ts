@@ -151,6 +151,18 @@ dragon`;
       expect(result.imports).toEqual([]);
     });
 
+    it('handles CRLF line endings without corrupting headers, entries, or directives', () => {
+      // Grammar files authored on Windows use \r\n; each line is trimmed
+      // before matching, so section headers, @from directives, and entries
+      // must roundtrip cleanly (mirrors the parseEntriesFile CRLF case).
+      const content =
+        '@from creatures.txt import *\r\n\r\n=== creature ===\r\nunicorn\r\ndragon\r\n\r\n=== food ===\r\ntoast';
+      const result = parseGrammarText(content);
+      expect(result.imports).toEqual(['creatures.txt']);
+      expect(result.sections.creature).toEqual(['unicorn', 'dragon']);
+      expect(result.sections.food).toEqual(['toast']);
+    });
+
     it('treats @from directives inside a section as imports, not entries', () => {
       const content = `=== food ===
 toast
