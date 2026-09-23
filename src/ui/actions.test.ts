@@ -483,6 +483,23 @@ describe('createActionButton', () => {
     expect(btn.textContent).toBe('✕');
   });
 
+  it('treats a non-Error reject as a failure and shows error feedback', async () => {
+    const btn = createActionButton({
+      icon: '⧉',
+      feedbackIcon: '✓',
+      errorIcon: '✕',
+      ariaLabel: 'Copy',
+      onClick: () => Promise.reject('network down'),
+    });
+
+    btn.click();
+    await Promise.resolve();
+
+    expect(btn.textContent).toBe('✕');
+    expect(btn.classList.contains('action-btn--feedback')).toBe(false);
+    expect(btn.disabled).toBe(false);
+  });
+
   it('re-enables the button after a rejecting action clears the busy state', async () => {
     const btn = createActionButton({
       icon: '⧉',
