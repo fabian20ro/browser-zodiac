@@ -11,6 +11,11 @@ import {
 } from './components.ts';
 import type { UIStrings } from '../i18n/types.ts';
 import type { Horoscope } from '../horoscope/generator.ts';
+import { generateHoroscope } from '../horoscope/generator.ts';
+import { en } from '../i18n/locales/en.ts';
+import { ro } from '../i18n/locales/ro.ts';
+import { readFileSync } from 'node:fs';
+import { parseGrammarText } from '../i18n/grammar-loader.ts';
 
 const minimalUi: UIStrings = {
   title: 'T',
@@ -53,12 +58,59 @@ const locales = [
   { id: 'ro', name: 'Română', ui: minimalUi, grammar: {} },
 ];
 
+describe('shipping locale color presentation', () => {
+  for (const [locale, path, symbol] of [
+    [en, '../../public/data/en/a-c.txt', 'color'],
+    [ro, '../../public/data/ro/d-l.txt', 'luckyColor'],
+  ] as const) {
+    it(`${locale.id}: renders the external browser grammar, preserving unknown poetic colors as text`, () => {
+      const labels = parseGrammarText(readFileSync(new URL(path, import.meta.url), 'utf8')).sections[symbol];
+      expect(labels.length).toBeGreaterThan(30);
+      for (const label of labels) {
+        const horoscope = generateHoroscope('aries', {
+          ...locale, grammar: { ...locale.grammar, luckyColor: [label] },
+        }, { readings: [], fingerprint: '' });
+        const card = createHoroscopeCard(horoscope, locale.ui);
+        expect(card.textContent).toContain(label);
+        const swatch = card.querySelector('.detail-row__swatch') as HTMLElement | null;
+        if (['net-worth-negative neon', 'uninsured ultraviolet'].includes(label)) {
+          expect(swatch).toBeNull(); // No invented color for an ambiguous label.
+        } else {
+          expect(swatch?.style.backgroundColor, label).toBeTruthy();
+        }
+      }
+    });
+  }
+  for (const locale of [en, ro]) {
+    for (const [index, label] of locale.grammar.color.entries()) {
+      it(`${locale.id}: renders ${label} with its stable color value`, () => {
+        const horoscope = generateHoroscope('aries', {
+          ...locale, grammar: { ...locale.grammar, color: [label] },
+        }, { readings: [], fingerprint: '' }, new Date('2026-09-23T12:00:00Z'));
+        const card = createHoroscopeCard(horoscope, locale.ui);
+        const swatch = card.querySelector('.detail-row__swatch') as HTMLElement;
+        expect(swatch?.style.backgroundColor).toBe(['red', 'blue', 'gold', 'silver', 'violet'][index]);
+        expect(swatch?.nextElementSibling?.textContent).toBe(label);
+      });
+    }
+  }
+  it('keeps arbitrary grammar text but does not treat it as a CSS color', () => {
+    const horoscope = generateHoroscope('aries', {
+      ...ro, grammar: { ...ro.grammar, luckyColor: ['culoarea destinului'] },
+    }, { readings: [], fingerprint: '' });
+    const card = createHoroscopeCard(horoscope, ro.ui);
+    expect(card.textContent).toContain('culoarea destinului');
+    expect(card.querySelector('.detail-row__swatch')).toBeNull();
+  });
+});
+
 const minimalHoroscope: Horoscope = {
   sign: 'aries',
   signSymbol: '♈',
   text: 'You will find a mysterious sock.',
   luckyNumber: 42,
   luckyColor: 'purple',
+  luckyColorCss: 'purple',
   warning: 'Beware of pigeons.',
   compatibility: 'Leo',
   date: '2026-03-03',

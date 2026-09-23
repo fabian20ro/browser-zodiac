@@ -1,6 +1,16 @@
 import type { LocalePack } from '../types.ts';
 
 export const ro: LocalePack = {
+  luckyColorValues: {
+    'roșu': 'red', albastru: 'blue', aurit: 'gold', argintiu: 'silver', violet: 'violet',
+    bej: 'beige', mov: 'purple', teal: 'teal', roz: 'pink', portocaliu: 'orange',
+    verde: 'green', magenta: 'magenta', cyan: 'cyan', 'vișiniu': 'maroon', galben: 'yellow',
+    auriu: 'gold', maro: 'brown', grena: '#800020', 'lavandă': 'lavender', kaki: 'khaki',
+    perivincliu: '#ccccff', taupe: '#483c32', bleumarin: 'navy', negru: 'black',
+    'verde lime': 'lime', coral: 'coral', indigo: 'indigo', 'alb-murdar': '#faf9f6',
+    transparent: 'transparent', fucsia: 'fuchsia', turcoaz: 'turquoise', stacojiu: '#ff2400',
+    crem: '#fffdd0', cupru: '#b87333',
+  },
   timeOfDayOpenings: {
     deep_night: 'În liniștea nopții adânci',
     morning: 'În lumina dimineții',

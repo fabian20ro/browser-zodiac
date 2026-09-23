@@ -12,6 +12,7 @@ export interface Horoscope {
   luckyNumber: number;
   mood: string;
   luckyColor: string;
+  luckyColorCss?: string;
   warning: string;
   compatibility: string;
   date: string;
@@ -33,6 +34,15 @@ const SIGN_ELEMENTS: Record<ZodiacSign, 'fire' | 'earth' | 'air' | 'water'> = {
   scorpio: 'water',
   pisces: 'water',
 };
+
+/** Explicit locale vocabulary; never pass whimsical grammar prose to CSS. */
+function colorValue(label: string, palette: Record<string, string> = {}): string | undefined {
+  const words = ` ${label.normalize('NFC').toLowerCase()} `;
+  // A specific phrase (off-white / verde lime) wins over its generic color.
+  const name = Object.keys(palette).sort((a, b) => b.length - a.length)
+    .find(key => words.includes(` ${key} `));
+  return name ? palette[name] : undefined;
+}
 
 /** Merge locale grammar with divination readings — signName symbol + reading keys as symbols. */
 function buildContextGrammar(
@@ -93,6 +103,7 @@ export function generateHoroscope(
     warning,
     mood,
     luckyColor,
+    luckyColorCss: colorValue(luckyColor, locale.luckyColorValues),
     compatibility,
     luckyNumber,
     date: dateStr,
