@@ -629,4 +629,18 @@ describe('dailySeed', () => {
       dailySeed('2026-07-09', 'aries', '14:30'),
     );
   });
+
+  it('fractional hour/minute values pass the range check untruncated (characterizes padStart passthrough)', () => {
+    // Number('14.5') = 14.5 sits inside 0..23, so the range check accepts it,
+    // but padStart does not truncate: '14.5'.padStart(2, '0') stays '14.5'.
+    // Characterizes the current non-canonical composition so a regression
+    // that truncates fractional values (e.g. h | 0) fails loudly.
+    expect(dailySeed('2026-07-09', 'aries', '14.5:30')).toBe(
+      hashString('2026-07-09:14.5:30:aries'),
+    );
+    // The fractional variant must differ from the canonical integer seed.
+    expect(dailySeed('2026-07-09', 'aries', '14.5:30')).not.toBe(
+      dailySeed('2026-07-09', 'aries', '14:30'),
+    );
+  });
 });
