@@ -396,6 +396,15 @@ body::before {
   color: var(--green-silver);
 }
 
+.detail-row__swatch {
+  display: inline-block;
+  width: 0.75em;
+  height: 0.75em;
+  border-radius: 50%;
+  vertical-align: middle;
+  margin-right: 0.3em;
+}
+
 /* ---- Divination Card ---- */
 
 .divination-card__heading {

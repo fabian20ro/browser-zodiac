@@ -15,9 +15,19 @@ function el<K extends keyof HTMLElementTagNameMap>(
   return e;
 }
 
-function appendDetailRow(parent: HTMLElement, label: string, value: string): void {
+function appendDetailRow(
+  parent: HTMLElement,
+  label: string,
+  value: string,
+  swatchColor?: string,
+): void {
   const row = el('div', 'detail-row');
   row.appendChild(el('span', 'detail-row__label', label));
+  if (swatchColor !== undefined) {
+    const swatch = el('span', 'detail-row__swatch');
+    swatch.style.backgroundColor = swatchColor;
+    row.appendChild(swatch);
+  }
   row.appendChild(el('span', 'detail-row__value', value));
   parent.appendChild(row);
 }
@@ -132,13 +142,13 @@ export function createHoroscopeCard(
 
   const details = el('div', 'horoscope-card__details');
 
-  for (const [labelKey, value] of [
+  for (const [labelKey, value, swatchColor] of [
     [ui.luckyNumber, String(horoscope.luckyNumber)],
-    [ui.luckyColor, horoscope.luckyColor],
+    [ui.luckyColor, horoscope.luckyColor, horoscope.luckyColor],
     [ui.cosmicWarning, horoscope.warning],
     [ui.compatibility, horoscope.compatibility],
   ]) {
-    appendDetailRow(details, labelKey, value);
+    appendDetailRow(details, labelKey, value, swatchColor);
   }
 
   card.append(headingRow, text, details);

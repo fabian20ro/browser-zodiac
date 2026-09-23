@@ -295,6 +295,16 @@ describe('createHoroscopeCard', () => {
     expect((rows[3].querySelector('.detail-row__label') as HTMLElement).textContent).toBe('Co');
     expect((rows[3].querySelector('.detail-row__value') as HTMLElement).textContent).toBe('Leo');
   });
+
+  it('renders a swatch dot matching the lucky color before the lucky color value', () => {
+    const card = createHoroscopeCard(minimalHoroscope, minimalUi);
+    const colorRow = card.querySelectorAll('.detail-row')[1];
+    const swatch = colorRow.querySelector('.detail-row__swatch') as HTMLElement;
+    expect(swatch).not.toBeNull();
+    expect(swatch.style.backgroundColor).toBe(minimalHoroscope.luckyColor);
+    expect(swatch.previousElementSibling?.className).toBe('detail-row__label');
+    expect(swatch.nextElementSibling?.className).toBe('detail-row__value');
+  });
 });
 
 describe('createTopBar', () => {
