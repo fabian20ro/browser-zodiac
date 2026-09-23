@@ -462,4 +462,16 @@ describe('loadAllGrammars', () => {
       );
     }
   });
+
+  it('serves the loaded grammar for regional tags after a successful load', async () => {
+    // The regional-tag tests above run against an empty grammar map. After
+    // loadAllGrammars, "ro-RO" must still resolve to the base locale's
+    // loaded grammar: keying the map by the full BCP-47 tag would silently
+    // fall back to the embedded grammar, and no other test would catch it.
+    await loadAllGrammars();
+
+    const regional = getLocale('ro-RO').grammar as Record<string, string[]>;
+    expect(regional).toBe(getLocale('ro').grammar);
+    expect(regional['loaded:ro']).toEqual(['ro']);
+  });
 });
