@@ -494,6 +494,19 @@ unicorn`,
     expect(grammar.creature).toEqual(['unicorn', 'sparkle', 'dragon']);
   });
 
+  it('deduplicates repeated entries within the main file itself', async () => {
+    // _mergeSections runs with deduplicate=true for the main file too
+    // (grammar-loader.ts line 166): listing the same entry twice for one
+    // symbol must not double the row. Existing dedup tests only cover
+    // main-vs-imported overlap, not duplicates inside the main file.
+    const fetch = mockFetch({
+      'http://test/data/en.txt': `=== creature ===\nunicorn\ndragon\nunicorn`,
+    });
+
+    const grammar = await loadGrammar('en', 'http://test/data/', fetch);
+    expect(grammar.creature).toEqual(['unicorn', 'dragon']);
+  });
+
   it('throws on non-200 @from response in strict mode with URL', async () => {
     const fetch = mockFetch({
       'http://test/data/en.txt': `@from bad.txt import *`,
