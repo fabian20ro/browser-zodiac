@@ -13,6 +13,16 @@ for (const sign of ZODIAC_SIGNS) {
 }
 
 export const en: LocalePack = {
+  luckyColorValues: {
+    red: 'red', blue: 'blue', gold: 'gold', silver: 'silver', violet: 'violet',
+    beige: 'beige', purple: 'purple', teal: 'teal', pink: 'pink', orange: 'orange',
+    vermillion: '#e34234', chartreuse: 'chartreuse', magenta: 'magenta', cyan: 'cyan',
+    maroon: 'maroon', yellow: 'yellow', gray: 'gray', lavender: 'lavender', khaki: 'khaki',
+    navy: 'navy', taupe: '#483c32', coral: 'coral', lime: 'lime', indigo: 'indigo',
+    periwinkle: '#ccccff', black: 'black', rose: '#ff007f', 'off-white': '#faf9f6',
+    scarlet: '#ff2400', tangerine: '#f28500', crimson: 'crimson', plum: 'plum',
+    lilac: '#c8a2c8', white: 'white', amber: '#ffbf00', burgundy: '#800020', ivory: 'ivory',
+  },
   timeOfDayOpenings: {
     deep_night: 'In the hush of deep night',
     morning: 'As the morning light spills',

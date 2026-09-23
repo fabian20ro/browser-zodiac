@@ -38,6 +38,8 @@ export interface LocalePack {
   name: string;
   ui: UIStrings;
   grammar: Grammar;
+  /** Localized grammar labels map to stable CSS values; arbitrary prose has no swatch. */
+  luckyColorValues?: Record<string, string>;
   timeOfDayOpenings?: Record<string, string>;
 }
 

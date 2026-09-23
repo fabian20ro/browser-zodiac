@@ -575,6 +575,21 @@ describe('isInRange', () => {
   it('edge: empty range (start > end in standard case)', () => {
     expect(isInRange(150, 300, 100)).toBe(false);   // start > end, neither branch matches
   });
+
+  it('branch-condition boundaries: start exactly month 3 and end exactly month 2 select the wrap branch', () => {
+    // The wrap condition `startMonth >= 3 && endMonth < 3` was only exercised
+    // in isolation with a Dec start / Jan end (1222/119). Pin its two
+    // comparison boundaries so an off-by-one (`> 3` or `< 2`) cannot silently
+    // reclassify these pairs to the standard branch and invert the results:
+    expect(isInRange(321, 321, 100)).toBe(true);   // start month 3 → wrap: inclusive start
+    expect(isInRange(50, 321, 100)).toBe(true);    // wrap: below end (Jan 5)
+    expect(isInRange(100, 321, 100)).toBe(false);  // exclusive end
+    expect(isInRange(150, 321, 100)).toBe(false);  // between end and start
+    expect(isInRange(1200, 1200, 219)).toBe(true); // end month 2 → wrap: inclusive start
+    expect(isInRange(50, 1200, 219)).toBe(true);   // wrap: below end
+    expect(isInRange(219, 1200, 219)).toBe(false); // exclusive end
+    expect(isInRange(300, 1200, 219)).toBe(false); // March → between end and start
+  });
 });
 
 describe('getSignDateRange', () => {
