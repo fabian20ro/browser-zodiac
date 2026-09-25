@@ -13,6 +13,7 @@ export interface UIStrings {
   dailyHoroscope: string;
   luckyNumber: string;
   luckyColor: string;
+  moodLabel: string;
   cosmicWarning: string;
   compatibility: string;
   browserDivination: string;
@@ -57,7 +58,7 @@ export function validateLocalePack(pack: LocalePack): { ok: true } | { ok: false
   const ui = pack.ui;
   const requiredStrings: (keyof UIStrings)[] = [
     'title', 'subtitle', 'yourSign', 'dailyHoroscope', 'luckyNumber',
-    'luckyColor', 'cosmicWarning', 'compatibility', 'browserDivination',
+    'luckyColor', 'moodLabel', 'cosmicWarning', 'compatibility', 'browserDivination',
     'randomizeSign', 'regenerate', 'copyHoroscope', 'copiedHoroscope',
     'interpretWithAI', 'aiInterpretQuery', 'switchToLanguageLabel',
     'switchToLightTheme', 'switchToDarkTheme', 'toggleDivinationDetails',

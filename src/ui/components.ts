@@ -145,6 +145,7 @@ export function createHoroscopeCard(
   for (const [labelKey, value, swatchColor] of [
     [ui.luckyNumber, String(horoscope.luckyNumber)],
     [ui.luckyColor, horoscope.luckyColor, horoscope.luckyColorCss],
+    [ui.moodLabel, horoscope.mood, undefined],
     [ui.cosmicWarning, horoscope.warning],
     [ui.compatibility, horoscope.compatibility],
   ] as const) {
