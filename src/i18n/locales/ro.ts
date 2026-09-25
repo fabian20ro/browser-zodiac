@@ -27,6 +27,7 @@ export const ro: LocalePack = {
     dailyHoroscope: 'Horoscopul de azi',
     luckyNumber: 'Numărul norocos',
     luckyColor: 'Culoarea norocoasă',
+    moodLabel: 'Stare',
     cosmicWarning: 'Avertisment cosmic',
     compatibility: 'Compatibilitate',
     browserDivination: 'Ce a dezvăluit browserul tău',

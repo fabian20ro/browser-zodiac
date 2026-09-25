@@ -438,6 +438,21 @@ describe('sign-assigner', () => {
       expect(signs.every(s => s !== '')).toBe(true);
     });
 
+    it('throws a TypeError for a truthy non-string entry — filter(Boolean) protects only falsy values, so truthy non-strings propagate the assignSign input contract', () => {
+      // The falsy-input test above pins that null/undefined/'' are silently dropped
+      // from the batch. filter(Boolean) keeps TRUTHY non-strings (numbers, booleans,
+      // objects, arrays), which then reach assignSign and hit its string-fingerprint
+      // guard — so the batch call throws rather than silently coercing or dropping
+      // them. This pins the complement of the falsy-filter behavior: a purely-truthy
+      // non-string, or a valid string mixed with one, throws instead of returning a
+      // partial array.
+      for (const bad of [42, true, {}, ['nested']] as any[]) {
+        expect(() => assignSigns([bad] as any)).toThrow(TypeError);
+        expect(() => assignSigns([bad] as any)).toThrow('assignSign requires a string fingerprint');
+      }
+      expect(() => assignSigns(['alice', 42] as any)).toThrow('assignSign requires a string fingerprint');
+    });
+
     it('preserves positional correspondence after filtering', () => {
       const fingerprints: Array<string | null | undefined> = ['alice', null, 'bob', undefined];
       const batchResult = assignSigns(fingerprints);

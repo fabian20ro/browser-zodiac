@@ -39,6 +39,7 @@ export const en: LocalePack = {
     dailyHoroscope: "Today's Horoscope",
     luckyNumber: 'Lucky Number',
     luckyColor: 'Lucky Color',
+    moodLabel: 'Mood',
     cosmicWarning: 'Cosmic Warning',
     compatibility: 'Compatibility',
     browserDivination: 'What Your Browser Revealed',
