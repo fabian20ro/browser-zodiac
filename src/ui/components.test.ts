@@ -22,6 +22,7 @@ const minimalUi: UIStrings = {
   subtitle: 'S',
   yourSign: 'Y',
   dailyHoroscope: 'D',
+  dateLabel: 'Date',
   luckyNumber: 'L',
   luckyColor: 'C',
   moodLabel: 'M',
@@ -326,38 +327,43 @@ describe('createHoroscopeCard', () => {
     }
   });
 
-  it('renders all five detail rows with correct labels and values', () => {
+  it('renders all six detail rows with correct labels and values', () => {
     const card = createHoroscopeCard(minimalHoroscope, minimalUi);
     const details = card.querySelector('.horoscope-card__details');
     expect(details).not.toBeNull();
     const rows = details!.querySelectorAll('.detail-row');
-    expect(rows.length).toBe(5);
+    expect(rows.length).toBe(6);
 
-    // Row 0: lucky number
-    expect((rows[0].querySelector('.detail-row__label') as HTMLElement).textContent).toBe('L');
-    expect((rows[0].querySelector('.detail-row__value') as HTMLElement).textContent).toBe('42');
+    // Row 0: date (first detail row, no swatch)
+    expect((rows[0].querySelector('.detail-row__label') as HTMLElement).textContent).toBe('Date');
+    expect((rows[0].querySelector('.detail-row__value') as HTMLElement).textContent).toBe('2026-03-03');
+    expect(rows[0].querySelector('.detail-row__swatch')).toBeNull();
 
-    // Row 1: lucky color
-    expect((rows[1].querySelector('.detail-row__label') as HTMLElement).textContent).toBe('C');
-    expect((rows[1].querySelector('.detail-row__value') as HTMLElement).textContent).toBe('purple');
+    // Row 1: lucky number
+    expect((rows[1].querySelector('.detail-row__label') as HTMLElement).textContent).toBe('L');
+    expect((rows[1].querySelector('.detail-row__value') as HTMLElement).textContent).toBe('42');
 
-    // Row 2: mood (no swatch)
-    expect((rows[2].querySelector('.detail-row__label') as HTMLElement).textContent).toBe('M');
-    expect((rows[2].querySelector('.detail-row__value') as HTMLElement).textContent).toBe('balanced');
-    expect(rows[2].querySelector('.detail-row__swatch')).toBeNull();
+    // Row 2: lucky color
+    expect((rows[2].querySelector('.detail-row__label') as HTMLElement).textContent).toBe('C');
+    expect((rows[2].querySelector('.detail-row__value') as HTMLElement).textContent).toBe('purple');
 
-    // Row 3: cosmic warning
-    expect((rows[3].querySelector('.detail-row__label') as HTMLElement).textContent).toBe('W');
-    expect((rows[3].querySelector('.detail-row__value') as HTMLElement).textContent).toBe('Beware of pigeons.');
+    // Row 3: mood (no swatch)
+    expect((rows[3].querySelector('.detail-row__label') as HTMLElement).textContent).toBe('M');
+    expect((rows[3].querySelector('.detail-row__value') as HTMLElement).textContent).toBe('balanced');
+    expect(rows[3].querySelector('.detail-row__swatch')).toBeNull();
 
-    // Row 4: compatibility
-    expect((rows[4].querySelector('.detail-row__label') as HTMLElement).textContent).toBe('Co');
-    expect((rows[4].querySelector('.detail-row__value') as HTMLElement).textContent).toBe('Leo');
+    // Row 4: cosmic warning
+    expect((rows[4].querySelector('.detail-row__label') as HTMLElement).textContent).toBe('W');
+    expect((rows[4].querySelector('.detail-row__value') as HTMLElement).textContent).toBe('Beware of pigeons.');
+
+    // Row 5: compatibility
+    expect((rows[5].querySelector('.detail-row__label') as HTMLElement).textContent).toBe('Co');
+    expect((rows[5].querySelector('.detail-row__value') as HTMLElement).textContent).toBe('Leo');
   });
 
   it('renders a swatch dot matching the lucky color before the lucky color value', () => {
     const card = createHoroscopeCard(minimalHoroscope, minimalUi);
-    const colorRow = card.querySelectorAll('.detail-row')[1];
+    const colorRow = card.querySelectorAll('.detail-row')[2];
     const swatch = colorRow.querySelector('.detail-row__swatch') as HTMLElement;
     expect(swatch).not.toBeNull();
     expect(swatch.style.backgroundColor).toBe(minimalHoroscope.luckyColor);

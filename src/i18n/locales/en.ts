@@ -37,6 +37,7 @@ export const en: LocalePack = {
     subtitle: 'Your Browser Knows Your Destiny',
     yourSign: 'Your sign for today',
     dailyHoroscope: "Today's Horoscope",
+    dateLabel: 'Date',
     luckyNumber: 'Lucky Number',
     luckyColor: 'Lucky Color',
     moodLabel: 'Mood',

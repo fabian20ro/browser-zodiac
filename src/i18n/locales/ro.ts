@@ -25,6 +25,7 @@ export const ro: LocalePack = {
     subtitle: 'Browserul tău îți cunoaște destinul',
     yourSign: 'Zodia ta pentru azi',
     dailyHoroscope: 'Horoscopul de azi',
+    dateLabel: 'Data',
     luckyNumber: 'Numărul norocos',
     luckyColor: 'Culoarea norocoasă',
     moodLabel: 'Stare',
