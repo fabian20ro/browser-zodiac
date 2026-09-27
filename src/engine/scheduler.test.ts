@@ -636,6 +636,45 @@ describe('scheduleMidnightGmt', () => {
     expect(newCallback).toHaveBeenCalledTimes(1);
   });
 
+  it('reschedules and fires again at the next midnight after a cancel() invoked from within its own synchronous callback', async () => {
+    // Observable contract (scheduler.ts:67-73 vs :57-62, :38): the returned
+    // cancel() clears the shared activeHandle and resets isLoopRunning but
+    // does NOT bump activeLoopId. When it is invoked directly from within a
+    // still-executing synchronous callback — with no replacement scheduler in
+    // between — the in-flight finally still sees loopId === activeLoopId and
+    // reschedules: the loop fires again at the next midnight. A scoped-cancel
+    // regression that bumps activeLoopId in cancel() would stop the loop here
+    // (one total fire instead of two); this assertion distinguishes it. The
+    // async variant is pinned in scheduler.resilience.test.ts ("cancel()
+    // during an in-flight async callback..."); this pins the direct
+    // synchronous self-cancel.
+    let cancelSelf: (() => void) | null = null;
+    let cancelRequested = false;
+    const callback = vi.fn(() => {
+      if (cancelRequested || cancelSelf === null) return;
+      cancelRequested = true;
+      cancelSelf();
+    });
+
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+    cancelSelf = scheduleMidnightGmt(callback);
+
+    // First tick fires at midnight; the callback cancels the loop mid-execution.
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(callback).toHaveBeenCalledTimes(1);
+
+    // cancel() did not bump activeLoopId, so the in-flight finally
+    // reschedules — the loop resumes at the next midnight.
+    vi.setSystemTime(new Date('2026-01-02T23:59:59.000Z'));
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(callback).toHaveBeenCalledTimes(2);
+
+    // A second explicit cancel between ticks stops the loop for good.
+    cancelSelf();
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(callback).toHaveBeenCalledTimes(2);
+  });
+
   it('only the latest callback fires when two are scheduled synchronously', async () => {
     // Observable contract: when scheduleMidnightGmt() is called twice in rapid succession
     // (without any time advance between calls), only the most recent scheduler should fire —
