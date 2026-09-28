@@ -143,6 +143,7 @@ export function createHoroscopeCard(
   const details = el('div', 'horoscope-card__details');
 
   for (const [labelKey, value, swatchColor] of [
+    [ui.dateLabel, horoscope.date, undefined],
     [ui.luckyNumber, String(horoscope.luckyNumber)],
     [ui.luckyColor, horoscope.luckyColor, horoscope.luckyColorCss],
     [ui.moodLabel, horoscope.mood, undefined],
