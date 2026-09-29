@@ -340,6 +340,26 @@ describe('dailySeed', () => {
     expect(dailySeed('2026-07-09', 'aries', '99:99')).toBe(base); // both invalid
   });
 
+  it('non-numeric timePart parts normalize to 00 via the Number() || 0 fallback', () => {
+    // random.ts:28-29 parses each part with Number(x) || 0, so a non-numeric
+    // hour or minute (NaN → 0) is RETAINED as a valid 00:MM / HH:00 rather
+    // than falling back to the date-only seed like the out-of-range branch
+    // above. Pins the degenerate-input fallback pattern; a strict-parse
+    // rewrite that rejects or NaN-embeds such parts would fail here.
+    const base = dailySeed('2026-07-09', 'aries');
+    expect(dailySeed('2026-07-09', 'aries', 'ab:15')).toBe(
+      dailySeed('2026-07-09', 'aries', '00:15'),
+    );
+    expect(dailySeed('2026-07-09', 'aries', '9:ab')).toBe(
+      dailySeed('2026-07-09', 'aries', '9:00'),
+    );
+    // Exact composition pin: both parts non-numeric → '00:00' insertion.
+    expect(dailySeed('2026-07-09', 'aries', 'ab:cd')).toBe(
+      hashString('2026-07-09:00:00:aries'),
+    );
+    expect(dailySeed('2026-07-09', 'aries', 'ab:cd')).not.toBe(base);
+  });
+
   it('whitespace-padded timePart normalizes correctly via Number() trim', () => {
     // normalizeTimePart uses Number(x) || 0 — JS Number trims whitespace, so
     // " 09:15 " and "\t14:30\n" parse identically to their trimmed equivalents.
