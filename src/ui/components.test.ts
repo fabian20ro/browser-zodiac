@@ -497,12 +497,17 @@ describe('createDivinationPanel', () => {
 
   it('uses localized aria label for details toggle', () => {
     const panel = createDivinationPanel({ readings: [], fingerprint: 'f' }, minimalUi);
-    const toggle = panel.querySelector('.divination-card__toggle');
+    const toggle = panel.querySelector('.divination-card__toggle') as HTMLButtonElement;
     const list = panel.querySelector('.divination-card__list');
-    expect(toggle?.getAttribute('aria-label')).toBe('Show Toggle divination details');
-    expect(toggle?.getAttribute('aria-controls')).toBe('divination-card__list');
+    // Accessible name must be fully localized; state is conveyed by aria-expanded, not a hardcoded prefix
+    expect(toggle.getAttribute('aria-label')).toBe(minimalUi.toggleDivinationDetails);
+    expect(toggle.getAttribute('aria-controls')).toBe('divination-card__list');
     expect(list?.id).toBe('divination-card__list');
-    expect((toggle as HTMLButtonElement).type).toBe('button');
+    expect(toggle.type).toBe('button');
+    // Expanded state is conveyed via aria-expanded, independent of the label
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    toggle.click();
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
   });
 
   it('renders reading rows with localized labels and raw values', () => {

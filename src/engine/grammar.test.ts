@@ -92,6 +92,21 @@ describe('createGrammarEngine', () => {
       }
     });
 
+    it('treats options without a weight as weight 1, so every option stays reachable', () => {
+      // pickWeighted assigns the default weight 1 to entries without '~~'.
+      // A regression that zeroed or dropped such entries (totalWeight 0)
+      // would pin output to the first option and fail the set assertions
+      // below, even though the explicit ~~0 weight tests still pass.
+      const engine = makeEngine({ item: ['a', 'b', 'c'] });
+      const results = new Set<string>();
+      for (let i = 0; i < 200; i++) {
+        results.add(engine.expand('#item#'));
+      }
+      expect(results.has('a')).toBe(true);
+      expect(results.has('b')).toBe(true);
+      expect(results.has('c')).toBe(true);
+    });
+
     it('applies unquote modifier', () => {
       const engine = makeEngine({ word: ['"hello"'] }, 42);
       expect(engine.expand('#word.unquote#')).toBe('hello');

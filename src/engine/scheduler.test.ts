@@ -416,6 +416,48 @@ describe('scheduleMidnightGmt', () => {
     expect(callCount).toBe(2); // inner scheduler fires after the skip tick
   });
 
+  it('skips the replacement first tick when it is scheduled while the previous async callback is still executing', async () => {
+    // Observable contract (scheduler.ts:39, :46-50, :59-61): the skip flag is
+    // latched at schedule time against isLoopRunning, so a replacement that
+    // arrives while the previous loop's callback is still executing (not just
+    // between ticks) must skip exactly one scheduled tick before resuming.
+    // The synchronous counterpart above cannot distinguish the two: its
+    // callback completes before the replacement is scheduled. This async
+    // variant pins the documented interaction (doc line 31) — the previous
+    // callback completes, but the replacement's first scheduled iteration is
+    // ignored while a new loop has started. A regression moving the skip
+    // decision to tick time (after the callback resolves) double-fires the
+    // replacement at its first midnight; a regression dropping the stale
+    // loopId guard in finally double-fires again when the old loop resumes.
+    let callCount = 0;
+    let allowInner = false;
+    vi.setSystemTime(new Date('2026-01-01T23:59:59.000Z'));
+    scheduleMidnightGmt(async () => {
+      callCount++;
+      await new Promise<void>(resolve => setTimeout(resolve, 1000));
+      // Replacement arrives while the outer callback is still executing.
+      if (!allowInner) {
+        allowInner = true;
+        scheduleMidnightGmt(() => {
+          callCount++;
+        });
+      }
+    });
+
+    await vi.advanceTimersByTimeAsync(2000);
+    expect(callCount).toBe(1); // outer fired; replacement's first tick skipped
+
+    // Replacement's skipped tick fires as a no-op, then it reschedules.
+    vi.setSystemTime(new Date('2026-01-02T23:59:59.000Z'));
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(callCount).toBe(1);
+
+    // The following midnight the replacement runs its callback.
+    vi.setSystemTime(new Date('2026-01-03T23:59:59.000Z'));
+    await vi.advanceTimersByTimeAsync(86400000);
+    expect(callCount).toBe(2);
+  });
+
   it('fires its first iteration normally when not scheduled during an active loop', async () => {
     // Observable contract: when scheduleMidnightGmt is called outside any active loop,
     // wasStartedDuringLoop=false — the scheduler must fire its callback at the first

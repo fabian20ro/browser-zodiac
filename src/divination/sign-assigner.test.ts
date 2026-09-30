@@ -324,6 +324,21 @@ describe('sign-assigner', () => {
       const symbols = new Set(Object.values(ZODIAC_SYMBOLS));
       expect(symbols.size).toBe(ZODIAC_SIGNS.length);
     });
+
+    it('cross-checks the derived sign against assignSign for every fingerprint — drift-proof', () => {
+      // The single-fingerprint test above asserts ZODIAC_SYMBOLS[result.sign] === result.symbol,
+      // which is tautological: production sets symbol from that same sign. It never verifies
+      // that the derived sign equals what assignSign would return for the fingerprint. A
+      // regression to a stale/different sign-derivation inside assignSignWithSymbol would pass
+      // every existing assertion. This cross-check (mirroring the assignSignWithElement
+      // drift-proof test) pins the sign against assignSign across many fingerprints.
+      for (let i = 0; i < ZODIAC_SIGNS.length * 50; i++) {
+        const fp = `symbol-drift-${i}`;
+        const withSymbol = assignSignWithSymbol(fp);
+        expect(withSymbol.sign).toBe(assignSign(fp));
+        expect(withSymbol.symbol).toBe(ZODIAC_SYMBOLS[withSymbol.sign]);
+      }
+    });
   });
 
   describe('assignSignWithElement', () => {

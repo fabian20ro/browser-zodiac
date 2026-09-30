@@ -1011,6 +1011,18 @@ describe('readBrowserOracle', () => {
     expect(profile.readings.find(r => r.key === 'pixel_density')?.raw).toBe('1');
   });
 
+  it('keeps fractional devicePixelRatio values in the pixel_density reading and fingerprint', () => {
+    vi.stubGlobal('window', {
+      innerWidth: 1920,
+      innerHeight: 1080,
+      devicePixelRatio: 1.5,
+      matchMedia: vi.fn().mockReturnValue({ matches: false }),
+    });
+    const profile = readBrowserOracle();
+    expect(profile.readings.find(r => r.key === 'pixel_density')?.raw).toBe('1.5');
+    expect(profile.fingerprint.split('|')[8]).toBe('1.5');
+  });
+
   it('uses saveData to set cosmic_thriftiness', () => {
     vi.stubGlobal('navigator', {
       userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/91 Safari/537.36',
