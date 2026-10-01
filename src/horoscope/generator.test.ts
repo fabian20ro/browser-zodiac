@@ -646,4 +646,25 @@ describe('generateHoroscope', () => {
     const h = generateHoroscope('aries', minimalLocale, divinationForMood('witching_hour'), fixedDate);
     expect(h.text).toBe('Your fate is sealed');
   });
+
+  it('luckyColorCss comes only from the explicit locale palette, never from whimsical grammar prose', () => {
+    const paletteLocale: LocalePack = {
+      ...minimalLocale,
+      luckyColorValues: { blue: 'blue', 'off-white': '#faf9f6' },
+    };
+    const h = generateHoroscope('aries', paletteLocale, minimalDivination, fixedDate);
+    expect(h.luckyColor).toBe('blue');
+    expect(h.luckyColorCss).toBe('blue');
+
+    const whimsicalLocale: LocalePack = {
+      ...paletteLocale,
+      grammar: {
+        ...paletteLocale.grammar,
+        luckyColor: ['the colour of your fate'],
+      },
+    };
+    const h2 = generateHoroscope('aries', whimsicalLocale, minimalDivination, fixedDate);
+    expect(h2.luckyColor).toBe('the colour of your fate');
+    expect(h2.luckyColorCss).toBeUndefined();
+  });
 });
