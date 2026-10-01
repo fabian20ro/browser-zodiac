@@ -194,6 +194,10 @@ describe('readBrowserOracle', () => {
     });
     // This should not throw if we add a check in the source
     expect(() => readBrowserOracle()).not.toThrow();
+    const profile = readBrowserOracle();
+    const langReading = profile.readings.find(r => r.key === 'cultural_destiny');
+    expect(langReading?.raw).toBe('');
+    expect(profile.fingerprint.split('|')[1]).toBe('');
   });
 
   it('degrades gracefully when navigator.connection is absent (Network Information API unavailable)', () => {
