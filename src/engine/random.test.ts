@@ -539,6 +539,22 @@ describe('dailySeed', () => {
     expect(negativeMinute).toBe(withoutTime);
   });
 
+  it('negative zero ("-0") timePart parts are retained and normalize to "00"', () => {
+    // Unlike other negatives ('-1:00', '14:-5'), which fall back to the
+    // date-only seed, Number('-0') = -0 is not < 0, so -0 parts pass the
+    // range check, are retained, and normalize to '00' via `|| 0` + padStart.
+    // Pins the lenient fallback: a strict-parse rewrite that rejects every
+    // negative token (including '-0') would flip these to the date-only seed.
+    const dateOnly = dailySeed('2026-07-09', 'aries');
+    expect(dailySeed('2026-07-09', 'aries', '09:-0')).toBe(
+      hashString('2026-07-09:09:00:aries'),
+    );
+    expect(dailySeed('2026-07-09', 'aries', '09:-0')).not.toBe(dateOnly);
+    expect(dailySeed('2026-07-09', 'aries', '-0:30')).toBe(
+      dailySeed('2026-07-09', 'aries', '00:30'),
+    );
+  });
+
   it('accepts boundary-valid hour and minute values', () => {
     // Hour=0, minute=0 should be valid; same as any other valid time.
     const withoutTime = dailySeed('2026-07-09', 'aries');
