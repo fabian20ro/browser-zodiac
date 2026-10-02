@@ -370,6 +370,26 @@ unicorn`,
     ).rejects.toThrow(/Failed to load http:\/\/test\/data\/en\.txt/);
   });
 
+  it('throws with the main file URL when its body read fails in strict mode', async () => {
+    // safeFetchText's text()-rejection path for the main file (always strict):
+    // fetch succeeds (ok:true) but res.text() rejects mid-stream. Must throw
+    // the URL-prefixed message — distinct from the null-check safety net
+    // ('Failed to load grammar: ...') which a strict-mode bug that returned
+    // null instead of throwing would hit.
+    const fetch = vi.fn((url: string) =>
+      Promise.resolve({
+        ok: true,
+        text: () => Promise.reject(new Error('body stream aborted')),
+      } as Response),
+    ) as FetchFn;
+
+    await expect(
+      loadGrammar('en', 'http://test/data/', fetch, true),
+    ).rejects.toThrow(
+      'Failed to load http://test/data/en.txt: body stream aborted',
+    );
+  });
+
   it('throws with the URL when the response body read fails in strict mode', async () => {
     // safeFetchText has three failure paths: fetch rejecting, a non-ok
     // response, and res.text() rejecting after headers arrived (e.g. a
