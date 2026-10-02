@@ -124,7 +124,10 @@ export function createHoroscopeCard(
     icon: '\u29C9',
     feedbackIcon: '\u2713',
     ariaLabel: ui.copyHoroscope,
-    onClick: () => copyToClipboard(horoscope.text),
+    onClick: () =>
+      copyToClipboard(
+        `${horoscope.signSymbol} ${ui.signNames[horoscope.sign]} \u2014 ${horoscope.date}\n\n${horoscope.text}`,
+      ),
   });
 
   const aiBtn = createActionButton({

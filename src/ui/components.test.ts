@@ -283,7 +283,9 @@ describe('createHoroscopeCard', () => {
       );
       copyBtn.click();
       await vi.waitFor(() => {
-        expect(writeText).toHaveBeenCalledWith('You will find a mysterious sock.');
+        expect(writeText).toHaveBeenCalledWith(
+          '♈ A \u2014 2026-03-03\n\nYou will find a mysterious sock.',
+        );
       });
       await vi.waitFor(() => {
         expect(copyBtn.textContent).toBe('✓');
@@ -311,7 +313,9 @@ describe('createHoroscopeCard', () => {
       );
       copyBtn.click();
       await vi.waitFor(() => {
-        expect(writeText).toHaveBeenCalledWith('You will find a mysterious sock.');
+        expect(writeText).toHaveBeenCalledWith(
+          '♈ A \u2014 2026-03-03\n\nYou will find a mysterious sock.',
+        );
       });
       await vi.waitFor(() => {
         expect(copyBtn.disabled).toBe(false);
