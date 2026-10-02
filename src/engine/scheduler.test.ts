@@ -126,6 +126,17 @@ describe('toGmtDateString', () => {
     expect(toGmtDateString(new Date('2026-07-04T14:22:33.999Z'))).toBe('2026-07-04');
   });
 
+  it('does not roll the date forward at the day boundary (before-midnight instant)', () => {
+    // Contract: toGmtDateString returns the calendar day OF the input instant
+    // (toISOString().slice(0,10), scheduler.ts:16-18). Distinct from the
+    // sub-millisecond case above (mid-day 14:22) and the exact-midnight case
+    // (00:00): this pins the end-of-day instant, where a before-midnight
+    // timestamp must still map to the same calendar day. A regression that
+    // crosses the day boundary (adding a day, or slicing the time-adjacent
+    // part of the ISO string) would yield '2026-07-05' instead of '2026-07-04'.
+    expect(toGmtDateString(new Date('2026-07-04T23:59:59.999Z'))).toBe('2026-07-04');
+  });
+
   it('returns a fresh string (not mutated by repeated calls)', () => {
     const date = new Date('2026-08-15T10:00:00.000Z');
     const first = toGmtDateString(date);
