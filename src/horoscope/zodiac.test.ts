@@ -620,6 +620,15 @@ describe('getSignDateRange', () => {
   it('returns null for a sign with no boundary entry', () => {
     expect(getSignDateRange('nonexistent' as any)).toBeNull();
   });
+
+  it('getSignDateRange and getSignByDate agree: start date maps to the sign, end date does not (inclusive start, exclusive end)', () => {
+    for (const sign of ZODIAC_SIGNS) {
+      const range = getSignDateRange(sign);
+      expect(range, `${sign} range`).not.toBeNull();
+      expect(getSignByDate(range!.startMonth, range!.startDay), `${sign} start`).toBe(sign);
+      expect(getSignByDate(range!.endMonth, range!.endDay), `${sign} end (exclusive)`).not.toBe(sign);
+    }
+  });
 });
 
 describe('ZodiacSign collection consistency', () => {
