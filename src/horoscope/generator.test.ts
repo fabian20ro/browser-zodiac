@@ -667,4 +667,18 @@ describe('generateHoroscope', () => {
     expect(h2.luckyColor).toBe('the colour of your fate');
     expect(h2.luckyColorCss).toBeUndefined();
   });
+
+  it('resolves a multi-word lucky color to its specific phrase, not a shorter generic color', () => {
+    const paletteLocale: LocalePack = {
+      ...minimalLocale,
+      luckyColorValues: { blue: 'blue', 'light blue': 'lightblue' },
+      grammar: {
+        ...minimalLocale.grammar,
+        luckyColor: ['light blue'],
+      },
+    };
+    const h = generateHoroscope('aries', paletteLocale, minimalDivination, fixedDate);
+    expect(h.luckyColor).toBe('light blue');
+    expect(h.luckyColorCss).toBe('lightblue');
+  });
 });
