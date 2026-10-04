@@ -681,4 +681,28 @@ describe('generateHoroscope', () => {
     expect(h.luckyColor).toBe('light blue');
     expect(h.luckyColorCss).toBe('lightblue');
   });
+
+  it('resolves palette keys case-insensitively and with Unicode normalization', () => {
+    const paletteLocale: LocalePack = {
+      ...minimalLocale,
+      luckyColorValues: { blue: 'blue', 'lavandă': 'lavender' },
+    };
+    const withCase = generateHoroscope(
+      'aries',
+      { ...paletteLocale, grammar: { ...minimalLocale.grammar, luckyColor: ['BLUE'] } },
+      minimalDivination,
+      fixedDate,
+    );
+    expect(withCase.luckyColor).toBe('BLUE');
+    expect(withCase.luckyColorCss).toBe('blue');
+
+    // Decomposed (NFD) diacritic must still match the composed (NFC) palette key.
+    const withDecomposed = generateHoroscope(
+      'aries',
+      { ...paletteLocale, grammar: { ...minimalLocale.grammar, luckyColor: ['lavand\u0061\u0306'] } },
+      minimalDivination,
+      fixedDate,
+    );
+    expect(withDecomposed.luckyColorCss).toBe('lavender');
+  });
 });
