@@ -26,6 +26,7 @@ vi.mock('./grammar-loader.ts', async () => {
 });
 
 const originalLanguage = navigator.language;
+const originalLanguages = navigator.languages;
 
 const localStorageStub = (() => {
   const items = new Map<string, string>();
@@ -56,6 +57,7 @@ beforeEach(() => {
 afterEach(() => {
   window.localStorage.removeItem('horror-scope-lang');
   setNavigatorProperty('language', originalLanguage);
+  setNavigatorProperty('languages', originalLanguages);
 });
 
 describe('getLocale', () => {
@@ -310,6 +312,33 @@ describe('detectLanguage', () => {
     setNavigatorProperty('language', 'fr-FR');
 
     expect(detectLanguage()).toBe('en');
+  });
+
+  it('detects Romanian from navigator.languages when the primary language is unregistered', () => {
+    // Primary is French (unregistered), but Romanian is the secondary preference
+    // in the ordered navigator.languages list, so the user should get the
+    // Romanian UI on first visit.
+    setNavigatorProperty('language', 'fr-FR');
+    setNavigatorProperty('languages', ['fr-FR', 'ro-RO']);
+
+    expect(detectLanguage()).toBe('ro');
+  });
+
+  it('falls back to English when neither the primary language nor any navigator.languages entry is registered', () => {
+    // The plural scan must not false-positive: an unregistered primary with no
+    // registered locale anywhere in the preference list still yields English.
+    setNavigatorProperty('language', 'fr-FR');
+    setNavigatorProperty('languages', ['fr-FR']);
+
+    expect(detectLanguage()).toBe('en');
+  });
+
+  it('prefers the saved language over navigator.languages', () => {
+    window.localStorage.setItem('horror-scope-lang', 'ro');
+    setNavigatorProperty('language', 'fr-FR');
+    setNavigatorProperty('languages', ['fr-FR']);
+
+    expect(detectLanguage()).toBe('ro');
   });
 });
 

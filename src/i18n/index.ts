@@ -43,6 +43,11 @@ export function getAvailableLocales(): LocalePack[] {
   return Array.from(registry.values());
 }
 
+function matchRegisteredLocale(tag: string): string | null {
+  const base = normalizeLocaleId(tag).slice(0, 2);
+  return registry.has(base) ? base : null;
+}
+
 export function detectLanguage(): string {
   try {
     const saved = window.localStorage.getItem(STORAGE_KEY);
@@ -54,8 +59,18 @@ export function detectLanguage(): string {
     // localStorage unavailable
   }
   if (typeof navigator !== 'undefined' && navigator.language) {
-    const browserLang = normalizeLocaleId(navigator.language).slice(0, 2);
-    if (registry.has(browserLang)) return browserLang;
+    const primary = matchRegisteredLocale(navigator.language);
+    if (primary) return primary;
+  }
+  if (typeof navigator !== 'undefined' && Array.isArray(navigator.languages)) {
+    // Primary language was unregistered: walk the ordered preference list
+    // (navigator.languages) for the first registered locale, so users whose
+    // first-choice language is unavailable get a matching UI instead of
+    // silently falling back to English.
+    for (const tag of navigator.languages) {
+      const matched = matchRegisteredLocale(tag);
+      if (matched) return matched;
+    }
   }
   return 'en';
 }
