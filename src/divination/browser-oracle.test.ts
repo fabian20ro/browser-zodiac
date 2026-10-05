@@ -89,6 +89,10 @@ describe('readBrowserOracle', () => {
     
     expect(browserReading?.raw).toBe('Chrome');
     expect(osReading?.raw).toBe('macOS');
+    // cosmic_mood derives from the (fake-timed) hour; its interpretation must embed the raw time-of-day.
+    const moodReading = profile.readings.find(r => r.key === 'cosmic_mood');
+    expect(moodReading?.raw).toBe('deep_night');
+    expect(moodReading?.interpretation).toBe('The cosmic mood is currently deep_night.');
     // The fingerprint should have the extra parameters: colorScheme, timeOfDay and mobileIndicator
     // Expected format: ${ua}|${lang}|${screenRes}|${platform}|${timezone}|${networkSpeed}|${colorScheme}|${timeOfDay}|${devicePixelRatio}|${mobileIndicator}
     // Based on mocks: Chrome|en-US|1920x1080|MacIntel|UTC|4g|light|deep_night|1|desktop

@@ -711,5 +711,24 @@ describe('sign-assigner', () => {
       expect(assignRandomSign(-7.9)).toBe(assignRandomSign(-8));
       expect(ZODIAC_SIGNS).toContain(assignRandomSign(1.9));
     });
+
+    it('pins the exact seed→sign mapping — "shareable by seed" requires the same sign, not merely some deterministic sign', () => {
+      // The reproducibility/variation tests above only assert self-consistency: a
+      // regression that changes how the seed is consumed (a double PRNG draw, a
+      // different index scale, a re-mapped wraparound) still passes all of them.
+      // The documented contract is that a reading shared by seed reproduces the
+      // same sign — so pin the mapping for representative seeds. This inlines
+      // mulberry32's first draw (same style as the inlined djb2 in the assignSign
+      // contract test) and applies production's index step: (firstDraw * 12) | 0.
+      for (const seed of [0, 1, 42, 123456789, -7, 0x80000000]) {
+        let s = seed | 0;
+        s = (s + 0x6d2b79f5) | 0;
+        let t = Math.imul(s ^ (s >>> 15), s | 1);
+        t = (t + Math.imul(t ^ (t >>> 7), 0x243f6a88)) | 0;
+        const firstDraw = ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        const expectedIndex = ((firstDraw * ZODIAC_SIGNS.length) | 0) % ZODIAC_SIGNS.length;
+        expect(assignRandomSign(seed)).toBe(ZODIAC_SIGNS[expectedIndex]);
+      }
+    });
   });
 });
