@@ -228,6 +228,14 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.titlecase#')).toBe('Hello World');
     });
 
+    it('trims and normalizes whitespace runs in titlecase', () => {
+      const engine = makeEngine({ word: ['  hello   world  '] });
+      // titlecase trims and collapses whitespace runs to single spaces.
+      // A regression that skips trim() or splits on ' ' instead of /\s+/
+      // would yield ' Hello World ' or 'Hello  World' here.
+      expect(engine.expand('#word.titlecase#')).toBe('Hello World');
+    });
+
     it('applies mystic modifier', () => {
       const engine = makeEngine({ word: ['hello'] });
       expect(engine.expand('#word.mystic#')).toBe('✧ hello ✧');
