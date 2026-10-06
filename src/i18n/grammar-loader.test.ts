@@ -112,6 +112,15 @@ dragon`;
     const content = 'unicorn\r\ndragon\r\nphoenix';
     expect(parseEntriesFile(content)).toEqual(['unicorn', 'dragon', 'phoenix']);
   });
+
+  it('preserves leading whitespace but trims trailing whitespace', () => {
+    // parseEntriesFile strips trailing whitespace with trimEnd() but keeps
+    // leading whitespace intact (trimStart() is used only for comment
+    // detection, not for entry normalization). Indented entries must keep
+    // their leading spaces; a wrong .trim() implementation would drop them.
+    const content = '  unicorn\n  dragon   ';
+    expect(parseEntriesFile(content)).toEqual(['  unicorn', '  dragon']);
+  });
 });
 
 describe('parseGrammarText', () => {
