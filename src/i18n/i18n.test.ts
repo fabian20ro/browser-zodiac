@@ -324,6 +324,22 @@ describe('detectLanguage', () => {
     expect(detectLanguage()).toBe('ro');
   });
 
+  it('returns the first registered locale in the ordered preference list', () => {
+    // The plural walk returns the FIRST registered locale it encounters, not
+    // the last and not a hardcoded preference: two registered entries in
+    // different orders must yield the earlier one each time. No existing
+    // navigator.languages test lists two registered entries, so this ordering
+    // contract was unpinned.
+    setNavigatorProperty('language', 'de-DE');
+    setNavigatorProperty('languages', ['ro', 'en']);
+
+    expect(detectLanguage()).toBe('ro');
+
+    setNavigatorProperty('languages', ['en', 'ro']);
+
+    expect(detectLanguage()).toBe('en');
+  });
+
   it('falls back to English when neither the primary language nor any navigator.languages entry is registered', () => {
     // The plural scan must not false-positive: an unregistered primary with no
     // registered locale anywhere in the preference list still yields English.

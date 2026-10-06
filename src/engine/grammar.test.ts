@@ -228,6 +228,14 @@ describe('createGrammarEngine', () => {
       expect(engine.expand('#word.titlecase#')).toBe('Hello World');
     });
 
+    it('trims and normalizes whitespace runs in titlecase', () => {
+      const engine = makeEngine({ word: ['  hello   world  '] });
+      // titlecase trims and collapses whitespace runs to single spaces.
+      // A regression that skips trim() or splits on ' ' instead of /\s+/
+      // would yield ' Hello World ' or 'Hello  World' here.
+      expect(engine.expand('#word.titlecase#')).toBe('Hello World');
+    });
+
     it('applies mystic modifier', () => {
       const engine = makeEngine({ word: ['hello'] });
       expect(engine.expand('#word.mystic#')).toBe('✧ hello ✧');
@@ -515,6 +523,10 @@ describe('createGrammarEngine', () => {
     it('throws on rule entry with invalid symbol ref in expansion reference', () => {
       expect(() => validateGrammar({ word: ['hello #123bad#'] })).toThrow(/malformed symbol reference/);
       expect(() => validateGrammar({ word: ['text #.uppercase# more'] })).toThrow(/malformed symbol reference/);
+      // A well-formed first reference must not mask a later malformed one in the
+      // same entry: validation runs for every #...# match. A regression that
+      // checked only the first match would let '#ok# #123bad#' through preflight.
+      expect(() => validateGrammar({ word: ['#ok# #123bad#'] })).toThrow(/malformed symbol reference/);
     });
 
     it('throws on an empty symbol name string', () => {
