@@ -515,6 +515,10 @@ describe('createGrammarEngine', () => {
     it('throws on rule entry with invalid symbol ref in expansion reference', () => {
       expect(() => validateGrammar({ word: ['hello #123bad#'] })).toThrow(/malformed symbol reference/);
       expect(() => validateGrammar({ word: ['text #.uppercase# more'] })).toThrow(/malformed symbol reference/);
+      // A well-formed first reference must not mask a later malformed one in the
+      // same entry: validation runs for every #...# match. A regression that
+      // checked only the first match would let '#ok# #123bad#' through preflight.
+      expect(() => validateGrammar({ word: ['#ok# #123bad#'] })).toThrow(/malformed symbol reference/);
     });
 
     it('throws on an empty symbol name string', () => {
