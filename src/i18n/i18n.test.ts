@@ -340,6 +340,19 @@ describe('detectLanguage', () => {
     expect(detectLanguage()).toBe('en');
   });
 
+  it('returns a registered primary language before walking the preference list', () => {
+    // detectLanguage checks navigator.language and returns a registered
+    // primary before it ever walks navigator.languages — the preference-list
+    // walk is only a fallback for an unregistered primary (see index.ts). A
+    // registered primary must therefore win even when an earlier preference-
+    // list entry is a different registered locale; a refactor that merged the
+    // primary into the walk (first registered entry wins) would yield 'en'.
+    setNavigatorProperty('language', 'ro');
+    setNavigatorProperty('languages', ['en', 'ro']);
+
+    expect(detectLanguage()).toBe('ro');
+  });
+
   it('falls back to English when neither the primary language nor any navigator.languages entry is registered', () => {
     // The plural scan must not false-positive: an unregistered primary with no
     // registered locale anywhere in the preference list still yields English.
