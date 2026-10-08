@@ -22,6 +22,16 @@ describe('buildGoogleAIUrl', () => {
     const url = buildGoogleAIUrl('a&b=c');
     expect(url).toBe('https://www.google.com/search?udm=50&q=a%26b%3Dc');
   });
+
+  it('appends hl with a language tag, positioned between udm and q', () => {
+    const url = buildGoogleAIUrl('test', 'ro');
+    expect(url).toBe('https://www.google.com/search?udm=50&hl=ro&q=test');
+  });
+
+  it('appends no hl parameter when lang is omitted', () => {
+    const url = buildGoogleAIUrl('test');
+    expect(url).toBe('https://www.google.com/search?udm=50&q=test');
+  });
 });
 
 describe('copyToClipboard', () => {

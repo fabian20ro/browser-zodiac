@@ -95,6 +95,8 @@ export async function copyToClipboard(text: string): Promise<boolean> {
   }
 }
 
-export function buildGoogleAIUrl(query: string): string {
-  return 'https://www.google.com/search?udm=50&q=' + encodeURIComponent(query);
+export function buildGoogleAIUrl(query: string, lang?: string): string {
+  // BCP-47 tags contain only safe characters, so append raw (no encodeURIComponent).
+  const hl = lang !== undefined ? '&hl=' + lang : '';
+  return 'https://www.google.com/search?udm=50' + hl + '&q=' + encodeURIComponent(query);
 }
