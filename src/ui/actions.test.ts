@@ -32,6 +32,11 @@ describe('buildGoogleAIUrl', () => {
     const url = buildGoogleAIUrl('test');
     expect(url).toBe('https://www.google.com/search?udm=50&q=test');
   });
+
+  it('emits an empty hl parameter for an explicitly-provided empty language tag', () => {
+    const url = buildGoogleAIUrl('test', '');
+    expect(url).toBe('https://www.google.com/search?udm=50&hl=&q=test');
+  });
 });
 
 describe('copyToClipboard', () => {
