@@ -167,6 +167,19 @@ describe('hashString', () => {
     expect(hashString('hello-world')).toBe(1403312366);
   });
 
+  it('iterates UTF-16 code units, not code points (astral char hashes as two units)', () => {
+    // No existing hashString test uses a supplementary-plane character, so a
+    // refactor from `for (i < str.length) charCodeAt(i)` to a code-point loop
+    // (`for (const ch of str)`) would pass every current (BMP-only) test yet
+    // change the output for a lone astral char. U+1F600 is one code point but
+    // two UTF-16 units (0xD83D 0xDE00); the code-unit loop folds in BOTH, while
+    // a code-point loop would fold only the high surrogate. This exact pin
+    // fails on that refactor while remaining a valid djb2 output.
+    const grinningFace = '\u{1F600}';
+    expect(grinningFace.length).toBe(2); // guard: two UTF-16 units
+    expect(hashString(grinningFace)).toBe(7743522);
+  });
+
   it('returns an unsigned 32-bit integer', () => {
     const hash = hashString('test');
     expect(hash).toBeGreaterThanOrEqual(0);
