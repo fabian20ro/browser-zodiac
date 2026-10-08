@@ -172,6 +172,21 @@ dragon`;
       expect(result.sections.food).toEqual(['toast']);
     });
 
+    it('trims leading and trailing whitespace from headers, directives, and entries', () => {
+      // Every line is trimmed exactly once before matching (grammar-loader.ts
+      // line 19): section headers, @from directives, and entries with leading
+      // or trailing whitespace — however it was authored (spaces, tabs, or
+      // \r\n from a Windows file) — must parse identically to unindented
+      // input. The existing CRLF case covers \r\n only; this pins the leading
+      // whitespace branch, whose removal would push indented headers as
+      // entries (^=== fails on the untrimmed line) instead of sections.
+      const content = `  @from creatures.txt import *\r\n\t=== creature ===\t\n   unicorn  \r\n  // indented comment`;
+      const result = parseGrammarText(content);
+      expect(result.imports).toEqual(['creatures.txt']);
+      expect(result.sections.creature).toEqual(['unicorn']);
+      expect(Object.keys(result.sections)).toEqual(['creature']);
+    });
+
     it('treats @from directives inside a section as imports, not entries', () => {
       const content = `=== food ===
 toast
