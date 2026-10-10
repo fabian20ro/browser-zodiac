@@ -1493,6 +1493,12 @@ describe('readBrowserOracle', () => {
     const luckReading = profile.readings.find(r => r.key === 'cosmic_luck');
     expect(luckReading?.raw).toBe('ominous');
 
+    // Window-derived fields fall back so SSR fingerprints stay well-formed.
+    const windowReading = profile.readings.find(r => r.key === 'soul_window');
+    expect(windowReading?.raw).toBe('0x0');
+    const pixelReading = profile.readings.find(r => r.key === 'pixel_density');
+    expect(pixelReading?.raw).toBe('1');
+
     // Browser and OS should both fall back to Unknown on empty UA string.
     const browserReading = profile.readings.find(r => r.key === 'spirit_browser');
     expect(browserReading?.raw).toBe('Unknown');
