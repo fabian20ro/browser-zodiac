@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { assignSign, assignDailySign, assignSignWithSymbol, assignSigns, assignRandomSign, getSignElement, assignSignWithElement } from './sign-assigner.ts';
 import { ZODIAC_SIGNS, ZODIAC_SYMBOLS } from '../horoscope/zodiac.ts';
 
@@ -671,6 +671,42 @@ describe('sign-assigner', () => {
           expect(err).toBeInstanceOf(TypeError);
           expect((err as TypeError).message).toBe('assignRandomSign requires a finite numeric seed');
         }
+      }
+    });
+
+    it('unseeded calls delegate to Math.random scaled by 2^31 — the fresh-draw path is the explicit-seed equivalent', () => {
+      // The seeded contract tests above pin nothing about the unseeded path: they
+      // all pass an explicit seed, and the "not constant" / reachability tests
+      // would still pass if the Math.random() * 0x80000000 scale regressed or the
+      // PRNG silently degenerated. 0x80000000 === 2^31, so a draw of v ∈ [0,1)
+      // seeds mulberry32 exactly like an explicit floor(v * 2^31) — the
+      // documented "each invocation produces a fresh unpredictable result".
+      afterEach(() => {
+        vi.restoreAllMocks();
+      });
+      for (const v of [0.5, 0.123456, 0.999999, 1 / 3, 0.25]) {
+        vi.spyOn(Math, 'random').mockReturnValue(v);
+        const drawn = assignRandomSign();
+        const randomSpy = vi.mocked(Math.random);
+        expect(randomSpy).toHaveBeenCalledTimes(1);
+        expect(randomSpy).toHaveBeenCalledWith();
+        expect(drawn).toBe(assignRandomSign(Math.floor(v * 2 ** 31)));
+        expect(ZODIAC_SIGNS).toContain(drawn);
+        randomSpy.mockRestore();
+      }
+      // Distribution across the full sign set: the PRNG state is 32-bit, so the
+      // draw * 2^31 can take only 2^31 distinct states and the | 0 index folds 16
+      // of them onto each sign. A scale regression to 2^32 collapses the input
+      // space to 16 states — only the first 6 signs reachable — and to 2^30 it
+      // biases two adjacent signs per bucket; a correct 2^31 scale stays flat.
+      const counts: Record<string, number> = {};
+      ZODIAC_SIGNS.forEach(s => counts[s] = 0);
+      for (let i = 0; i < 1200; i++) {
+        counts[assignRandomSign()]++;
+      }
+      for (const sign of ZODIAC_SIGNS) {
+        expect(counts[sign]).toBeGreaterThan(40);
+        expect(counts[sign]).toBeLessThan(160);
       }
     });
 
