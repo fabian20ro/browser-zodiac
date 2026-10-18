@@ -48,6 +48,7 @@ export const en: LocalePack = {
     regenerate: 'Consult the Cosmos Again',
     copyHoroscope: 'Copy horoscope text',
     copiedHoroscope: 'Copied!',
+    shareHoroscope: 'Share horoscope',
     interpretWithAI: 'Interpret with AI',
     aiInterpretQuery: 'interpret this horoscope prediction for today: ',
     switchToLanguageLabel: 'Switch to {language}',

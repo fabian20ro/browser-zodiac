@@ -139,7 +139,15 @@ export function createHoroscopeCard(
     },
   });
 
-  headingRow.append(copyBtn, heading, aiBtn);
+  const shareText = `${horoscope.signSymbol} ${ui.signNames[horoscope.sign]} \u2014 ${horoscope.date}\n\n${horoscope.text}`;
+  const shareBtn = createActionButton({
+    icon: '\u{1F517}',
+    ariaLabel: ui.shareHoroscope,
+    onClick: () => navigator.share({ text: shareText }).then(() => true),
+  });
+  if (typeof navigator.share !== 'function') shareBtn.disabled = true;
+
+  headingRow.append(copyBtn, heading, aiBtn, shareBtn);
 
   const text = el('p', 'horoscope-card__text', horoscope.text);
 
