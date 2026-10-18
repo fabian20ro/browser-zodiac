@@ -22,6 +22,7 @@ export interface UIStrings {
   regenerate: string;
   copyHoroscope: string;
   copiedHoroscope: string;
+  shareHoroscope: string;
   interpretWithAI: string;
   aiInterpretQuery: string;
   switchToLanguageLabel: string;
@@ -61,6 +62,7 @@ export function validateLocalePack(pack: LocalePack): { ok: true } | { ok: false
     'title', 'subtitle', 'yourSign', 'dailyHoroscope', 'dateLabel', 'luckyNumber',
     'luckyColor', 'moodLabel', 'cosmicWarning', 'compatibility', 'browserDivination',
     'randomizeSign', 'regenerate', 'copyHoroscope', 'copiedHoroscope',
+    'shareHoroscope',
     'interpretWithAI', 'aiInterpretQuery', 'switchToLanguageLabel',
     'switchToLightTheme', 'switchToDarkTheme', 'toggleDivinationDetails',
     'generatedBy', 'footer',

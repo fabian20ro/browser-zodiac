@@ -33,6 +33,7 @@ const minimalUi: UIStrings = {
   regenerate: 'Read Again',
   copyHoroscope: 'Copy',
   copiedHoroscope: 'Copied!',
+  shareHoroscope: 'Share',
   interpretWithAI: 'Interpret',
   aiInterpretQuery: 'interpret this: ',
   switchToLanguageLabel: 'Switch to {language}',
@@ -218,12 +219,12 @@ describe('createSignCard', () => {
 });
 
 describe('createHoroscopeCard', () => {
-  it('contains a heading row with two action buttons and a heading', () => {
+  it('contains a heading row with three action buttons and a heading', () => {
     const card = createHoroscopeCard(minimalHoroscope, minimalUi);
     const headingRow = card.querySelector('.horoscope-card__heading-row');
     expect(headingRow).not.toBeNull();
     const buttons = headingRow!.querySelectorAll('.action-btn');
-    expect(buttons.length).toBe(2);
+    expect(buttons.length).toBe(3);
     const heading = headingRow!.querySelector('.horoscope-card__heading');
     expect(heading).not.toBeNull();
   });
@@ -242,6 +243,58 @@ describe('createHoroscopeCard', () => {
     const lastChild = headingRow.children[2] as HTMLElement;
     expect(lastChild.textContent).toBe('→');
     expect(lastChild.getAttribute('aria-label')).toBe('Interpret');
+  });
+
+  it('places the share button after the interpret button with its aria label', () => {
+    const card = createHoroscopeCard(minimalHoroscope, minimalUi);
+    const headingRow = card.querySelector('.horoscope-card__heading-row')!;
+    const shareBtn = headingRow.children[3] as HTMLElement;
+    expect(shareBtn.textContent).toBe('\u{1F517}');
+    expect(shareBtn.getAttribute('aria-label')).toBe('Share');
+  });
+
+  it('shares the formatted horoscope text via navigator.share when supported', async () => {
+    const share = vi.fn().mockResolvedValue({});
+    const originalShare = Object.getOwnPropertyDescriptor(navigator, 'share');
+    Object.defineProperty(navigator, 'share', { value: share, configurable: true, writable: true });
+    try {
+      const shareBtn = (
+        createHoroscopeCard(minimalHoroscope, minimalUi)
+          .querySelectorAll('.action-btn')[2] as HTMLButtonElement
+      );
+      expect(shareBtn.disabled).toBe(false);
+      shareBtn.click();
+      await vi.waitFor(() => {
+        expect(share).toHaveBeenCalledWith({
+          text: '♈ A \u2014 2026-03-03\n\nYou will find a mysterious sock.',
+        });
+      });
+    } finally {
+      if (originalShare) {
+        Object.defineProperty(navigator, 'share', originalShare);
+      } else {
+        delete (navigator as unknown as { share?: unknown }).share;
+      }
+    }
+  });
+
+  it('disables the share button when navigator.share is unavailable', () => {
+    const originalShare = Object.getOwnPropertyDescriptor(navigator, 'share');
+    Object.defineProperty(navigator, 'share', { value: undefined, configurable: true, writable: true });
+    try {
+      const shareBtn = (
+        createHoroscopeCard(minimalHoroscope, minimalUi)
+          .querySelectorAll('.action-btn')[2] as HTMLButtonElement
+      );
+      expect(shareBtn.disabled).toBe(true);
+      expect(() => shareBtn.click()).not.toThrow();
+    } finally {
+      if (originalShare) {
+        Object.defineProperty(navigator, 'share', originalShare);
+      } else {
+        delete (navigator as unknown as { share?: unknown }).share;
+      }
+    }
   });
 
   it('displays the horoscope text', () => {

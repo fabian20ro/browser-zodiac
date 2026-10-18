@@ -36,6 +36,7 @@ export const ro: LocalePack = {
     regenerate: 'Consultă din nou Cosmosul',
     copyHoroscope: 'Copiază textul horoscopului',
     copiedHoroscope: 'Copiat!',
+    shareHoroscope: 'Partajează horoscopul',
     interpretWithAI: 'Interpretează cu AI',
     aiInterpretQuery: 'interpretează această predicție a horoscopului de azi: ',
     switchToLanguageLabel: 'Schimbă în {language}',
