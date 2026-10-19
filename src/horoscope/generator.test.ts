@@ -647,6 +647,14 @@ describe('generateHoroscope', () => {
     expect(h.text).toBe('Your fate is sealed');
   });
 
+  it('omits the time-of-day prefix without throwing when the locale pack has no timeOfDayOpenings table', () => {
+    // Packs omitting the optional table must not crash on a valid cosmic_mood reading.
+    const noTable = { ...minimalLocale, timeOfDayOpenings: undefined } as unknown as LocalePack;
+    expect(() => generateHoroscope('aries', noTable, divinationForMood('morning'), fixedDate)).not.toThrow();
+    const h = generateHoroscope('aries', noTable, divinationForMood('morning'), fixedDate);
+    expect(h.text).toBe('Your fate is sealed');
+  });
+
   it('luckyColorCss comes only from the explicit locale palette, never from whimsical grammar prose', () => {
     const paletteLocale: LocalePack = {
       ...minimalLocale,
