@@ -303,6 +303,13 @@ describe('createHoroscopeCard', () => {
     expect(text?.textContent).toBe('You will find a mysterious sock.');
   });
 
+  it('marks the horoscope text as a polite live region for screen reader announcements', () => {
+    const card = createHoroscopeCard(minimalHoroscope, minimalUi);
+    const text = card.querySelector('.horoscope-card__text');
+    expect(text).not.toBeNull();
+    expect(text!.getAttribute('aria-live')).toBe('polite');
+  });
+
   it('opens the Google AI URL with noopener when the interpret button is clicked', async () => {
     const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
     const aiBtn = (

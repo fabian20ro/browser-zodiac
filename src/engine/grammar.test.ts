@@ -204,6 +204,10 @@ describe('createGrammarEngine', () => {
       // Negative / non-finite options also fall back to MAX_DEPTH.
       expect(makeEngine(grammar, 42, -1).expand('#s11#')).toBe('#s1#');
       expect(makeEngine(grammar, 42, Number.NaN).expand('#s1#'.replace('s1', 's11'))).toBe('#s1#');
+      // Positive Infinity is the other non-finite value the isFinite guard must
+      // reject; honoring it would let the 11-level chain fully expand to
+      // 'plain' instead of stopping at depth 10.
+      expect(makeEngine(grammar, 42, Number.POSITIVE_INFINITY).expand('#s11#')).toBe('#s1#');
       // 11 expands one level further — proves the default is exactly 10, not 11.
       expect(makeEngine(grammar, 42, 11).expand('#s11#')).toBe('#s0#');
     });
