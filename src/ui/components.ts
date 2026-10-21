@@ -150,6 +150,7 @@ export function createHoroscopeCard(
   headingRow.append(copyBtn, heading, aiBtn, shareBtn);
 
   const text = el('p', 'horoscope-card__text', horoscope.text);
+  text.setAttribute('aria-live', 'polite');
 
   const details = el('div', 'horoscope-card__details');
 
