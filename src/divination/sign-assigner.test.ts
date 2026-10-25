@@ -159,6 +159,25 @@ describe('sign-assigner', () => {
      );
     });
 
+    it('does not unicode-normalize the fingerprint — decomposed and precomposed forms of the same text hash differently', () => {
+     // assignSign applies .normalize() (pinned in 'is invariant to unicode
+     // normalization'), but assignDailySign only lowercases: it composes the
+     // fingerprint raw into "fingerprint:YYYY-MM-DD" before hashing, so a
+     // decomposed (NFD) fingerprint hashes differently from its precomposed
+     // (NFC) twin. Pin this asymmetry: adding .normalize() to
+     // assignDailySign later is an intentional behavior change.
+     const date = new Date(2024, 5, 15);
+     const nfc = 'caf\u00e9';
+     const nfd = 'cafe\u0301';
+     // Guard: the fixtures differ only by unicode normalization...
+     expect(nfd.normalize()).toBe(nfc);
+     // ...so any difference between their daily signs comes from the daily
+     // path skipping .normalize().
+     expect(assignDailySign(nfd, date)).not.toBe(
+       assignDailySign(nfc, date)
+     );
+    });
+
     it('silently stringifies non-string fingerprints via template coercion — unlike assignSign, no TypeError', () => {
      // assignSign guards with typeof and throws TypeError, but assignDailySign
      // interpolates the fingerprint into a template literal — String(null) /
