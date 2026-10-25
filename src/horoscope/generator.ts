@@ -17,6 +17,7 @@ export interface Horoscope {
   compatibility: string;
   date: string;
   signElement: 'fire' | 'earth' | 'air' | 'water';
+  reading?: number;
 }
 
 /** Standard tropical element assignment per zodiac sign. */
@@ -108,5 +109,6 @@ export function generateHoroscope(
     luckyNumber,
     date: dateStr,
     signElement,
+    reading: consultation,
   };
 }
