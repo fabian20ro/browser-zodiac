@@ -303,6 +303,16 @@ describe('createHoroscopeCard', () => {
     expect(text?.textContent).toBe('You will find a mysterious sock.');
   });
 
+  it('shows the reading count badge in the heading row when reading is greater than zero', () => {
+    const card = createHoroscopeCard({ ...minimalHoroscope, reading: 3 }, minimalUi);
+    expect(card.querySelector('.horoscope-card__reading-count')?.textContent).toBe('\u00D73');
+  });
+
+  it('omits the reading count badge when reading is zero', () => {
+    const card = createHoroscopeCard({ ...minimalHoroscope, reading: 0 }, minimalUi);
+    expect(card.querySelector('.horoscope-card__reading-count')).toBeNull();
+  });
+
   it('marks the horoscope text as a polite live region for screen reader announcements', () => {
     const card = createHoroscopeCard(minimalHoroscope, minimalUi);
     const text = card.querySelector('.horoscope-card__text');

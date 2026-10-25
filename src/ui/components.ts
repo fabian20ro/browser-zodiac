@@ -148,6 +148,9 @@ export function createHoroscopeCard(
   if (typeof navigator.share !== 'function') shareBtn.disabled = true;
 
   headingRow.append(copyBtn, heading, aiBtn, shareBtn);
+  if (horoscope.reading !== undefined && horoscope.reading > 0) {
+    headingRow.appendChild(el('span', 'horoscope-card__reading-count', `\u00D7${horoscope.reading}`));
+  }
 
   const text = el('p', 'horoscope-card__text', horoscope.text);
   text.setAttribute('aria-live', 'polite');

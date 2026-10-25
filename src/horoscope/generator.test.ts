@@ -115,6 +115,16 @@ describe('generateHoroscope', () => {
     expect(withDefault).toEqual(withExplicitZero);
   });
 
+  it('surfaces the consultation as the reading count', () => {
+    const h = generateHoroscope('aries', minimalLocale, minimalDivination, fixedDate, 3);
+    expect(h.reading).toBe(3);
+  });
+
+  it('defaults the reading count to zero when consultation is omitted', () => {
+    const h = generateHoroscope('aries', minimalLocale, minimalDivination, fixedDate);
+    expect(h.reading).toBe(0);
+  });
+
   it('non-default consultations produce deterministic distinct horoscopes', () => {
     const hNeg = generateHoroscope('aries', minimalLocale, minimalDivination, fixedDate, -1);
     const hOne = generateHoroscope('aries', minimalLocale, minimalDivination, fixedDate, 1);
