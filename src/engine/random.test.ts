@@ -463,6 +463,21 @@ describe('dailySeed', () => {
     );
   });
 
+  it('out-of-range seconds part (third split element) is ignored, not validated', () => {
+    // normalizeTimePart reads only parts[0] (hour) and parts[1] (minute), and
+    // the range check at random.ts:30 never inspects later parts — so a third
+    // part outside 0..59 still yields the canonical HH:MM seed rather than
+    // the date-only fallback. A rewrite that validated every part (e.g. a
+    // leap-second guard) would flip these inputs to the date-only seed,
+    // silently re-deriving horoscopes for callers passing 'HH:MM:SS' strings.
+    const canonical = hashString('2026-07-09:14:30:aries');
+    expect(dailySeed('2026-07-09', 'aries', '14:30:60')).toBe(canonical); // leap second
+    expect(dailySeed('2026-07-09', 'aries', '14:30:99')).toBe(canonical); // out-of-range seconds
+    expect(dailySeed('2026-07-09', 'aries', '14:30:99')).not.toBe(
+      dailySeed('2026-07-09', 'aries'),
+    );
+  });
+
   it('dateStr containing colons produces distinct seeds from dash-separated dates', () => {
     // Edge case: if dateStr itself contains ':', the concatenation with ':' separator
     const colonDate = dailySeed('2026:03:03', 'aries');
