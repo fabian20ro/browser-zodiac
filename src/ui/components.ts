@@ -161,7 +161,7 @@ export function createHoroscopeCard(
     [ui.dateLabel, horoscope.date, undefined],
     [ui.luckyNumber, String(horoscope.luckyNumber)],
     [ui.luckyColor, horoscope.luckyColor, horoscope.luckyColorCss],
-    [ui.moodLabel, horoscope.mood, undefined],
+    [ui.moodLabel, ui.moodValues[horoscope.mood] ?? horoscope.mood, undefined],
     [ui.cosmicWarning, horoscope.warning],
     [ui.compatibility, horoscope.compatibility],
   ] as const) {

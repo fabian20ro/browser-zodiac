@@ -107,6 +107,17 @@ describe('createGrammarEngine', () => {
       expect(results.has('c')).toBe(true);
     });
 
+    it('expands a reference inside a weighted entry after stripping the weight suffix', () => {
+      // pickWeighted slices the entry at the last '~~' before recursion, so
+      // the suffix is metadata that must never leak into the output, and the
+      // remaining entry text (the reference) must still expand. A regression
+      // that returned the raw entry would yield 'hi~~5' instead of 'hi'.
+      // A single weighted entry is chosen for any rng value, so the
+      // assertion is seed-independent.
+      const engine = makeEngine({ item: ['#a#~~5'], a: ['hi'] });
+      expect(engine.expand('#item#')).toBe('hi');
+    });
+
     it('applies unquote modifier', () => {
       const engine = makeEngine({ word: ['"hello"'] }, 42);
       expect(engine.expand('#word.unquote#')).toBe('hello');

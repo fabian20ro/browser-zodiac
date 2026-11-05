@@ -34,6 +34,7 @@ export interface UIStrings {
   signNames: Record<ZodiacSign, string>;
   signElement: Record<AstroElement, string>;
   divinationLabels: Record<DivinationReadingKey, string>;
+  moodValues: Record<string, string>;
 }
 
 export interface LocalePack {

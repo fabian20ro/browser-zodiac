@@ -58,6 +58,11 @@ export const en: LocalePack = {
     generatedBy: 'Divined from ancient browser APIs',
     footer:
       'No actual celestial bodies were consulted. Your browser gave you up voluntarily.',
+    moodValues: {
+      turbulent: 'Turbulent',
+      balanced: 'Balanced',
+      radiant: 'Radiant',
+    },
     signNames: {
       aries: 'Aries',
       taurus: 'Taurus',

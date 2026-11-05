@@ -46,6 +46,11 @@ export const ro: LocalePack = {
     generatedBy: 'Ghicit din API-urile ancestrale ale browserului',
     footer:
       'Niciun corp ceresc nu a fost consultat. Browserul tău te-a dat de gol de bunăvoie.',
+    moodValues: {
+      turbulent: 'Turbulent',
+      balanced: 'Echilibrat',
+      radiant: 'Radiant',
+    },
     signNames: {
       aries: 'Berbec',
       taurus: 'Taur',

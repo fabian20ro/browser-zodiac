@@ -54,6 +54,11 @@ const minimalUi: UIStrings = {
     water: 'Water',
   },
   divinationLabels: {},
+  moodValues: {
+    turbulent: 'Turbulent',
+    balanced: 'Echilibrat',
+    radiant: 'Radiant',
+  },
 };
 
 const locales = [
@@ -120,6 +125,15 @@ const minimalHoroscope: Horoscope = {
   date: '2026-03-03',
   signElement: 'fire',
 };
+
+describe('createHoroscopeCard mood localization', () => {
+  it('renders the mood value from the locale moodValues map', () => {
+    const card = createHoroscopeCard(minimalHoroscope, minimalUi);
+    const details = card.querySelector('.horoscope-card__details') as HTMLElement;
+    expect(details.textContent).toContain('Echilibrat');
+    expect(details.textContent).not.toContain('balanced');
+  });
+});
 
 describe('createRegenerateButton', () => {
   it('returns a button element', () => {
@@ -421,9 +435,9 @@ describe('createHoroscopeCard', () => {
     expect((rows[2].querySelector('.detail-row__label') as HTMLElement).textContent).toBe('C');
     expect((rows[2].querySelector('.detail-row__value') as HTMLElement).textContent).toBe('purple');
 
-    // Row 3: mood (no swatch)
+    // Row 3: mood (no swatch); value renders through the locale moodValues map
     expect((rows[3].querySelector('.detail-row__label') as HTMLElement).textContent).toBe('M');
-    expect((rows[3].querySelector('.detail-row__value') as HTMLElement).textContent).toBe('balanced');
+    expect((rows[3].querySelector('.detail-row__value') as HTMLElement).textContent).toBe(minimalUi.moodValues.balanced);
     expect(rows[3].querySelector('.detail-row__swatch')).toBeNull();
 
     // Row 4: cosmic warning
