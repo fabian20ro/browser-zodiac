@@ -567,6 +567,24 @@ describe('dailySeed', () => {
     expect(negativeMinute).toBe(withoutTime);
   });
 
+  it('rejects non-finite Infinity timePart tokens via the range check, falling back to date-only seed', () => {
+    // Number('Infinity') succeeds the `|| 0` coercion — unlike letter or NaN
+    // tokens, which become 0 and are RETAINED as '00:MM' (see the non-numeric
+    // tests above) — but ±Infinity is outside 0..23 / 0..59, so the range
+    // check at random.ts:30 rejects it exactly like the finite out-of-range
+    // values above and skips the `:HH:MM` insertion. Pins the two distinct
+    // parse outcomes for numeric-looking tokens: finite-in-range is retained,
+    // while out-of-range or non-finite falls back to date-only. A
+    // truncating-coercion rewrite (`v | 0`, parseInt, Math.trunc) would turn
+    // Infinity into 0, retain it as '00:00', and fail here — silently
+    // re-seeding time-varying horoscopes for such inputs.
+    const dateOnly = dailySeed('2026-07-09', 'aries');
+    expect(dailySeed('2026-07-09', 'aries', 'Infinity:00')).toBe(dateOnly);
+    expect(dailySeed('2026-07-09', 'aries', '-Infinity:30')).toBe(dateOnly);
+    expect(dailySeed('2026-07-09', 'aries', '00:Infinity')).toBe(dateOnly);
+    expect(dailySeed('2026-07-09', 'aries', '14:-Infinity')).toBe(dateOnly);
+  });
+
   it('negative zero ("-0") timePart parts are retained and normalize to "00"', () => {
     // Unlike other negatives ('-1:00', '14:-5'), which fall back to the
     // date-only seed, Number('-0') = -0 is not < 0, so -0 parts pass the
