@@ -195,6 +195,11 @@ export function createDivinationPanel(
   toggle.setAttribute('aria-label', ui.toggleDivinationDetails);
   heading.appendChild(toggle);
 
+  if (divination.readings.length > 0) {
+    const count = el('span', 'divination-card__count', String(divination.readings.length));
+    heading.insertBefore(count, toggle);
+  }
+
   const list = el('div', 'divination-card__list');
   list.id = 'divination-card__list';
   list.classList.add('divination-card__list--collapsed');
