@@ -152,6 +152,24 @@ describe('sign-assigner', () => {
      );
     });
 
+    it('pins the documented local calendar day contract timezone-independently — different local instants, same local day', () => {
+     // The time-part fixtures above use absolute (Z) instants whose local date shifts with
+     // the runner's timezone (e.g. 23:59:59Z is already the next day local for UTC+1..+12),
+     // so they only exercise the same-day contract in a narrow timezone band. Constructing
+     // both dates with the local constructor guarantees an equal local calendar day in any
+     // timezone: a regression to UTC date components (getUTC*) would split the pair whenever
+     // the local day straddles a UTC midnight, i.e. in every non-UTC timezone.
+     const fingerprint = 'tz-safe-daily';
+     const startOfDay = new Date(2024, 5, 15, 0, 0);
+     const endOfDay = new Date(2024, 5, 15, 23, 59);
+     // Fixture guard: the pair really shares one local calendar day.
+     expect(startOfDay.getMonth() + 1).toBe(6);
+     expect(startOfDay.getDate()).toBe(15);
+     expect(endOfDay.getMonth() + 1).toBe(6);
+     expect(endOfDay.getDate()).toBe(15);
+     expect(assignDailySign(fingerprint, startOfDay)).toBe(assignDailySign(fingerprint, endOfDay));
+    });
+
     it('is insensitive to fingerprint casing', () => {
      const date = new Date('2024-06-15');
      expect(assignDailySign('Fingerprint', date)).toBe(

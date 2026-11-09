@@ -417,6 +417,13 @@ body::before {
   cursor: pointer;
 }
 
+.divination-card__count {
+  margin-left: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
 .divination-card__toggle {
   font-size: 0.8rem;
   background: none;

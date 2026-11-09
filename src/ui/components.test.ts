@@ -665,6 +665,26 @@ describe('createDivinationPanel', () => {
       }
     }
   });
+
+  it('shows a reading count badge in the heading when readings exist, and omits it when empty', () => {
+    const populated = createDivinationPanel(
+      {
+        readings: [
+          { key: 'spirit_browser', raw: 'Chrome', interpretation: 'a browser spirit' },
+          { key: 'elemental_os', raw: 'macOS', interpretation: 'an os element' },
+          { key: 'life_resolution', raw: '1920x1080', interpretation: 'a life view' },
+        ],
+        fingerprint: 'f',
+      },
+      minimalUi,
+    );
+    expect(populated.querySelector('.divination-card__count')?.textContent).toBe('3');
+    const heading = populated.querySelector('.divination-card__heading') as HTMLElement;
+    expect(heading.textContent).toContain(minimalUi.browserDivination);
+
+    const empty = createDivinationPanel({ readings: [], fingerprint: 'f' }, minimalUi);
+    expect(empty.querySelector('.divination-card__count')).toBeNull();
+  });
 });
 
 describe('createHeader', () => {
