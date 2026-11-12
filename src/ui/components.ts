@@ -101,6 +101,8 @@ export function createSignCard(
     'sign-card__element-badge',
     `${ELEMENT_ICONS[horoscope.signElement]} ${ui.signElement[horoscope.signElement]}`,
   );
+  elementBadge.setAttribute('role', 'img');
+  elementBadge.setAttribute('aria-label', `${ui.signElement[horoscope.signElement]} element`);
   const diceBtn = el('button', 'sign-card__randomize', '\u{1F3B2}');
   diceBtn.type = 'button';
   diceBtn.setAttribute('aria-label', ui.randomizeSign);

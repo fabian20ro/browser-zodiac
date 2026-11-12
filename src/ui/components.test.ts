@@ -215,6 +215,13 @@ describe('createSignCard', () => {
     expect(label!.textContent).toBe('Y');
   });
 
+  it('announces the element badge as a single named image', () => {
+    const card = createSignCard(minimalHoroscope, minimalUi, () => {});
+    const badge = card.querySelector('.sign-card__element-badge') as HTMLElement;
+    expect(badge.getAttribute('role')).toBe('img');
+    expect(badge.getAttribute('aria-label')).toContain('Fire element');
+  });
+
   it('renders the element icon matching the sign element for all four elements', () => {
     const cases: Array<[Horoscope['signElement'], string]> = [
       ['fire', '\u{1F525} Fire'],
