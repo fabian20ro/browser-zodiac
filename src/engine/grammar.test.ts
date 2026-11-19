@@ -73,6 +73,22 @@ describe('createGrammarEngine', () => {
       expect(aCount).toBeGreaterThan(3 * bCount);
     });
 
+    it('produces identical output for engines sharing the same seed', () => {
+      // Product contract ("same browser, same fate"): generateHoroscope builds
+      // a fresh engine per request from dailySeed(date, sign), so two engines
+      // with equal seed and grammar must agree on every pick. random.test.ts
+      // pins mulberry32 alone; this pins the engine's own rng consumption — a
+      // regression sourcing picks from an unseeded random would pass the
+      // reachability/bias tests above (weight distribution unchanged) but
+      // diverge here.
+      const grammar = { item: ['a', 'b', 'c'] };
+      const engineA = makeEngine(grammar, 42);
+      const engineB = makeEngine(grammar, 42);
+      for (let i = 0; i < 100; i++) {
+        expect(engineA.expand('#item#')).toBe(engineB.expand('#item#'));
+      }
+    });
+
     it('splits weight at the last ~~ and preserves embedded separators in text', () => {
       const engine = makeEngine({ item: ['ab~~cd~~5', 'plain~~0'] });
       for (let i = 0; i < 50; i++) {
