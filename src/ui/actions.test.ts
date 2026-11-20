@@ -846,6 +846,36 @@ describe('createActionButton', () => {
     vi.useRealTimers();
   });
 
+  it('announces success feedback to assistive technology via aria-live and aria-label', async () => {
+    const btn = createActionButton({
+      icon: 'A',
+      feedbackIcon: 'OK',
+      ariaLabel: 'Run',
+      onClick: () => {},
+    });
+
+    btn.click();
+    await Promise.resolve();
+
+    expect(btn.getAttribute('aria-live')).toBe('polite');
+    expect(btn.getAttribute('aria-label')).toBe('OK');
+  });
+
+  it('announces failure feedback to assistive technology via aria-live and aria-label', async () => {
+    const btn = createActionButton({
+      icon: 'A',
+      errorText: 'Failed',
+      ariaLabel: 'Run',
+      onClick: () => { throw new Error('boom'); },
+    });
+
+    btn.click();
+    await Promise.resolve();
+
+    expect(btn.getAttribute('aria-label')).toBe('Failed');
+    expect(btn.getAttribute('aria-live')).toBe('polite');
+  });
+
   it('reverts immediately for zero or negative durationMs instead of holding', async () => {
     vi.useFakeTimers();
     const zero = createActionButton({
