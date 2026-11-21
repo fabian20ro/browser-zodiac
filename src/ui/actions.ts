@@ -57,11 +57,16 @@ export function createActionButton(options: ActionButtonOptions): HTMLButtonElem
   function handleResult(result: unknown): void {
     const isFailure = result instanceof Error || (typeof result === 'boolean' && !result);
     if (isFailure) {
-      showIcon(options.errorText ?? options.errorIcon ?? options.icon, false);
+      const errorText = options.errorText ?? options.errorIcon ?? options.icon;
+      showIcon(errorText, false);
+      btn.setAttribute('aria-live', 'polite');
+      btn.setAttribute('aria-label', errorText);
     } else {
       const successText = options.feedbackText ?? options.feedbackIcon;
       if (successText) {
         showIcon(successText, true);
+        btn.setAttribute('aria-live', 'polite');
+        btn.setAttribute('aria-label', successText);
       }
     }
   }
