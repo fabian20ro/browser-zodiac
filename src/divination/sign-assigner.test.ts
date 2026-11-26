@@ -505,6 +505,24 @@ describe('sign-assigner', () => {
       expect(() => assignSigns(['alice', 42] as any)).toThrow('assignSign requires a string fingerprint');
     });
 
+    it('drops falsy non-string entries — 0, false and NaN are filtered silently like null/undefined/""', () => {
+      // The falsy-input test above pins that null/undefined/'' are dropped, and the
+      // truthy non-string test above pins that 42/true/{} throw. The falsy non-string
+      // class (0, false, NaN) is the remaining corner of the same filter(Boolean)
+      // contract: production drops it silently, so the batch returns a shorter array
+      // — never throws. A partial hardening to `filter(x => x !== null && x !==
+      // undefined && x !== '')` keeps 0/false/NaN alive, and the batch call would
+      // throw assignSign's string-fingerprint TypeError instead; the existing falsy
+      // tests only use null/undefined/'' and still pass under that regression, so
+      // these are the only assertions that catch it.
+      expect(assignSigns([0, false, NaN] as any[])).toEqual([]);
+      expect(() => assignSigns(['alice', 0, false, NaN, 'bob'] as any[])).not.toThrow();
+      const signs = assignSigns(['alice', 0, false, NaN, 'bob'] as any[]);
+      expect(signs).toHaveLength(2);
+      expect(signs[0]).toBe(assignSign('alice'));
+      expect(signs[1]).toBe(assignSign('bob'));
+    });
+
     it('preserves positional correspondence after filtering', () => {
       const fingerprints: Array<string | null | undefined> = ['alice', null, 'bob', undefined];
       const batchResult = assignSigns(fingerprints);

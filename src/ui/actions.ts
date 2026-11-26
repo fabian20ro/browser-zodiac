@@ -35,17 +35,20 @@ export function createActionButton(options: ActionButtonOptions): HTMLButtonElem
       revertTimer = null;
     }
     btn.textContent = options.icon;
+    btn.title = options.ariaLabel;
     btn.classList.remove('action-btn--feedback');
   }
 
   function showIcon(icon: string, addFeedbackClass?: boolean): void {
     if (icon !== options.icon) {
       btn.textContent = icon;
+      btn.title = icon;
       if (addFeedbackClass) {
         btn.classList.add('action-btn--feedback');
       }
       revertTimer = setTimeout(() => {
         btn.textContent = options.icon;
+        btn.title = options.ariaLabel;
         btn.classList.remove('action-btn--feedback');
         revertTimer = null;
       }, options.durationMs ?? 1500);

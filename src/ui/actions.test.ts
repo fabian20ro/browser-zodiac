@@ -217,6 +217,22 @@ describe('createActionButton', () => {
     expect(btn.classList.contains('action-btn--feedback')).toBe(false);
   });
 
+  it('updates the tooltip to the feedback icon and restores it after revert', async () => {
+    vi.useFakeTimers();
+    const btn = createActionButton({
+      icon: 'A',
+      feedbackIcon: 'OK',
+      ariaLabel: 'Do thing',
+      onClick: () => {},
+    });
+    btn.click();
+    await Promise.resolve();
+    expect(btn.getAttribute('title')).toBe('OK');
+    vi.advanceTimersByTime(1500);
+    expect(btn.getAttribute('title')).toBe('Do thing');
+    vi.useRealTimers();
+  });
+
   it('leaves button unchanged when async click returns false and no feedback/error icon', async () => {
     const btn = createActionButton({
       icon: '→',

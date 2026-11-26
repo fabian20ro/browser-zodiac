@@ -146,6 +146,21 @@ describe('mulberry32', () => {
       expect(rng()).toBe(0); // constant — must return exactly 0 every call
     }
   });
+
+  it('pins exact output values so the mulberry32 algorithm cannot silently change', () => {
+    // Every other mulberry32 test above is relative (bounds, determinism,
+    // distribution) and would still pass if the core mix constants changed —
+    // silently re-deriving every user's horoscope stream, the same regression
+    // class the exact djb2 pins guard below for hashString. A wrong PRNG is a
+    // wrong algorithm: these are mulberry32's canonical outputs.
+    const rng = mulberry32(42);
+    expect(rng()).toBe(0.7298945200163871);
+    expect(rng()).toBe(0.8142907537985593);
+    expect(rng()).toBe(0.8124599875882268);
+
+    // Negative seed: `seed | 0` normalizes to Int32; pin one value there too.
+    expect(mulberry32(-1)()).toBe(0.7102420832961798);
+  });
 });
 
 describe('hashString', () => {
